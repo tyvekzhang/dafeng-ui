@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { MenuState } from "@/stores/types";
+import type { MenuState } from '@/stores/types';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: MenuState = {
   menuList: [],
@@ -7,7 +7,7 @@ const initialState: MenuState = {
 };
 
 const menu = createSlice({
-  name: "menu",
+  name: 'menu',
   initialState,
   reducers: {
     setMenuList: (state, action) => {

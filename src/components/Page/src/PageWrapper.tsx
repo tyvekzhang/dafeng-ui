@@ -1,7 +1,7 @@
-import { Button } from "antd";
-import { openWindow } from "@/utils";
-import SvgIcon from "@/components/SvgIcon";
-import compoStyle from "./compo.module.less";
+import SvgIcon from '@/components/SvgIcon';
+import { openWindow } from '@/utils';
+import { Button } from 'antd';
+import compoStyle from './compo.module.less';
 
 interface PluginProp {
   name?: string;
@@ -20,9 +20,9 @@ const PageWrapper = (props: PageProp) => {
   }
 
   return (
-    <div className={compoStyle["compo_page-wrapper"]}>
-      <div className={compoStyle["page-header"]}>
-        <div className={compoStyle["page-header-name"]}>
+    <div className={compoStyle['compo_page-wrapper']}>
+      <div className={compoStyle['page-header']}>
+        <div className={compoStyle['page-header-name']}>
           <SvgIcon name="hints" size={18} />
           <span>{props.plugin?.name}</span>
         </div>
@@ -34,7 +34,7 @@ const PageWrapper = (props: PageProp) => {
           </Button>
         </p>
       </div>
-      <div className={compoStyle["page-content"]}>{props.children}</div>
+      <div className={compoStyle['page-content']}>{props.children}</div>
     </div>
   );
 };

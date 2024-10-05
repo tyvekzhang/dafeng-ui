@@ -1,11 +1,11 @@
-import type { AppConfig } from "@/types/config";
-import { MenuTypeEnum, MenuModeEnum, MenuFoldBtnEnum } from "@/enums/menuEnum";
-import { ThemeEnum, PageTransitionEnum, PermissionModeEnum } from "@/enums/appEnum";
-import { CacheTypeEnum } from "@/enums/cacheEnum";
+import { PageTransitionEnum, PermissionModeEnum, ThemeEnum } from '@/enums/appEnum';
+import { CacheTypeEnum } from '@/enums/cacheEnum';
+import { MenuFoldBtnEnum, MenuModeEnum, MenuTypeEnum } from '@/enums/menuEnum';
+import type { AppConfig } from '@/types/config';
 
 export const appSetting: AppConfig = {
   // Theme color
-  themeColor: "#1890ff",
+  themeColor: '#1890ff',
   // Permission-related cache is stored in sessionStorage or localStorage
   permissionCacheType: CacheTypeEnum.LOCAL,
   // Header configuration

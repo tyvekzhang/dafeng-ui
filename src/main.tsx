@@ -1,18 +1,18 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { store, persistor } from "./stores";
-import { App, ConfigProvider } from "antd";
-import zhCN from "antd/locale/zh_CN";
-import { PersistGate } from "redux-persist/integration/react";
-import { Provider } from "react-redux";
-import "@/design/index.less";
+import '@/design/index.less';
+import { App, ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor, store } from './stores';
 
 // register svg icon
-import "virtual:svg-icons-register";
-import router from "@/routers";
-import { RouterProvider } from "react-router-dom";
+import router from '@/router';
+import { RouterProvider } from 'react-router-dom';
+import 'virtual:svg-icons-register';
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate persistor={persistor}>

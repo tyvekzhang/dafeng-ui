@@ -1,5 +1,5 @@
-import { createStorage as create, type CreateStorageParams } from "./storageCache";
-import { enableStorageEncryption, DEFAULT_CACHE_TIME } from "@/settings/encryptionSetting";
+import { DEFAULT_CACHE_TIME, enableStorageEncryption } from '@/settings/encryptionSetting';
+import { createStorage as create, type CreateStorageParams } from './storageCache';
 
 type Options = Partial<CreateStorageParams>;
 
@@ -8,7 +8,7 @@ const createOptions = (storage: Storage, options: Options = {}): Options => {
     // No encryption in debug mode
     hasEncrypt: enableStorageEncryption,
     storage,
-    prefixKey: "react-admin-design__",
+    prefixKey: 'react-admin-design__',
     ...options,
   };
 };

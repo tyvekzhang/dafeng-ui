@@ -1,18 +1,18 @@
-import type { RouteObject } from "@/router/types";
+import type { RouteObject } from '@/router/types';
 
-import { Memory } from "./memory";
-import type { AppConfig } from "@/types/config";
 import {
-  type TOKEN_KEY,
-  type USER_INFO_KEY,
   type APP_CONFIG_KEY,
   type APP_TAGS_KEY,
+  type TOKEN_KEY,
+  type USER_INFO_KEY,
   APP_LOCAL_CACHE_KEY,
   APP_SESSION_CACHE_KEY,
-} from "@/enums/cacheEnum";
-import { createLocalStorage, createSessionStorage } from "@/utils/cache";
-import { DEFAULT_CACHE_TIME } from "@/settings/encryptionSetting";
-import type { UserInfo } from "@/types";
+} from '@/enums/cacheEnum';
+import { DEFAULT_CACHE_TIME } from '@/settings/encryptionSetting';
+import type { UserInfo } from '@/types';
+import type { AppConfig } from '@/types/config';
+import { createLocalStorage, createSessionStorage } from '@/utils/cache';
+import { Memory } from './memory';
 
 interface BasicStore {
   [TOKEN_KEY]: string | number | null | undefined;
@@ -108,6 +108,6 @@ function storageChange(e: any) {
   }
 }
 
-window.addEventListener("storage", storageChange);
+window.addEventListener('storage', storageChange);
 
 initPersistentMemory();

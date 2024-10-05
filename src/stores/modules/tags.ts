@@ -1,8 +1,8 @@
 // import type { PayloadAction } from '@reduxjs/toolkit'
-import type { RouteObject } from "@/routers/types";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { TagsState } from "@/stores/types";
-import type { RootState, AppDispatch } from "..";
+import type { RouteObject } from '@/router/types';
+import type { TagsState } from '@/stores/types';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import type { AppDispatch, RootState } from '..';
 
 const initialState: TagsState = {
   visitedTags: [],
@@ -17,7 +17,7 @@ const createAppAsyncThunk = createAsyncThunk.withTypes<{
 }>();
 
 const tags = createSlice({
-  name: "tags",
+  name: 'tags',
   initialState,
   reducers: {
     addVisitedTags: (state, action) => {
@@ -38,13 +38,13 @@ const tags = createSlice({
       const tagIndex = visitedTags.findIndex((tag: any) => tag.fullPath === path);
       const affixTags = visitedTags.filter((tag: any) => tag?.meta?.affix);
       switch (type) {
-        case "left":
+        case 'left':
           restTags = visitedTags.slice(tagIndex);
           break;
-        case "right":
+        case 'right':
           restTags = visitedTags.slice(0, tagIndex + 1);
           break;
-        case "other":
+        case 'other':
           restTags = visitedTags.filter((tag: any) => tag.fullPath === path);
           break;
       }
@@ -65,7 +65,7 @@ const tags = createSlice({
   },
 });
 
-export const closeTagByKey = createAppAsyncThunk("tags/closeTagByKey", (path: string, { getState, dispatch }) => {
+export const closeTagByKey = createAppAsyncThunk('tags/closeTagByKey', (path: string, { getState, dispatch }) => {
   const { visitedTags } = getState().tags;
   const tagIndex = visitedTags.findIndex((tag: any) => tag.fullPath === path);
   const restTags = visitedTags.filter((tag: any) => tag.fullPath !== path);
@@ -76,7 +76,7 @@ export const closeTagByKey = createAppAsyncThunk("tags/closeTagByKey", (path: st
   });
 });
 
-export const closeAllTags = createAppAsyncThunk("tags/closeAllTags", (_, { getState, dispatch }) => {
+export const closeAllTags = createAppAsyncThunk('tags/closeAllTags', (_, { getState, dispatch }) => {
   const { visitedTags } = getState().tags;
   const restTags = visitedTags.filter((tag: any) => tag?.meta?.affix);
   dispatch(updateVisitedTags(restTags));

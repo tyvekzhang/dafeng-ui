@@ -1,26 +1,26 @@
 // Menu types
 export enum MenuTypeEnum {
-  SIDER_MENU = "sider-menu",
+  SIDER_MENU = 'sider-menu',
 
-  HEADER_MENU = "header-menu",
+  HEADER_MENU = 'header-menu',
 
-  HYBRID_MENU = "hybrid-menu",
+  HYBRID_MENU = 'hybrid-menu',
 }
 
 // Menu modes
 export enum MenuModeEnum {
-  VERTICAL = "vertical",
+  VERTICAL = 'vertical',
 
-  HORIZONTAL = "horizontal",
+  HORIZONTAL = 'horizontal',
 
-  INLINE = "inline",
+  INLINE = 'inline',
 }
 
 // Menu folding button location
 export enum MenuFoldBtnEnum {
-  NONE = "none",
+  NONE = 'none',
 
-  HEADER = "header",
+  HEADER = 'header',
 
-  SIDER = "sider",
+  SIDER = 'sider',
 }

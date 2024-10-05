@@ -1,8 +1,7 @@
-import { encrypt, decrypt } from "crypto-js/aes";
-import { parse } from "crypto-js/enc-utf8";
-import UTF8 from "crypto-js/enc-utf8";
-import PKCS7 from "crypto-js/pad-pkcs7";
-import ECB from "crypto-js/mode-ecb";
+import { decrypt, encrypt } from 'crypto-js/aes';
+import UTF8, { parse } from 'crypto-js/enc-utf8';
+import ECB from 'crypto-js/mode-ecb';
+import PKCS7 from 'crypto-js/pad-pkcs7';
 
 export interface EncryptParams {
   key: string;

@@ -1,10 +1,10 @@
-import type { FC } from "react";
-import type { Position, DraggableData } from "react-rnd";
-import { useState } from "react";
-import { Card } from "antd";
-import { PageWrapper } from "@/components/Page";
-import { REACT_RND_PLUGIN } from "@/settings/websiteSetting";
-import { Rnd } from "react-rnd";
+import { PageWrapper } from '@/components/Page';
+import { REACT_RND_PLUGIN } from '@/settings/websiteSetting';
+import { Card } from 'antd';
+import type { FC } from 'react';
+import { useState } from 'react';
+import type { DraggableData, Position } from 'react-rnd';
+import { Rnd } from 'react-rnd';
 
 interface configState {
   x: number;
@@ -41,7 +41,7 @@ const DragResize: FC = () => {
   return (
     <PageWrapper plugin={REACT_RND_PLUGIN}>
       <Card bordered={false} bodyStyle={{ padding: 0 }}>
-        <div style={{ width: "100%", height: "500px" }}>
+        <div style={{ width: '100%', height: '500px' }}>
           <Rnd
             size={{ width: config.width, height: config.height }}
             position={{ x: config.x, y: config.y }}
@@ -50,10 +50,10 @@ const DragResize: FC = () => {
             onDragStop={handleDragStop}
             onResize={handleResize}
             bounds="parent"
-            style={{ background: "#1890ff" }}
+            style={{ background: '#1890ff' }}
           >
-            <div className="flex-center" style={{ height: "100%" }}>
-              <div style={{ width: "90px", color: "#fff" }}>
+            <div className="flex-center" style={{ height: '100%' }}>
+              <div style={{ width: '90px', color: '#fff' }}>
                 <p>x: {config.x}</p>
                 <p>y: {config.y}</p>
                 <p>width: {config.width}</p>

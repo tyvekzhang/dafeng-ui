@@ -4,7 +4,7 @@
  * @returns {Blob}
  */
 export function base64toBlob(base64Buf: string): Blob {
-  const arr = base64Buf.split(",");
+  const arr = base64Buf.split(',');
   const typeItem = arr[0];
   const mime = typeItem.match(/:(.*?);/)![1];
   const bstr = window.atob(arr[1]);
@@ -23,11 +23,11 @@ export function base64toBlob(base64Buf: string): Blob {
  */
 export function urlToBase64(url: string, mimeType?: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    let canvas = document.createElement("CANVAS") as Nullable<HTMLCanvasElement>;
-    const ctx = canvas!.getContext("2d");
+    let canvas = document.createElement('CANVAS') as Nullable<HTMLCanvasElement>;
+    const ctx = canvas!.getContext('2d');
 
     const img = new Image();
-    img.crossOrigin = "";
+    img.crossOrigin = '';
     img.onload = function () {
       if (!canvas || !ctx) {
         return reject();
@@ -35,7 +35,7 @@ export function urlToBase64(url: string, mimeType?: string): Promise<string> {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
-      const dataURL = canvas.toDataURL(mimeType || "image/png");
+      const dataURL = canvas.toDataURL(mimeType || 'image/png');
       canvas = null;
       resolve(dataURL);
     };
@@ -77,11 +77,11 @@ export function compressImage(
   return new Promise((resolve, reject) => {
     const { width, height, quality, mimeType } = options;
 
-    let canvas = document.createElement("CANVAS") as Nullable<HTMLCanvasElement>;
-    const ctx = canvas!.getContext("2d");
+    let canvas = document.createElement('CANVAS') as Nullable<HTMLCanvasElement>;
+    const ctx = canvas!.getContext('2d');
 
     const img = new Image();
-    img.crossOrigin = "";
+    img.crossOrigin = '';
     img.onload = function () {
       if (!canvas || !ctx) {
         return reject();
@@ -90,7 +90,7 @@ export function compressImage(
       canvas.width = width;
       canvas.height = height;
       ctx.drawImage(img, 0, 0, width, height);
-      const dataURL = canvas.toDataURL(mimeType || "image/png", quality);
+      const dataURL = canvas.toDataURL(mimeType || 'image/png', quality);
       canvas = null;
       resolve(dataURL);
     };

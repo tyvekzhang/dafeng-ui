@@ -1,15 +1,15 @@
-import type { Store } from "redux";
-import { configureStore, type ThunkAction, type Action } from "@reduxjs/toolkit";
-import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import appSlice from "./modules/app";
-import menuSlice from "./modules/menu";
-import tagsSlice from "./modules/tags";
-import userSlice from "./modules/user";
+import { configureStore, type Action, type ThunkAction } from '@reduxjs/toolkit';
+import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
+import type { Store } from 'redux';
+import { persistReducer, persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import appSlice from './modules/app';
+import menuSlice from './modules/menu';
+import tagsSlice from './modules/tags';
+import userSlice from './modules/user';
 
 const persistConfig = {
-  key: "redux-persist",
+  key: 'redux-persist',
   storage,
 };
 

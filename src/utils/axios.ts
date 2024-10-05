@@ -1,12 +1,12 @@
-import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
-import axios from "axios";
-import { message } from "antd";
-import { getToken, clearAuthCache } from "@/utils/auth";
-import { Recordable } from "vite-plugin-mock";
+import { clearAuthCache, getToken } from '@/utils/auth';
+import { message } from 'antd';
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import { Recordable } from 'vite-plugin-mock';
 
 // Create axios instance
 const service = axios.create({
-  baseURL: "/api",
+  baseURL: '/api',
   timeout: 10 * 1000,
 });
 
@@ -14,9 +14,9 @@ const service = axios.create({
 const handleError = (error: AxiosError): Promise<AxiosError> => {
   if (error.response?.status === 401 || error.response?.status === 504) {
     clearAuthCache();
-    location.href = "/login";
+    location.href = '/login';
   }
-  message.error(error.message || "error");
+  message.error(error.message || 'error');
   return Promise.reject(error);
 };
 
@@ -24,9 +24,9 @@ const handleError = (error: AxiosError): Promise<AxiosError> => {
 service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = getToken();
   if (token) {
-    (config as Recordable).headers["Authorization"] = `${token}`;
+    (config as Recordable).headers['Authorization'] = `${token}`;
   }
-  (config as Recordable).headers["Content-Type"] = "application/json";
+  (config as Recordable).headers['Content-Type'] = 'application/json';
   return config;
 }, handleError);
 
@@ -39,7 +39,7 @@ service.interceptors.response.use((response: AxiosResponse) => {
   } else {
     message.error(data.message);
 
-    return Promise.reject("error");
+    return Promise.reject('error');
   }
 }, handleError);
 

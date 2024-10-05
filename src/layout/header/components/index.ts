@@ -1,3 +1,3 @@
-import FoldTrigger from "./FoldTrigger";
+import FoldTrigger from './FoldTrigger';
 
 export { FoldTrigger };

@@ -14,28 +14,28 @@ for (let i = 1; i < 10; i++) {
 }
 
 const treeData: DataState[] = [
-  { key: "1", title: "备选项 1" },
+  { key: '1', title: '备选项 1' },
   {
-    key: "2",
-    title: "备选项 2",
+    key: '2',
+    title: '备选项 2',
     children: [
-      { key: "2-1", title: "备选项 2-1" },
-      { key: "2-2", title: "备选项 2-2" },
-      { key: "2-3", title: "备选项 2-3" },
+      { key: '2-1', title: '备选项 2-1' },
+      { key: '2-2', title: '备选项 2-2' },
+      { key: '2-3', title: '备选项 2-3' },
     ],
   },
-  { key: "3", title: "备选项 3-1" },
+  { key: '3', title: '备选项 3-1' },
   {
-    key: "4",
-    title: "备选项 4",
+    key: '4',
+    title: '备选项 4',
     children: [
-      { key: "4-1", title: "备选项 4-1" },
+      { key: '4-1', title: '备选项 4-1' },
       {
-        key: "4-2",
-        title: "备选项 4-2",
-        children: [{ key: "4-2-1", title: "备选项 4-2-1" }],
+        key: '4-2',
+        title: '备选项 4-2',
+        children: [{ key: '4-2-1', title: '备选项 4-2-1' }],
       },
-      { key: "4-3", title: "备选项 4-3" },
+      { key: '4-3', title: '备选项 4-3' },
     ],
   },
 ];
@@ -49,4 +49,4 @@ function flatten(list: DataState[] = []) {
 }
 flatten(JSON.parse(JSON.stringify(treeData)));
 
-export { mockData, treeData, transferDataSource };
+export { mockData, transferDataSource, treeData };

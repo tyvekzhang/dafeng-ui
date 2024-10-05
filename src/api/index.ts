@@ -1,4 +1,4 @@
-import { service } from "@/utils/axios";
+import { service } from '@/utils/axios';
 
 interface LoginParams {
   username: string;
@@ -8,8 +8,8 @@ interface LoginParams {
 // User login api
 export function loginApi(data: LoginParams): Promise<any> {
   return service({
-    url: "/login",
-    method: "post",
+    url: '/login',
+    method: 'post',
     data,
   });
 }
@@ -17,24 +17,24 @@ export function loginApi(data: LoginParams): Promise<any> {
 // Get User info
 export function getUserInfo(): Promise<never> {
   return service({
-    url: "/getUserInfo",
-    method: "get",
+    url: '/getUserInfo',
+    method: 'get',
   });
 }
 
 // User logout api
 export function logoutApi() {
   return service({
-    url: "/logout",
-    method: "get",
+    url: '/logout',
+    method: 'get',
   });
 }
 
 // Table list
 export function getTableList(params: any) {
   return service({
-    url: "/table/getTableList",
-    method: "get",
+    url: '/table/getTableList',
+    method: 'get',
     params,
   });
 }

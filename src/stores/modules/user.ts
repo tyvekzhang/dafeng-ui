@@ -1,7 +1,7 @@
-import type { UserState } from "@/stores/types";
-import { createSlice } from "@reduxjs/toolkit";
-import { TOKEN_KEY, USER_INFO_KEY } from "@/enums/cacheEnum";
-import { setAuthCache } from "@/utils/auth";
+import { TOKEN_KEY, USER_INFO_KEY } from '@/enums/cacheEnum';
+import type { UserState } from '@/stores/types';
+import { setAuthCache } from '@/utils/auth';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: UserState = {
   userInfo: null,
@@ -11,11 +11,11 @@ const initialState: UserState = {
 };
 
 const user = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     setToken: (state, action) => {
-      state.token = action.payload ? action.payload : "";
+      state.token = action.payload ? action.payload : '';
       setAuthCache(TOKEN_KEY, action.payload);
     },
     setUserInfo: (state, action) => {

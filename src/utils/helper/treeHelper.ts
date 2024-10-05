@@ -5,9 +5,9 @@ interface TreeHelperConfig {
 }
 
 const DEFAULT_CONFIG: TreeHelperConfig = {
-  id: "id",
-  children: "children",
-  pid: "pid",
+  id: 'id',
+  children: 'children',
+  pid: 'pid',
 };
 
 const getConfig = (config: Partial<TreeHelperConfig>) => Object.assign({}, DEFAULT_CONFIG, config);
@@ -146,7 +146,7 @@ export function treeMap<T = any>(treeData: T[], opt: { children?: string; conver
 /**
  * @description: Extract tree specified structure
  */
-export function treeMapEach(data: any, { children = "children", conversion }: { children?: string; conversion: Fn }) {
+export function treeMapEach(data: any, { children = 'children', conversion }: { children?: string; conversion: Fn }) {
   const haveChildren = Array.isArray(data[children]) && data[children].length > 0;
   const conversionData = conversion(data) || {};
   if (haveChildren) {

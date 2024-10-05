@@ -33,9 +33,9 @@ export function keepCursorEnd(target: HTMLElement) {
  */
 export function getPasteText(event: ClipboardEvent): string {
   const clipboardData = event.clipboardData || (window as any).clipboardData;
-  let pasteText = "";
+  let pasteText = '';
   if (clipboardData && clipboardData.getData) {
-    pasteText = clipboardData.getData("text/plain");
+    pasteText = clipboardData.getData('text/plain');
   }
   return pasteText;
 }

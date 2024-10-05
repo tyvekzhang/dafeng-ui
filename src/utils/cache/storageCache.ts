@@ -1,7 +1,7 @@
-import type { EncryptParams } from "../cipher";
-import { cacheCipher } from "@/settings/encryptionSetting";
-import { AesEncrypt } from "../cipher";
-import { isNullOrUnDef } from "../is";
+import { cacheCipher } from '@/settings/encryptionSetting';
+import type { EncryptParams } from '../cipher';
+import { AesEncrypt } from '../cipher';
+import { isNullOrUnDef } from '../is';
 
 export interface CreateStorageParams extends EncryptParams {
   prefixKey: string;
@@ -11,7 +11,7 @@ export interface CreateStorageParams extends EncryptParams {
 }
 
 export const createStorage = ({
-  prefixKey = "",
+  prefixKey = '',
   storage = sessionStorage,
   hasEncrypt = true,
   key = cacheCipher.key,
@@ -19,7 +19,7 @@ export const createStorage = ({
   timeout = null,
 }: Partial<CreateStorageParams> = {}) => {
   if (hasEncrypt && [key.length, iv.length].some((item) => item !== 16)) {
-    throw new Error("When hasEncrypt is true, the key or iv must be 16 bits!");
+    throw new Error('When hasEncrypt is true, the key or iv must be 16 bits!');
   }
 
   const encrypt = new AesEncrypt({ key, iv });

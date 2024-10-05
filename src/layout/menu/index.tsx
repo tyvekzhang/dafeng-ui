@@ -1,22 +1,22 @@
-import type { MenuProps } from "antd";
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { connect } from "react-redux";
-import { Menu, Spin } from "antd";
-import { getAsyncMenus } from "@/routers/menus";
-import type { AppMenu } from "@/routers/types";
-import { setMenuList } from "@/stores/modules/menu";
-import { getOpenKeys } from "@/utils/helper/menuHelper";
-import SvgIcon from "@/components/SvgIcon";
+import SvgIcon from '@/components/SvgIcon';
+import { getAsyncMenus } from '@/router/menus';
+import type { AppMenu } from '@/router/types';
+import { setMenuList } from '@/stores/modules/menu';
+import { getOpenKeys } from '@/utils/helper/menuHelper';
+import type { MenuProps } from 'antd';
+import { Menu, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-type MenuItem = Required<MenuProps>["items"][number];
+type MenuItem = Required<MenuProps>['items'][number];
 
 const getItem = (
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
   children?: MenuItem[],
-  type?: "group",
+  type?: 'group',
 ): MenuItem => {
   return {
     label,
@@ -75,7 +75,7 @@ const LayoutMenu = (props: any) => {
     getMenuList();
   }, []);
 
-  const handleOpenChange: MenuProps["onOpenChange"] = (keys: string[]) => {
+  const handleOpenChange: MenuProps['onOpenChange'] = (keys: string[]) => {
     if (keys.length === 0 || keys.length === 1) return setOpenKeys(keys);
     const latestKey = keys[keys.length - 1];
     if (latestKey.includes(keys[0])) return setOpenKeys(keys);
@@ -83,7 +83,7 @@ const LayoutMenu = (props: any) => {
   };
 
   const navigate = useNavigate();
-  const handleMenuClick: MenuProps["onClick"] = ({ key }: { key: string }) => {
+  const handleMenuClick: MenuProps['onClick'] = ({ key }: { key: string }) => {
     navigate(key);
   };
 

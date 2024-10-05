@@ -1,6 +1,6 @@
-import type { LoadableComponent } from "@loadable/component";
-import React, { type ReactNode, Suspense } from "react";
-import { Spin } from "antd";
+import type { LoadableComponent } from '@loadable/component';
+import { Spin } from 'antd';
+import React, { type ReactNode, Suspense } from 'react';
 
 /**
  * @description 路由懒加载
@@ -9,10 +9,10 @@ import { Spin } from "antd";
  */
 const LazyLoad = (Component: LoadableComponent<Record<string, unknown>>): ReactNode => {
   const spinnerStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100%",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
   };
 
   return (

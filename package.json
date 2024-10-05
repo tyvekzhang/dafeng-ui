@@ -1,15 +1,15 @@
 {
   "name": "dafeng-ui-vite",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "tsc -b && vite build",
+    "dev": "vite",
     "lint": "eslint .",
-    "lint:prettier": "prettier --write \"src/**/*.{js,json,ts,tsx,css,less,html,md}\"",
-    "preview": "vite preview",
-    "prepare": "husky"
+    "lint:prettier": "prettier --write .",
+    "prepare": "husky",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
@@ -23,9 +23,12 @@
     "crypto-js": "^4.2.0",
     "lodash-es": "^4.17.21",
     "react": "^18.3.1",
+    "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
     "react-redux": "^9.1.2",
+    "react-rnd": "^10.4.13",
     "react-router-dom": "^6.26.2",
+    "react-sortablejs": "^6.1.4",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "vite-plugin-mock": "^3.0.2"
@@ -47,6 +50,8 @@
     "less": "^4.2.0",
     "lint-staged": "^15.2.10",
     "prettier": "3.3.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-packagejson": "^2.5.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",

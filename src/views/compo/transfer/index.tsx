@@ -1,13 +1,13 @@
-import type { DataNode } from "antd/es/tree";
-import React, { useState } from "react";
-import { Row, Col, Card, Transfer, Table, Tree } from "antd";
-import { PageWrapper } from "@/components/Page";
-import { TRANSFER_COMPO } from "@/settings/websiteSetting";
-import { mockData, treeData, transferDataSource } from "./data";
+import { PageWrapper } from '@/components/Page';
+import { TRANSFER_COMPO } from '@/settings/websiteSetting';
+import { Card, Col, Row, Table, Transfer, Tree } from 'antd';
+import type { DataNode } from 'antd/es/tree';
+import React, { useState } from 'react';
+import { mockData, transferDataSource, treeData } from './data';
 
 const TransferPage: React.FC = () => {
-  const [targetKeys, setTargetKeys] = useState(["1", "5"]);
-  const [selectedKeys, setSelectedKeys] = useState<string[]>(["2", "6"]);
+  const [targetKeys, setTargetKeys] = useState(['1', '5']);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>(['2', '6']);
   const [treeTargetKeys, setTreeTargetKeys] = useState<string[]>([]);
 
   const onChange = (nextTargetKeys: string[]) => {
@@ -48,31 +48,31 @@ const TransferPage: React.FC = () => {
     <PageWrapper plugin={TRANSFER_COMPO}>
       <Row gutter={12}>
         <Col span={8}>
-          <Card title="基础用法" bordered={false} bodyStyle={{ height: "420px" }}>
+          <Card title="基础用法" bordered={false} bodyStyle={{ height: '420px' }}>
             <Transfer
               targetKeys={targetKeys}
               selectedKeys={selectedKeys}
               dataSource={mockData}
               render={(item) => item.title}
-              listStyle={{ width: "230px", height: "360px" }}
-              locale={{ itemsUnit: "项 " }}
+              listStyle={{ width: '230px', height: '360px' }}
+              locale={{ itemsUnit: '项 ' }}
               onChange={onChange}
               onSelectChange={onSelectChange}
             />
           </Card>
         </Col>
         <Col span={8}>
-          <Card title="树穿梭框" bordered={false} bodyStyle={{ height: "420px" }}>
+          <Card title="树穿梭框" bordered={false} bodyStyle={{ height: '420px' }}>
             <Transfer
               targetKeys={treeTargetKeys}
               dataSource={transferDataSource}
               render={(item) => item.title}
               showSelectAll={false}
-              listStyle={{ width: "230px", height: "360px" }}
+              listStyle={{ width: '230px', height: '360px' }}
               onChange={handleChange}
             >
               {({ direction, selectedKeys, onItemSelect }) => {
-                if (direction === "left") {
+                if (direction === 'left') {
                   const treeCheckedKeys = [...selectedKeys, ...treeTargetKeys];
                   return (
                     <Tree
@@ -96,18 +96,18 @@ const TransferPage: React.FC = () => {
           </Card>
         </Col>
         <Col span={8}>
-          <Card title="表格穿梭框" bordered={false} bodyStyle={{ height: "420px" }}>
+          <Card title="表格穿梭框" bordered={false} bodyStyle={{ height: '420px' }}>
             <Transfer
               targetKeys={targetKeys}
               dataSource={mockData}
-              listStyle={{ width: "230px", height: "360px" }}
-              locale={{ itemsUnit: "项 " }}
+              listStyle={{ width: '230px', height: '360px' }}
+              locale={{ itemsUnit: '项 ' }}
               onChange={onChange}
             >
               {({ filteredItems, selectedKeys, onItemSelectAll, onItemSelect }) => (
                 <Table
                   rowSelection={getRowSelection({ selectedKeys, onItemSelectAll, onItemSelect })}
-                  columns={[{ dataIndex: "title", title: "Name" }]}
+                  columns={[{ dataIndex: 'title', title: 'Name' }]}
                   dataSource={filteredItems}
                   size="small"
                   pagination={false}

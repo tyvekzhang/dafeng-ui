@@ -1,8 +1,8 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { AppState } from "../types";
-import { Persistent } from "@/utils/cache/persistent";
-import { APP_CONFIG_KEY } from "@/enums/cacheEnum";
-import { deepMerge } from "@/utils";
+import { APP_CONFIG_KEY } from '@/enums/cacheEnum';
+import { deepMerge } from '@/utils';
+import { Persistent } from '@/utils/cache/persistent';
+import { createSlice } from '@reduxjs/toolkit';
+import type { AppState } from '../types';
 
 const initialState: AppState = {
   appMode: undefined,
@@ -11,7 +11,7 @@ const initialState: AppState = {
 };
 
 const app = createSlice({
-  name: "app",
+  name: 'app',
   initialState,
   reducers: {
     setAppMode: (state, action) => {

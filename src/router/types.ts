@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import type { LoaderFunction } from "react-router-dom";
+import React, { ReactNode } from 'react';
+import type { LoaderFunction } from 'react-router-dom';
 
 export interface MetaProps {
   title: string;
@@ -35,4 +35,9 @@ export interface AppMenu {
   hideMenu?: boolean;
   hideChildrenInMenu?: boolean;
   hideBreadcrumb?: boolean;
+}
+
+export interface RouteModule {
+  default: React.ComponentType;
+  [key: string]: unknown;
 }

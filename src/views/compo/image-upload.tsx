@@ -1,35 +1,34 @@
-import type { UploadFile } from "antd/es/upload/interface";
-import type { RcFile, UploadProps } from "antd/es/upload";
-import React, { useState } from "react";
-import { Row, Col, Card, Button, Upload, Modal } from "antd";
-import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
-import { PageWrapper } from "@/components/Page";
-import { UPLOAD_COMPO } from "@/settings/websiteSetting";
-import { UPLOAD_IMG_SRC, UPLOAD_IMG_SRC2 } from "@/settings/websiteSetting";
+import { PageWrapper } from '@/components/Page';
+import { UPLOAD_COMPO, UPLOAD_IMG_SRC, UPLOAD_IMG_SRC2 } from '@/settings/websiteSetting';
+import { CloudUploadOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Modal, Row, Upload } from 'antd';
+import type { RcFile, UploadProps } from 'antd/es/upload';
+import type { UploadFile } from 'antd/es/upload/interface';
+import React, { useState } from 'react';
 
 const ImageUpload: React.FC = () => {
   const { Dragger } = Upload;
 
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
+  const [previewImage, setPreviewImage] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
 
   const dragImgs: UploadFile[] = [
-    { uid: "-1", name: "beautiful-girl.jpg" },
-    { uid: "-2", name: "beautiful-sunshine.jpg" },
+    { uid: '-1', name: 'beautiful-girl.jpg' },
+    { uid: '-2', name: 'beautiful-sunshine.jpg' },
   ];
   const [listImgs, setListImgs] = useState<UploadFile[]>([
     {
-      uid: "-1",
-      name: "beautiful-girl.jpg",
-      status: "done",
+      uid: '-1',
+      name: 'beautiful-girl.jpg',
+      status: 'done',
       url: UPLOAD_IMG_SRC,
       thumbUrl: UPLOAD_IMG_SRC,
     },
     {
-      uid: "-2",
-      name: "beautiful-sunshine.jpg",
-      status: "done",
+      uid: '-2',
+      name: 'beautiful-sunshine.jpg',
+      status: 'done',
       url: UPLOAD_IMG_SRC2,
       thumbUrl: UPLOAD_IMG_SRC2,
     },
@@ -41,7 +40,7 @@ const ImageUpload: React.FC = () => {
     }
     setPreviewImage(file.url || (file.preview as string));
     setPreviewVisible(true);
-    setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf("/") + 1));
+    setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
   };
 
   const getBase64 = (file: RcFile): Promise<string> => {
@@ -53,18 +52,18 @@ const ImageUpload: React.FC = () => {
     });
   };
 
-  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => setListImgs(newFileList);
+  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setListImgs(newFileList);
 
   const handleCancle = () => {
     setPreviewVisible(false);
-    setPreviewTitle("");
+    setPreviewTitle('');
   };
 
   return (
     <PageWrapper plugin={UPLOAD_COMPO}>
       <Row gutter={12}>
         <Col span={8}>
-          <Card title="拖拽上传" bordered={false} bodyStyle={{ height: "300px" }}>
+          <Card title="拖拽上传" bordered={false} bodyStyle={{ height: '300px' }}>
             <Dragger
               defaultFileList={dragImgs}
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
@@ -75,14 +74,14 @@ const ImageUpload: React.FC = () => {
                 <CloudUploadOutlined rev={undefined} />
               </p>
               <p>
-                将图片拖到此处, 或<span style={{ color: "#1890ff" }}>点击上传</span>
+                将图片拖到此处, 或<span style={{ color: '#1890ff' }}>点击上传</span>
               </p>
               <p className="ant-upload-hint">只能上传jpg、jpeg、gif、png、bmp文件, 且不超过500kb</p>
             </Dragger>
           </Card>
         </Col>
         <Col span={8}>
-          <Card title="列表样式" bordered={false} bodyStyle={{ height: "300px" }}>
+          <Card title="列表样式" bordered={false} bodyStyle={{ height: '300px' }}>
             <Upload
               defaultFileList={[...listImgs]}
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
@@ -99,7 +98,7 @@ const ImageUpload: React.FC = () => {
           </Card>
         </Col>
         <Col span={8}>
-          <Card title="照片墙" bordered={false} bodyStyle={{ height: "300px" }}>
+          <Card title="照片墙" bordered={false} bodyStyle={{ height: '300px' }}>
             <Upload
               fileList={listImgs}
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
@@ -111,12 +110,12 @@ const ImageUpload: React.FC = () => {
             >
               <div>
                 <PlusOutlined rev={undefined} />
-                <div style={{ marginTop: "8px" }}>点击上传</div>
+                <div style={{ marginTop: '8px' }}>点击上传</div>
               </div>
             </Upload>
           </Card>
           <Modal open={previewVisible} title={previewTitle} footer={null} onCancel={handleCancle}>
-            <img src={previewImage} style={{ width: "100%" }} />
+            <img src={previewImage} style={{ width: '100%' }} />
           </Modal>
         </Col>
       </Row>

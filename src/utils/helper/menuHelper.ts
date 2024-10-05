@@ -4,11 +4,11 @@
  * @returns subMenu array
  */
 export const getOpenKeys = (path: string) => {
-  let pathStr: string = "";
+  let pathStr: string = '';
   const openKeys: string[] = [];
-  path.split("/").forEach((key) => {
+  path.split('/').forEach((key) => {
     if (key) {
-      pathStr += "/" + key;
+      pathStr += '/' + key;
       openKeys.push(pathStr);
     }
   });

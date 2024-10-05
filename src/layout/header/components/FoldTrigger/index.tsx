@@ -1,8 +1,8 @@
-import { useAppSelector, useAppDispatch } from "@/stores";
-import { setAppConfig } from "@/stores/modules/app";
-import SvgIcon from "@/components/SvgIcon";
-import style from "./index.module.less";
-import classNames from "classnames";
+import SvgIcon from '@/components/SvgIcon';
+import { useAppDispatch, useAppSelector } from '@/stores';
+import { setAppConfig } from '@/stores/modules/app';
+import classNames from 'classnames';
+import style from './index.module.less';
 
 export default function FoldTrigger() {
   const getMenuFold = useAppSelector((state) => state.app.appConfig?.menuSetting?.menuFold);
@@ -14,7 +14,7 @@ export default function FoldTrigger() {
 
   return (
     <span
-      className={classNames(style["compo_fold-trigger"], { [style["unfold"]]: !getMenuFold })}
+      className={classNames(style['compo_fold-trigger'], { [style['unfold']]: !getMenuFold })}
       onClick={toggledMenuFold}
     >
       <SvgIcon name="unfold" size={20} />
