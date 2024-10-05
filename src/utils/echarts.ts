@@ -1,7 +1,7 @@
-import * as echarts from 'echarts/core'
-import { SVGRenderer } from 'echarts/renderers'
+import * as echarts from "echarts/core";
+import { SVGRenderer } from "echarts/renderers";
 
-import { BarChart, LineChart, PieChart, MapChart, PictorialBarChart, RadarChart } from 'echarts/charts'
+import { BarChart, LineChart, PieChart, MapChart, PictorialBarChart, RadarChart } from "echarts/charts";
 
 import {
   TitleComponent,
@@ -17,8 +17,8 @@ import {
   VisualMapComponent,
   TimelineComponent,
   CalendarComponent,
-  GraphicComponent
-} from 'echarts/components'
+  GraphicComponent,
+} from "echarts/components";
 
 echarts.use([
   LegendComponent,
@@ -41,7 +41,7 @@ echarts.use([
   VisualMapComponent,
   TimelineComponent,
   CalendarComponent,
-  GraphicComponent
-])
+  GraphicComponent,
+]);
 
-export default echarts
+export default echarts;

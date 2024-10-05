@@ -1,40 +1,40 @@
-import { service } from '@/utils/axios'
+import { service } from "@/utils/axios";
 
 interface LoginParams {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }
 
 // User login api
 export function loginApi(data: LoginParams): Promise<any> {
   return service({
-    url: '/login',
-    method: 'post',
-    data
-  })
+    url: "/login",
+    method: "post",
+    data,
+  });
 }
 
 // Get User info
-export function getUserInfo(): Promise<any> {
+export function getUserInfo(): Promise<never> {
   return service({
-    url: '/getUserInfo',
-    method: 'get'
-  })
+    url: "/getUserInfo",
+    method: "get",
+  });
 }
 
 // User logout api
 export function logoutApi() {
   return service({
-    url: '/logout',
-    method: 'get'
-  })
+    url: "/logout",
+    method: "get",
+  });
 }
 
 // Table list
 export function getTableList(params: any) {
   return service({
-    url: '/table/getTableList',
-    method: 'get',
-    params
-  })
+    url: "/table/getTableList",
+    method: "get",
+    params,
+  });
 }

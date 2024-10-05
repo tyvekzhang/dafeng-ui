@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:prettier": "prettier --write \"src/**/*.{js,json,ts,tsx,css,less,html,md}\"",
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
@@ -32,6 +34,7 @@
     "@eslint/js": "^9.9.0",
     "@types/antd": "^1.0.0",
     "@types/loadable__component": "^5.13.9",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -40,7 +43,10 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
+    "husky": "^9.1.6",
     "less": "^4.2.0",
+    "lint-staged": "^15.2.10",
+    "prettier": "3.3.3",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",

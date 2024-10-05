@@ -4,6 +4,7 @@ interface ViteEnv {
   VITE_PORT: number
   VITE_PROXY: [string, string][]
   VITE_DROP_CONSOLE: boolean
+  VITE_API_HOST: string
 }
 
 // read all environment variable configuration files to process.env
@@ -33,7 +34,7 @@ export function wrapperEnv(envConf: Recordable): ViteEnv {
     } else if (typeof realName === 'object') {
       process.env[envName] = JSON.stringify(realName)
     }
-  }
 
+  }
   return result
 }

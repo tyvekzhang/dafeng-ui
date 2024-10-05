@@ -7,7 +7,7 @@
  * @returns
  */
 export function matchesSelectorToParentElement(el: HTMLElement, selector: string): boolean {
-  const p = Element.prototype
+  const p = Element.prototype;
   const f =
     p.matches ||
     p.webkitMatchesSelector ||
@@ -15,7 +15,7 @@ export function matchesSelectorToParentElement(el: HTMLElement, selector: string
     p.msMatchesSelector ||
     p.oMatchesSelector ||
     function (s) {
-      return [].indexOf.call(document.querySelectorAll(s), this) !== -1
-    }
-  return f.call(el, selector)
+      return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
+    };
+  return f.call(el, selector);
 }
