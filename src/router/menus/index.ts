@@ -1,13 +1,12 @@
-import { basicRoutes } from '..';
-import { transformRouteToMenu } from '../helpers';
 import type { AppMenu } from '../types';
+import { dynamicMenu } from '@/api';
 
-// Get async menus
 export async function getAsyncMenus(): Promise<AppMenu[]> {
-  const staticMenus = transformRouteToMenu(basicRoutes);
-  staticMenus.sort((a: { orderNo: any }, b: { orderNo: any }) => {
-    return (a?.orderNo || staticMenus.length) - (b?.orderNo || staticMenus.length);
+  const staticMenus =  await dynamicMenu()
+  console.log(JSON.stringify(staticMenus));
+  staticMenus.sort((a: AppMenu, b: AppMenu) => {
+    return (a?.orderNo ?? Infinity) - (b?.orderNo ?? Infinity);
   });
 
-  return staticMenus.filter((item: { hideMenu: any }) => !item.hideMenu);
+  return staticMenus.filter((item: AppMenu) => !item.hideMenu);
 }

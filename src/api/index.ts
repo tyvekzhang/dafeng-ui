@@ -1,4 +1,5 @@
 import { service } from '@/utils/axios';
+import type { AppMenu } from '@/router/types';
 
 interface LoginParams {
   username: string;
@@ -22,19 +23,9 @@ export function getUserInfo(): Promise<never> {
   });
 }
 
-// User logout api
-export function logoutApi() {
+export function dynamicMenu(): Promise<AppMenu[]> {
   return service({
-    url: '/logout',
+    url: '/dynamicMenu',
     method: 'get',
-  });
-}
-
-// Table list
-export function getTableList(params: any) {
-  return service({
-    url: '/table/getTableList',
-    method: 'get',
-    params,
-  });
+  })
 }
