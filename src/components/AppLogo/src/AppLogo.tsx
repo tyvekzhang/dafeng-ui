@@ -1,17 +1,26 @@
 import { Space } from 'antd';
 import type { FC } from 'react';
-// import { useAppSelector } from '@/stores'
+import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '@/stores'
 import logoImg from '@/assets/images/logo.png';
 import logoName from '@/assets/images/name_white.png';
 import classNames from 'classnames';
 import styles from './app-logo.module.less';
 
 const AppLogo: FC = () => {
-  const getMenuFold = false;
-  // const getMenuFold = useAppSelector(state => state.app.appConfig?.menuSetting?.menuFold)
+  const navigate = useNavigate();
+  const getMenuFold = useAppSelector(state => state.app.appConfig?.menuSetting?.menuFold)
+
+  const handleClick = () => {
+    navigate('/home');
+  };
 
   return (
-    <div className={classNames('anticon', styles['app-logo'])}>
+    <div
+      className={classNames('anticon', styles['app-logo'])}
+      onClick={handleClick}
+      style={{ cursor: 'pointer' }}
+    >
       <Space>
         <img className={styles['logo-img']} src={logoImg} alt="logo" />
         <img

@@ -9,7 +9,7 @@ const LayoutHeader = () => {
       className="flex-between-h"
       style={{
         flexDirection: 'column',
-        height: 'auto',
+        height: '32px',
         background: '#fff',
       }}
     >
