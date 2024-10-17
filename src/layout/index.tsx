@@ -5,16 +5,17 @@ import { Outlet, useLocation } from 'react-router-dom';
 import HeaderLayout from './header';
 import './index.less';
 import Menu from './menu';
+import React from 'react';
 
-export const BasicLayout = () => {
+const BasicLayout:React.FC = () => {
   const { Sider, Content } = Layout;
   const { state } = useLocation();
   const { key = 'key' } = state || {};
-  const getMenuFold = useAppSelector((st) => st.app.appConfig?.menuSetting?.menuFold);
+  const getMenuFold = useAppSelector(st => st.app.appConfig?.menuSetting?.menuFold);
 
   return (
     <Layout className="layout_wrapper">
-      <Sider width={210} trigger={null} collapsed={getMenuFold} style={{ height: '100vh' }}>
+      <Sider width={200} collapsed={getMenuFold}>
         <AppLogo />
         <Menu />
       </Sider>

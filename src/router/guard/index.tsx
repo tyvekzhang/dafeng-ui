@@ -1,4 +1,4 @@
-import { BasicLayout } from '@/layout';
+import BasicLayout from '@/layout';
 import { GuardRoute } from '@/router/guard/guardRoute';
 
 export const LayoutGuard = () => {

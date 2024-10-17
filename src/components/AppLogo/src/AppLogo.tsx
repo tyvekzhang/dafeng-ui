@@ -23,11 +23,9 @@ const AppLogo: FC = () => {
     >
       <Space>
         <img className={styles['logo-img']} src={logoImg} alt="logo" />
-        <img
+        <div
           className={classNames(styles['logo-name'], { [styles['hidden']]: getMenuFold })}
-          src={logoName}
-          alt="logo"
-        />
+        >大风管理平台</div>
       </Space>
     </div>
   );

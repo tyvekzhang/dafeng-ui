@@ -18,7 +18,7 @@ const LoginPage: FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const { token, sessionTimeout } = useAppSelector((state) => state.user);
+  const { token, sessionTimeout } = useAppSelector(state => state.user);
   const getToken = (): string => {
     return token || getAuthCache<string>(TOKEN_KEY);
   };
