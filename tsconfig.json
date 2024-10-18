@@ -1,27 +1,47 @@
 {
+  // TypeScript编译器选项
   "compilerOptions": {
+    // 设定目标JavaScript版本
     "target": "ESNext",
+    // 使用类字段的定义语法
     "useDefineForClassFields": true,
+    // 包含的库文件
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    // 设置基础目录
     "baseUrl": ".",
+    // 不允许JavaScript文件
     "allowJs": false,
+    // 跳过库文件的类型检查
     "skipLibCheck": true,
+    // 不启用ES模块互操作性
     "esModuleInterop": false,
+    // 允许合成默认导入
     "allowSyntheticDefaultImports": true,
+    // 启用严格模式
     "strict": true,
+    // 强制文件名大小写一致
     "forceConsistentCasingInFileNames": true,
+    // 模块系统
     "module": "ESNext",
+    // 模块解析策略
     "moduleResolution": "Node",
+    // 允许导入JSON模块
     "resolveJsonModule": true,
+    // 确保每个文件可以独立编译
     "isolatedModules": true,
+    // 不生成输出文件
     "noEmit": true,
+    // JSX编译模式
     "jsx": "react-jsx",
+    // 路径映射
     "paths": {
       "@/*": ["src/*"],
       "#/*": ["types/*"]
     },
+    // 指定类型声明文件
     "types": ["vite/client", "vite-plugin-svg-icons/client"]
   },
+  // 包含的文件
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
@@ -33,5 +53,6 @@
     "mock/*.ts",
     "vite.config.ts"
   ],
+  // 排除的文件
   "exclude": ["node_modules", "dist", "**/*.js"]
 }

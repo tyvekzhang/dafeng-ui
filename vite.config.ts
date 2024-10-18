@@ -2,27 +2,33 @@ import react from '@vitejs/plugin-react';
 import type { ConfigEnv, UserConfig } from 'vite';
 import { loadEnv } from 'vite';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
-import { wrapperEnv } from './build/utils';
-// 需要安装 @typings/node 插件
+import { ViteEnv, wrapperEnv } from './build/utils';
 import { resolve } from 'path';
+import imagemin from 'unplugin-imagemin/vite';
+import legacy from '@vitejs/plugin-legacy';
 
 /** @type {import('vite').UserConfig} */
 export default ({ mode }: ConfigEnv): UserConfig => {
+  // 获取当前工作目录
   const root = process.cwd();
 
+  // 加载特定模式的环境变量
   const env = loadEnv(mode, root);
 
-  // this function can be converted to different typings
-  const viteEnv: any = wrapperEnv(env);
+  // 包装环境变量以便使用
+  const viteEnv: ViteEnv = wrapperEnv(env);
   const { VITE_PORT, VITE_DROP_CONSOLE, VITE_API_HOST } = viteEnv;
 
   return {
+    // 设置基础路径
     base: './',
+    // 服务器配置
     server: {
-      // Listening on all local ips
+      // 监听所有本地IP
       host: true,
       open: true,
       port: VITE_PORT,
+      // 设置代理
       proxy: {
         '/api': {
           target: VITE_API_HOST,
@@ -31,14 +37,46 @@ export default ({ mode }: ConfigEnv): UserConfig => {
         },
       },
     },
+    // 插件配置
     plugins: [
       react(),
+      imagemin({
+        // Default mode sharp. support squoosh and sharp
+        mode: 'squoosh',
+        beforeBundle: true,
+        // Default configuration options for compressing different pictures
+        compress: {
+          jpg: {
+            quality: 10,
+          },
+          jpeg: {
+            quality: 10,
+          },
+          png: {
+            quality: 10,
+          },
+          webp: {
+            quality: 10,
+          },
+        },
+        conversion: [
+          { from: 'jpeg', to: 'webp' },
+          { from: 'png', to: 'webp' },
+          { from: 'JPG', to: 'jpeg' },
+        ],
+      }),
+      legacy({
+        targets: ['defaults', 'not IE 11']
+      }),
       createSvgIconsPlugin({
+        // 图标目录
         iconDirs: [resolve(process.cwd(), 'src/assets/icons')],
+        // 图标ID格式
         symbolId: 'icon-[dir]-[name]',
       }),
     ],
 
+    // 构建配置
     build: {
       target: 'es2015',
       cssTarget: 'chrome86',
@@ -46,13 +84,15 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       terserOptions: {
         compress: {
           keep_infinity: true,
-          // used to delete console and debugger in production environment
+          // 删除生产环境中的console和debugger
           drop_console: VITE_DROP_CONSOLE,
+          drop_debugger: VITE_DROP_CONSOLE,
         },
       },
-      chunkSizeWarningLimit: 2000,
+      chunkSizeWarningLimit: 1000,
     },
 
+    // 路径别名配置
     resolve: {
       alias: {
         '@': resolve(__dirname, './src'),
