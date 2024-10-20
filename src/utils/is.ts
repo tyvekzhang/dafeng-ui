@@ -1,5 +1,5 @@
 export function is(val: unknown, type: string) {
-  return Object.prototype.toString.call(val) === `[object ${type}]`
+  return Object.prototype.toString.call(val) === `[object ${type}]`;
 }
 
 export function isObject(val: unknown): val is unknown {
@@ -28,7 +28,7 @@ export function isUrl(path: string): boolean {
 }
 
 export function isString(val: unknown): val is string {
-  return is(val, 'String')
+  return is(val, 'String');
 }
 
 export const isServer = typeof window === 'undefined';

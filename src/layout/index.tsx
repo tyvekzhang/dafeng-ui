@@ -1,4 +1,6 @@
 import { AppLogo } from '@/components/AppLogo';
+import { useTitle } from '@/hooks/web/useTitle';
+import TagsLayout from '@/layout/tags';
 import { useAppSelector } from '@/stores';
 import { Layout } from 'antd';
 import React from 'react';
@@ -6,11 +8,9 @@ import { Outlet, useLocation } from 'react-router-dom';
 import HeaderLayout from './header';
 import Menu from './menu';
 import useStyles from './style';
-import TagsLayout from "@/layout/tags";
-import {useTitle} from "@/hooks/web/useTitle";
 
 const BasicLayout: React.FC = () => {
-  useTitle()
+  useTitle();
   const { styles } = useStyles();
   const { Sider, Content } = Layout;
   const { state } = useLocation();

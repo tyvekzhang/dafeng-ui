@@ -1,23 +1,22 @@
-import {Layout} from 'antd';
+import { Layout } from 'antd';
 
-import { FoldTrigger, Breadcrumb } from './components';
-import LayoutFeature from "@/layout/feature";
-import React from "react";
+import LayoutFeature from '@/layout/feature';
+import { Breadcrumb, FoldTrigger } from './components';
 
 const LayoutHeader = () => {
   const { Header } = Layout;
 
   return (
     <Header
-      className='flex-between-h'
+      className="flex-between-h"
       style={{
         flexDirection: 'column',
         height: 'auto',
-        background: '#fff'
+        background: '#fff',
       }}
     >
-      <div className='flex-between-h' style={{ padding: '0 12px' }}>
-        <div className='flex-center-v'>
+      <div className="flex-between-h" style={{ padding: '0 12px' }}>
+        <div className="flex-center-v">
           <FoldTrigger />
           <Breadcrumb />
         </div>

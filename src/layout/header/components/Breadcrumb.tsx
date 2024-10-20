@@ -1,32 +1,31 @@
-import { useState, useEffect } from 'react'
-import { Breadcrumb } from 'antd'
-import { useLocation, matchRoutes } from 'react-router-dom'
-import { useAppSelector } from '@/stores'
-import SvgIcon from '@/components/SvgIcon'
+import { useAppSelector } from '@/stores';
+import { Breadcrumb } from 'antd';
+import { useEffect, useState } from 'react';
+import { matchRoutes, useLocation } from 'react-router-dom';
 
 export default function LayoutBreadcrumb() {
-  const [breadcrumbs, setBreadcrumbs] = useState<any[]>([])
-  const { pathname } = useLocation()
-  const getMenuList = useAppSelector(state => state.menu.menuList)
+  const [breadcrumbs, setBreadcrumbs] = useState<any[]>([]);
+  const { pathname } = useLocation();
+  const getMenuList = useAppSelector((state) => state.menu.menuList);
 
   useEffect(() => {
-    const matchRouteList = matchRoutes(getMenuList, pathname) || []
+    const matchRouteList = matchRoutes(getMenuList, pathname) || [];
     const breadcrumbList = matchRouteList.map((item: any) => {
-      const { name } = item?.route
+      const { name } = item?.route;
       return {
         title: (
           <>
             <span>{name}</span>
           </>
-        )
-      }
-    })
-    setBreadcrumbs(breadcrumbList)
-  }, [pathname])
+        ),
+      };
+    });
+    setBreadcrumbs(breadcrumbList);
+  }, [pathname]);
 
   return (
-    <div className='flex-center-v' style={{ padding: '0 16px' }}>
+    <div className="flex-center-v" style={{ padding: '0 16px' }}>
       <Breadcrumb items={breadcrumbs} />
     </div>
-  )
+  );
 }

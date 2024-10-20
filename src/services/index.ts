@@ -21,7 +21,6 @@ export function dynamicMenu(): Promise<AppMenu[]> {
   return httpClient.get('/dynamicMenu'); // 使用 httpClient 的 get 方法
 }
 
-
 export function logoutApi() {
   return httpClient.get('/logout');
 }

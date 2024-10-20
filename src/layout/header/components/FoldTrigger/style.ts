@@ -1,7 +1,7 @@
-import {createStyles} from 'antd-style'
+import { createStyles } from 'antd-style';
 
-export default createStyles( ({css}) => ({
-  compoFoldToggle:  css`
+export default createStyles(({ css }) => ({
+  compoFoldToggle: css`
     display: flex;
     align-items: center;
     height: 48px;
@@ -13,5 +13,5 @@ export default createStyles( ({css}) => ({
         transition: transform 0.1s;
       }
     }
-  `
-}))
+  `,
+}));

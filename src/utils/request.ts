@@ -1,6 +1,6 @@
+import { clearAuthCache, getToken } from '@/utils/auth';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
-import { clearAuthCache, getToken } from '@/utils/auth';
 
 import { message } from '@/components/GlobalToast';
 import NProgress from '@/settings/n_progress';
@@ -65,11 +65,7 @@ class HttpRequest {
     return this.instance.put(url, data, _object);
   }
 
-  delete<T>(
-    url: string,
-    params?: Record<string, unknown>,
-    _object: Record<string, unknown> = {},
-  ): Promise<T> {
+  delete<T>(url: string, params?: Record<string, unknown>, _object: Record<string, unknown> = {}): Promise<T> {
     return this.instance.delete(url, { params, ..._object });
   }
 }
