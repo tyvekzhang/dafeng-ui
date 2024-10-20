@@ -21,6 +21,8 @@ interface BasicStore {
   [APP_TAGS_KEY]: RouteObject[];
 }
 
+type Nullable<T> = T | null | undefined;
+
 type LocalStore = BasicStore;
 type SessionStore = BasicStore;
 
@@ -37,8 +39,14 @@ const sessionMemory = new Memory(DEFAULT_CACHE_TIME);
 function initPersistentMemory() {
   const localCache = ls.get(APP_LOCAL_CACHE_KEY);
   const sessionCache = ss.get(APP_SESSION_CACHE_KEY);
-  localCache && localMemory.resetCache(localCache);
-  sessionCache && sessionMemory.resetCache(sessionCache);
+
+  if (localCache) {
+    localMemory.resetCache(localCache);
+  }
+
+  if (sessionCache) {
+    sessionMemory.resetCache(sessionCache);
+  }
 }
 
 export class Persistent {
@@ -48,17 +56,25 @@ export class Persistent {
 
   static setLocal(key: LocalKeys, value: LocalStore[LocalKeys], immediate = false): void {
     localMemory.set(key, value);
-    immediate && ls.set(APP_LOCAL_CACHE_KEY, localMemory.getCache);
+
+    if (immediate) {
+      ls.set(APP_LOCAL_CACHE_KEY, localMemory.getCache);
+    }
   }
 
   static removeLocal(key: LocalKeys, immediate = false): void {
     localMemory.remove(key);
-    immediate && ls.set(APP_LOCAL_CACHE_KEY, localMemory.getCache);
+
+    if (immediate) {
+      ls.set(APP_LOCAL_CACHE_KEY, localMemory.getCache);
+    }
   }
 
   static clearLocal(immediate = false): void {
     localMemory.clear();
-    immediate && ls.clear();
+    if (immediate) {
+      ls.clear();
+    }
   }
 
   static getSession<T>(key: SessionKeys) {
@@ -67,17 +83,23 @@ export class Persistent {
 
   static setSession(key: SessionKeys, value: SessionStore[SessionKeys], immediate = false): void {
     sessionMemory.set(key, value);
-    immediate && ss.set(APP_SESSION_CACHE_KEY, sessionMemory.getCache);
+    if (immediate) {
+      ss.set(APP_SESSION_CACHE_KEY, sessionMemory.getCache);
+    }
   }
 
   static removeSession(key: SessionKeys, immediate = false): void {
     sessionMemory.remove(key);
-    immediate && ss.set(APP_SESSION_CACHE_KEY, sessionMemory.getCache);
+    if (immediate) {
+      ss.set(APP_SESSION_CACHE_KEY, sessionMemory.getCache);
+    }
   }
 
   static clearSession(immediate = false): void {
     sessionMemory.clear();
-    immediate && ss.clear();
+    if (immediate) {
+      ls.clear();
+    }
   }
 
   static clearAll(immediate = false) {

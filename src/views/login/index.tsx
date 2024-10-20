@@ -1,16 +1,16 @@
-import { getUserInfo, loginApi } from '@/api';
-import logoIcon from '@/assets/images/logo_name.png';
+import { getUserInfo, loginApi } from '@/services';
 import { TOKEN_KEY } from '@/enums/cacheEnum';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { setSessionTimeout, setToken, setUserInfo } from '@/stores/modules/user';
 import type { LoginParams, UserInfo } from '@/types';
 import { getAuthCache } from '@/utils/auth';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import {LockOutlined, SafetyCertificateOutlined, UserOutlined} from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import classNames from 'classnames';
-import { type FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './index.module.less';
+import {appSetting} from "@/settings/appBaseSetting";
 
 const LoginPage: FC = () => {
   const [form] = Form.useForm();
@@ -18,7 +18,7 @@ const LoginPage: FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const { token, sessionTimeout } = useAppSelector(state => state.user);
+  const { token, sessionTimeout } = useAppSelector((state) => state.user);
   const getToken = (): string => {
     return token || getAuthCache<string>(TOKEN_KEY);
   };
@@ -93,8 +93,7 @@ const LoginPage: FC = () => {
     <div className={styles['login-wrapper']}>
       <div className={styles['login-box']}>
         <div className={styles['login-box-title']}>
-          <img src={logoIcon} alt="icon" />
-          <p>账 号 登 录</p>
+          {appSetting.name}
         </div>
         <Form
           form={form}
@@ -108,15 +107,21 @@ const LoginPage: FC = () => {
         >
           <Form.Item name="username" rules={[{ required: true, message: '请输入账号' }]}>
             <Input
-              placeholder="请输入账号"
+              placeholder="请输入"
               prefix={<UserOutlined style={{ color: 'rgba(0, 0, 0, 0.25)' }} rev={undefined} />}
             />
           </Form.Item>
           <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
             <Input
               type="password"
-              placeholder="请输入密码"
+              placeholder="请输入"
               prefix={<LockOutlined style={{ color: 'rgba(0, 0, 0, 0.25)' }} rev={undefined} />}
+            />
+          </Form.Item>
+          <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
+            <Input
+              placeholder="请输入"
+              prefix={<SafetyCertificateOutlined  style={{ color: 'rgba(0, 0, 0, 0.25)', backgroundColor: 'rgba(255, 255, 255, 0.8)' }} rev={undefined} />}
             />
           </Form.Item>
           <Form.Item>

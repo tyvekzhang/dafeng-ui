@@ -1,5 +1,5 @@
 import type { MenuState } from '@/stores/types';
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: MenuState = {
   menuList: [],
@@ -10,10 +10,10 @@ const menu = createSlice({
   name: 'menu',
   initialState,
   reducers: {
-    setMenuList: (state, action) => {
+    setMenuList: (state, action: PayloadAction<any[]>) => {
       state.menuList = action.payload;
     },
-    updateCollapse: (state, action) => {
+    updateCollapse: (state, action: PayloadAction<boolean>) => {
       state.isCollapse = action.payload;
     },
   },

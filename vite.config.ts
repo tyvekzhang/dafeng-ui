@@ -1,11 +1,11 @@
+import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+import imagemin from 'unplugin-imagemin/vite';
 import type { ConfigEnv, UserConfig } from 'vite';
 import { loadEnv } from 'vite';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import { ViteEnv, wrapperEnv } from './build/utils';
-import { resolve } from 'path';
-import imagemin from 'unplugin-imagemin/vite';
-import legacy from '@vitejs/plugin-legacy';
 
 /** @type {import('vite').UserConfig} */
 export default ({ mode }: ConfigEnv): UserConfig => {
@@ -66,7 +66,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
         ],
       }),
       legacy({
-        targets: ['defaults', 'not IE 11']
+        targets: ['defaults', 'not IE 11'],
       }),
       createSvgIconsPlugin({
         // 图标目录

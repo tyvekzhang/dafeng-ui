@@ -1,31 +1,28 @@
+import logoImg from '@/assets/images/logo.png';
+import { appSetting } from '@/settings/appBaseSetting';
+import { useAppSelector } from '@/stores';
 import { Space } from 'antd';
+import classNames from 'classnames';
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '@/stores'
-import logoImg from '@/assets/images/logo.png';
-import logoName from '@/assets/images/name_white.png';
-import classNames from 'classnames';
-import styles from './app-logo.module.less';
+import useStyles from './style';
 
 const AppLogo: FC = () => {
+  const { styles } = useStyles();
   const navigate = useNavigate();
-  const getMenuFold = useAppSelector(state => state.app.appConfig?.menuSetting?.menuFold)
+  const getMenuFold = useAppSelector((state) => state.app.appConfig?.menuSetting?.menuFold);
 
   const handleClick = () => {
     navigate('/home');
   };
 
   return (
-    <div
-      className={classNames('anticon', styles['app-logo'])}
-      onClick={handleClick}
-      style={{ cursor: 'pointer' }}
-    >
+    <div className={classNames('anticon', styles.appLogo)} onClick={handleClick}>
       <Space>
-        <img className={styles['logo-img']} src={logoImg} alt="logo" />
-        <div
-          className={classNames(styles['logo-name'], { [styles['hidden']]: getMenuFold })}
-        >大风管理平台</div>
+        {/* 图标 */}
+        <img className={styles.logoImg} src={logoImg} alt="logo" />
+        {/* 名称 */}
+        <div className={classNames(styles.logoName, { hidden: getMenuFold })}>{appSetting.name}</div>
       </Space>
     </div>
   );

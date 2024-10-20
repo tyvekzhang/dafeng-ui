@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Button, Card, DatePicker, Form, Input, Modal, Select, Space, Switch, Table, theme } from 'antd';
 import type { DatePickerProps } from 'antd';
+import { Button, Card, DatePicker, Form, Input, Modal, Select, Space, Switch, Table, theme } from 'antd';
 import type { Dayjs } from 'dayjs';
+import React, { useState } from 'react';
 
 const User: React.FC = () => {
   const [form] = Form.useForm();
@@ -53,14 +53,14 @@ const User: React.FC = () => {
       username: 'Dill',
       nickname: '迪丽热巴',
       state: 1,
-      createDate: '2024-10-18'
+      createDate: '2024-10-18',
     },
     {
       no: '2',
       username: 'Gull',
       nickname: '古力娜扎',
       state: 0,
-      createDate: '2024-10-18'
+      createDate: '2024-10-18',
     },
   ];
 
@@ -84,9 +84,7 @@ const User: React.FC = () => {
       title: '状态',
       dataIndex: 'state',
       key: 'state',
-      render: (text, record) => (
-        <Switch checked={record.state} />
-      ),
+      render: (text, record) => <Switch checked={record.state} />,
     },
     {
       title: '创建时间',
@@ -97,7 +95,7 @@ const User: React.FC = () => {
       title: '操作',
       key: 'action',
       render: () => (
-        <Space size="middle" style={{color: '#189DFE'}}>
+        <Space size="middle" style={{ color: '#189DFE' }}>
           <a>删除</a>
           <a>编辑</a>
         </Space>
@@ -107,25 +105,16 @@ const User: React.FC = () => {
 
   return (
     <>
-      <Card style={{marginBottom: 2}} bordered={false}>
+      <Card style={{ marginBottom: 2 }} bordered={false}>
         <Form>
           <Space wrap>
-            <Form.Item
-              name="username"
-              label="用户名"
-            >
+            <Form.Item name="username" label="用户名">
               <Input placeholder="请输入" />
             </Form.Item>
-            <Form.Item
-              name="nickname"
-              label="用户昵称"
-            >
+            <Form.Item name="nickname" label="用户昵称">
               <Input placeholder="请输入" />
             </Form.Item>
-            <Form.Item
-              name="state"
-              label="状态"
-            >
+            <Form.Item name="state" label="状态">
               <Select
                 allowClear
                 placeholder="请选择"
@@ -140,14 +129,11 @@ const User: React.FC = () => {
                   {
                     value: '0',
                     label: '停用',
-                  }
+                  },
                 ]}
               />
             </Form.Item>
-            <Form.Item
-              name="createDate"
-              label="创建日期"
-            >
+            <Form.Item name="createDate" label="创建日期">
               <DatePicker.RangePicker cellRender={cellRender} />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
@@ -159,9 +145,11 @@ const User: React.FC = () => {
         </Form>
       </Card>
       <Card bordered={false}>
-        <Space style={{margin: '0 0 12px 0'}}>
-          <Button onClick={showModal} type='primary'>新建</Button>
-          <Button >导入</Button>
+        <Space style={{ margin: '0 0 12px 0' }}>
+          <Button onClick={showModal} type="primary">
+            新建
+          </Button>
+          <Button>导入</Button>
         </Space>
         <Modal title="用户新增:" open={isModalVisible} onCancel={handleCancel}>
           <Form form={form} name="user_add_rule">
@@ -173,12 +161,7 @@ const User: React.FC = () => {
             >
               <Input placeholder="请输入" />
             </Form.Item>
-            <Form.Item
-              {...formItemLayout}
-              name="password"
-              label="密码"
-              rules={[{ required: true, message: '必填项' }]}
-            >
+            <Form.Item {...formItemLayout} name="password" label="密码" rules={[{ required: true, message: '必填项' }]}>
               <Input.Password
                 placeholder="请输入"
                 defaultValue={123456}
@@ -193,11 +176,7 @@ const User: React.FC = () => {
             >
               <Input placeholder="请输入" />
             </Form.Item>
-            <Form.Item
-              {...formItemLayout}
-              name="remark"
-              label="备注"
-            >
+            <Form.Item {...formItemLayout} name="remark" label="备注">
               <Input.TextArea
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
@@ -207,7 +186,7 @@ const User: React.FC = () => {
             </Form.Item>
           </Form>
         </Modal>
-        <Table dataSource={dataSource} columns={columns}  />
+        <Table dataSource={dataSource} columns={columns} />
       </Card>
     </>
   );

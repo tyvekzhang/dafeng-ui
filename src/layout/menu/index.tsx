@@ -5,7 +5,7 @@ import { setMenuList } from '@/stores/modules/menu';
 import { getOpenKeys } from '@/utils/helper/menuHelper';
 import type { MenuProps } from 'antd';
 import { Menu, Spin } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -27,7 +27,7 @@ const getItem = (
   } as MenuItem;
 };
 
-const LayoutMenu = (props: any) => {
+const LayoutMenu = memo((props: any) => {
   const { pathname } = useLocation();
   const { setMenuList: setMenuListAction } = props;
   const [loading, setLoading] = useState(false);
@@ -88,8 +88,8 @@ const LayoutMenu = (props: any) => {
   };
 
   return (
-    <div className="layout_menu">
-      <Spin spinning={loading} tip="Loading...">
+    <div>
+      <Spin spinning={loading}>
         <Menu
           theme="dark"
           mode="inline"
@@ -105,7 +105,7 @@ const LayoutMenu = (props: any) => {
       </Spin>
     </div>
   );
-};
+});
 
 const mapStateToProps = (state: any) => state.menu;
 const mapDispatchToProps = { setMenuList };

@@ -1,23 +1,28 @@
 .login-wrapper {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-image: url('@/assets/images/login-background.jpg');
+  background-image: url('@/assets/images/background.svg');
   background-size: cover;
 
   .login-box {
-    padding: 16px 30px 10px;
-    background: #fff;
-    border-radius: 4px;
+    position: absolute;
+    right: 40px;
+    width: 39%;
+    min-height: 576px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 16px;
     box-shadow: 0 15px 30px 0 rgba(0, 0, 1, 0.1);
 
     &-title {
       margin: 0 auto 35px;
       text-align: center;
-      color: #707070;
       font-size: 18px;
+      font-weight: 600;
       letter-spacing: 2px;
 
       img {

@@ -1,23 +1,25 @@
 import SvgIcon from '@/components/SvgIcon';
-import { useAppDispatch, useAppSelector } from '@/stores';
-import { setAppConfig } from '@/stores/modules/app';
+import {useAppDispatch, useAppSelector} from '@/stores';
+import {setAppConfig} from '@/stores/modules/app';
 import classNames from 'classnames';
-import style from './index.module.less';
+import useStyles from './style';
+import {useCallback} from "react";
 
 export default function FoldTrigger() {
-  const getMenuFold = useAppSelector((state) => state.app.appConfig?.menuSetting?.menuFold);
+  const {styles} = useStyles();
+  const isMenuFold = useAppSelector((state) => state.app.appConfig?.menuSetting?.menuFold);
   const dispatch = useAppDispatch();
 
-  function toggledMenuFold() {
-    dispatch(setAppConfig({ menuSetting: { menuFold: !getMenuFold } }));
-  }
+  const toggleMenuFold = useCallback(() => {
+    dispatch(setAppConfig({menuSetting: {menuFold: !isMenuFold}}));
+  }, [dispatch, isMenuFold]);
 
   return (
     <span
-      className={classNames(style['compo_fold-trigger'], { [style['unfold']]: !getMenuFold })}
-      onClick={toggledMenuFold}
+      className={classNames(styles.compoFoldToggle, {'unfold': !isMenuFold})}
+      onClick={toggleMenuFold}
     >
-      <SvgIcon name="unfold" size={24} />
+      <SvgIcon name="unfold" size={22}/>
     </span>
   );
 }

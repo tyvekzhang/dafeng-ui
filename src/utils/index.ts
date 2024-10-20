@@ -1,5 +1,7 @@
 import { isObject } from './is';
 
+type TargetContext = '_blank' | '_self' | '_parent' | '_top' | string;
+
 export function openWindow(
   url: string,
   opt?: {
@@ -11,8 +13,12 @@ export function openWindow(
   const { target = '__blank', noopener = true, noreferrer = true } = opt || {};
   const feature: string[] = [];
 
-  noopener && feature.push('noopener=yes');
-  noreferrer && feature.push('noreferrer=yes');
+  if (noopener) {
+    feature.push('noopener=yes');
+  }
+  if (noreferrer) {
+    feature.push('noreferrer=yes');
+  }
 
   window.open(url, target, feature.join(','));
 }
@@ -24,7 +30,13 @@ export function promiseTimeout(ms: number, throwOnTimeout = false, reason = 'Tim
   });
 }
 
-export const searchRoute: any = (path: string, routes: any = []) => {
+interface Route {
+  path: string;
+  fullPath?: string; // 可选属性
+  children?: Route[]; // 子路由
+}
+
+export const searchRoute = (path: string, routes: Route[] = []): Route | null => {
   for (const item of routes) {
     if (item.path === path || item.fullPath === path) return item;
     if (item.children) {

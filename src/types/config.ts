@@ -3,6 +3,8 @@ import type { CacheTypeEnum } from '../enums/cacheEnum';
 import type { MenuFoldBtnEnum, MenuModeEnum, MenuTypeEnum } from '../enums/menuEnum';
 
 export interface AppConfig {
+  // App name
+  name: string;
   // Theme color
   themeColor: string;
   // Storage location of permission related information

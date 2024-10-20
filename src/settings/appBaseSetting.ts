@@ -4,6 +4,7 @@ import { MenuFoldBtnEnum, MenuModeEnum, MenuTypeEnum } from '@/enums/menuEnum';
 import type { AppConfig } from '@/types/config';
 
 export const appSetting: AppConfig = {
+  name: '大风管理平台',
   // Theme color
   themeColor: '#1890ff',
   // Permission-related cache is stored in sessionStorage or localStorage

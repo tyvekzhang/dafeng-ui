@@ -3,6 +3,8 @@ import type { EncryptParams } from '../cipher';
 import { AesEncrypt } from '../cipher';
 import { isNullOrUnDef } from '../is';
 
+type Nullable<T> = T | null | undefined;
+
 export interface CreateStorageParams extends EncryptParams {
   prefixKey: string;
   storage: Storage;

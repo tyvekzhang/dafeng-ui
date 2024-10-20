@@ -1,7 +1,9 @@
+type Nullable<T> = T | null | undefined;
+
 /**
  * 图片base64转blob
- * @param image
  * @returns {Blob}
+ * @param base64Buf
  */
 export function base64toBlob(base64Buf: string): Blob {
   const arr = base64Buf.split(',');
