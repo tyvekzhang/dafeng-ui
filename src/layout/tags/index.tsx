@@ -69,7 +69,7 @@ const TagsLayout: FC = () => {
 
   useEffect(() => {
     const affixTags = initAffixTags(basicRoutes);
-    affixTags.forEach(tag => dispatch(addVisitedTags(tag)));
+    affixTags.forEach((tag) => dispatch(addVisitedTags(tag)));
     const currRoute = searchRoute(pathname, basicRoutes);
     if (currRoute) {
       dispatch(addVisitedTags(currRoute));
@@ -79,7 +79,7 @@ const TagsLayout: FC = () => {
 
   useEffect(() => {
     const tagNodeList = tagsMainCont.current?.childNodes as NodeListOf<HTMLElement>;
-    const activeTagNode = Array.from(tagNodeList).find(item => item.dataset.path === activeTag) || null;
+    const activeTagNode = Array.from(tagNodeList).find((item) => item.dataset.path === activeTag) || null;
     moveToActiveTag(activeTagNode);
   }, [activeTag]);
 
@@ -138,7 +138,7 @@ const TagsLayout: FC = () => {
   };
 
   const handleReload = () => {
-    const index = visitedTags.findIndex((tab: { fullPath: string; }) => tab.fullPath === activeTag);
+    const index = visitedTags.findIndex((tab: { fullPath: string }) => tab.fullPath === activeTag);
     if (index >= 0) {
       navigate(activeTag, { replace: true, state: { key: getKey() } });
     }

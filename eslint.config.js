@@ -31,7 +31,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       // 配置react-refresh插件的规则，警告级别，允许常量导出
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      "@typescript-eslint/no-explicit-any": "off",
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 );

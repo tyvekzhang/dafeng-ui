@@ -1,7 +1,7 @@
 import { CacheTypeEnum, TOKEN_KEY } from '@/enums/cacheEnum';
 import { appSetting } from '@/settings/appBaseSetting';
-import { Persistent, type BasicKeys } from './cache/persistent';
 import { AuthCacheValue } from '@/stores/types';
+import { Persistent, type BasicKeys } from './cache/persistent';
 
 const { permissionCacheType } = appSetting;
 const isLocal = permissionCacheType === CacheTypeEnum.LOCAL;

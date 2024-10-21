@@ -2,7 +2,7 @@
  * @description: Extract tree specified structure
  */
 export function treeMap<T = any>(treeData: T[], opt: { children?: string; conversion: Fn }): T[] {
-  return treeData.map(item => treeMapEach(item, opt));
+  return treeData.map((item) => treeMapEach(item, opt));
 }
 
 /**
@@ -35,7 +35,7 @@ export function treeMapEach(data: any, { children = 'children', conversion }: { 
  * @param parentNode 父节点
  */
 export function eachTree(treeDatas: any[], callBack: Fn, parentNode = {}) {
-  treeDatas.forEach(element => {
+  treeDatas.forEach((element) => {
     const newNode = callBack(element, parentNode) || element;
     if (element.children) {
       eachTree(element.children, callBack, newNode);

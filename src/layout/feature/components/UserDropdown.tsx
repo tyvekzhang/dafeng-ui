@@ -70,7 +70,7 @@ export default function UserDropdown() {
     if (getToken()) {
       try {
         await logoutApi();
-      } catch{
+      } catch {
         const { createMessage } = myMessage();
         createMessage.error('注销失败!');
       }

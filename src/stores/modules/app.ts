@@ -1,9 +1,9 @@
 import { APP_CONFIG_KEY } from '@/enums/cacheEnum';
+import { AppConfig } from '@/types/config';
 import { deepMerge } from '@/utils';
 import { Persistent } from '@/utils/cache/persistent';
 import { createSlice } from '@reduxjs/toolkit';
 import type { AppState } from '../types';
-import { AppConfig } from '@/types/config';
 
 const initialState: AppState = {
   appMode: undefined,
