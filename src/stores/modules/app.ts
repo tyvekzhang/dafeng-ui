@@ -3,11 +3,12 @@ import { deepMerge } from '@/utils';
 import { Persistent } from '@/utils/cache/persistent';
 import { createSlice } from '@reduxjs/toolkit';
 import type { AppState } from '../types';
+import { AppConfig } from '@/types/config';
 
 const initialState: AppState = {
   appMode: undefined,
   themeMode: undefined,
-  appConfig: Persistent.getLocal(APP_CONFIG_KEY),
+  appConfig: Persistent.getLocal(APP_CONFIG_KEY) as AppConfig,
 };
 
 const app = createSlice({

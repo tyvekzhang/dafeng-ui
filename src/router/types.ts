@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import type { LoaderFunction } from 'react-router-dom';
+import { Route } from '@/utils';
 
 export interface MetaProps {
   title: string;
@@ -12,14 +13,14 @@ export interface MetaProps {
   hideChildrenInMenu?: boolean;
 }
 
-export interface RouteObject {
+export interface RouteObject extends Route{
+  path?: string;
+  fullPath?: string;
+  children?: RouteObject[];
   id?: string;
   name?: string;
   loader?: LoaderFunction;
   element?: ReactNode;
-  path?: string;
-  fullPath?: string;
-  children?: RouteObject[];
   index?: false;
   meta?: MetaProps;
 }

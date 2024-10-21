@@ -1,4 +1,3 @@
-// import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RouteObject } from '@/router/types';
 import type { TagsState } from '@/stores/types';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';

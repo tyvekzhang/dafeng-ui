@@ -1,8 +1,6 @@
 import { openWindow } from '.';
 import { base64toBlob, urlToBase64 } from './image';
 
-type TargetContext = '_blank' | '_self' | '_parent' | '_top' | string;
-
 /**
  * Download image by url
  * @param url

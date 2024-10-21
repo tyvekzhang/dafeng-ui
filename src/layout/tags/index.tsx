@@ -4,11 +4,10 @@ import { useAppDispatch, useAppSelector } from '@/stores';
 import { addVisitedTags, closeAllTags, closeTagByKey, closeTagsByType } from '@/stores/modules/tags';
 import { searchRoute } from '@/utils';
 import { CloseOutlined, LeftOutlined, RedoOutlined, RightOutlined } from '@ant-design/icons';
-import { useFullscreen } from 'ahooks';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown } from 'antd';
 import classNames from 'classnames';
-import { type FC, type WheelEvent, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState, WheelEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TagItem } from './components';
 import styles from './index.module.less';
@@ -21,111 +20,80 @@ const TagsLayout: FC = () => {
     { key: 'all', label: '关闭所有' },
   ];
 
-  const onClick: MenuProps['onClick'] = ({ key }) => {
-    if (key === 'all') {
-      // @ts-ignore
-      dispatch(closeAllTags()).then(({ payload }) => {
-        const lastTag = payload.slice(-1)[0];
-        if (activeTag !== lastTag?.fullPath) {
-          navigate(lastTag?.fullPath);
-        }
-      });
-    } else {
-      dispatch(closeTagsByType({ type: key, path: activeTag }));
-    }
-  };
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const visitedTags = useAppSelector((state) => state.tags.visitedTags);
 
-  const tagsMain = useRef<ElRef>(null);
-  const tagsMainCont = useRef<ElRef>(null);
+  const tagsMain = useRef<HTMLDivElement>(null);
+  const tagsMainCont = useRef<HTMLDivElement>(null);
 
   const [canMove, setCanMove] = useState(false);
   const [tagsContLeft, setTagsContLeft] = useState(0);
-  const [isFullscreen, { toggleFullscreen }] = useFullscreen(document.querySelector('#mainCont')!);
-
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const visitedTags = useAppSelector((state) => state.tags.visitedTags);
-  const dispatch = useAppDispatch();
-
   const [activeTag, setActiveTag] = useState(pathname);
-
-  useEffect(() => {
-    const affixTags = initAffixTags(basicRoutes);
-    for (const tag of affixTags) {
-      dispatch(addVisitedTags(tag));
-    }
-  }, []);
-
-  useEffect(() => {
-    const currRoute = searchRoute(pathname, basicRoutes);
-    if (currRoute) {
-      dispatch(addVisitedTags(currRoute));
-    }
-    setActiveTag(pathname);
-  }, [pathname]);
-
-  useEffect(() => {
-    const tagNodeList = tagsMainCont.current?.childNodes as unknown as Array<HTMLElement>;
-    const activeTagNode = Array.from(tagNodeList).find((item) => item.dataset.path === activeTag)!;
-
-    moveToActiveTag(activeTagNode);
-  }, [activeTag]);
-
-  useEffect(() => {
-    const mainWidth = tagsMain.current?.offsetWidth!;
-    const mainContWidth = tagsMainCont.current?.offsetWidth!;
-
-    if (mainContWidth > mainWidth) {
-      setCanMove(true);
-    } else {
-      setCanMove(false);
-    }
-  }, [visitedTags.length]);
 
   const initAffixTags = (routes: RouteObject[], basePath: string = '/') => {
     let affixTags: RouteObject[] = [];
-
     for (const route of routes) {
       if (route.meta?.affix) {
         const fullPath = route.path!.startsWith('/') ? route.path : basePath + route.path;
-        affixTags.push({
-          ...route,
-          path: fullPath,
-        });
+        affixTags.push({ ...route, path: fullPath });
       }
       if (route.children && route.children.length) {
         affixTags = affixTags.concat(initAffixTags(route.children, route.path));
       }
     }
-
     return affixTags;
   };
 
-  const moveToActiveTag = (tag: any) => {
-    let leftOffset: number = 0;
+  const moveToActiveTag = (tag: HTMLElement | null) => {
+    if (!tag) return;
+
     const mainContPadding = 4;
-    const mainWidth = tagsMain.current?.offsetWidth!;
-    const mainContWidth = tagsMainCont.current?.offsetWidth!;
+    const mainWidth = tagsMain.current?.offsetWidth || 0;
+    const mainContWidth = tagsMainCont.current?.offsetWidth || 0;
+
+    let leftOffset: number = 0;
 
     if (mainContWidth < mainWidth) {
       leftOffset = 0;
-    } else if (tag?.offsetLeft! < -tagsContLeft) {
-      // 标签在可视区域左侧 (The active tag on the left side of the layout_tags-main)
-      leftOffset = -tag?.offsetLeft! + mainContPadding;
-    } else if (tag?.offsetLeft! > -tagsContLeft && tag?.offsetLeft! + tag?.offsetWidth! < -tagsContLeft + mainWidth) {
-      // 标签在可视区域 (The active tag on the layout_tags-main)
-      leftOffset = Math.min(0, mainWidth - tag?.offsetWidth! - tag?.offsetLeft! - mainContPadding);
+    } else if (tag.offsetLeft < -tagsContLeft) {
+      leftOffset = -tag.offsetLeft + mainContPadding;
+    } else if (tag.offsetLeft > -tagsContLeft && tag.offsetLeft + tag.offsetWidth < -tagsContLeft + mainWidth) {
+      leftOffset = Math.min(0, mainWidth - tag.offsetWidth - tag.offsetLeft - mainContPadding);
     } else {
-      // 标签在可视区域右侧 (The active tag on the right side of the layout_tags-main)
-      leftOffset = -(tag?.offsetLeft! - (mainWidth - mainContPadding - tag?.offsetWidth!));
+      leftOffset = -(tag.offsetLeft - (mainWidth - mainContPadding - tag.offsetWidth));
     }
     setTagsContLeft(leftOffset);
   };
 
+  useEffect(() => {
+    const affixTags = initAffixTags(basicRoutes);
+    affixTags.forEach(tag => dispatch(addVisitedTags(tag)));
+    const currRoute = searchRoute(pathname, basicRoutes);
+    if (currRoute) {
+      dispatch(addVisitedTags(currRoute));
+    }
+    setActiveTag(pathname);
+  }, [pathname, dispatch]);
+
+  useEffect(() => {
+    const tagNodeList = tagsMainCont.current?.childNodes as NodeListOf<HTMLElement>;
+    const activeTagNode = Array.from(tagNodeList).find(item => item.dataset.path === activeTag) || null;
+    moveToActiveTag(activeTagNode);
+  }, [activeTag]);
+
+  useEffect(() => {
+    const mainWidth = tagsMain.current?.offsetWidth || 0;
+    const mainContWidth = tagsMainCont.current?.offsetWidth || 0;
+
+    setCanMove(mainContWidth > mainWidth);
+  }, [visitedTags.length]);
+
   const handleMove = (offset: number) => {
     let leftOffset: number = 0;
-    const mainWidth = tagsMain.current?.offsetWidth!;
-    const mainContWidth = tagsMainCont.current?.offsetWidth!;
+    const mainWidth = tagsMain.current?.offsetWidth || 0;
+    const mainContWidth = tagsMainCont.current?.offsetWidth || 0;
 
     if (offset > 0) {
       leftOffset = Math.min(0, tagsContLeft + offset);
@@ -142,29 +110,20 @@ const TagsLayout: FC = () => {
   };
 
   const handleScroll = (e: WheelEvent) => {
-    const type = e.type;
-    let distance: number = 0;
-
-    if (type === 'wheel') {
-      distance = e.deltaY ? e.deltaY * 2 : -(e.detail || 0) * 2;
-    }
-
+    const distance = e.deltaY ? e.deltaY * 2 : -(e.detail || 0) * 2;
     handleMove(distance);
   };
 
   const handleCloseTag = (path: string) => {
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     dispatch(closeTagByKey(path)).then(({ payload }) => {
-      let currTag: RouteObject;
       const { tagIndex, tagsList } = payload;
       const tagLen = tagsList.length;
+
       if (path === activeTag) {
-        if (tagIndex <= tagLen - 1) {
-          currTag = tagsList[tagIndex];
-        } else {
-          currTag = tagsList[tagLen - 1];
-        }
-        navigate(currTag?.fullPath!);
+        const currTag = tagIndex < tagLen ? tagsList[tagIndex] : tagsList[tagLen - 1];
+        navigate(currTag.fullPath);
       }
     });
   };
@@ -173,48 +132,69 @@ const TagsLayout: FC = () => {
     setActiveTag(path);
     navigate(path);
   };
+
   const getKey = () => {
-    return new Date().getTime().toString();
+    return Date.now().toString();
   };
+
   const handleReload = () => {
-    // 刷新当前路由，页面不刷新
-    const index = visitedTags.findIndex((tab) => tab.fullPath === activeTag);
+    const index = visitedTags.findIndex((tab: { fullPath: string; }) => tab.fullPath === activeTag);
     if (index >= 0) {
-      // 这个是react的特性，key变了，组件会卸载重新渲染
       navigate(activeTag, { replace: true, state: { key: getKey() } });
     }
   };
+
+  const onClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'all') {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      dispatch(closeAllTags()).then(({ payload }) => {
+        const lastTag = payload.slice(-1)[0];
+        if (activeTag !== lastTag?.fullPath) {
+          navigate(lastTag?.fullPath);
+        }
+      });
+    } else {
+      dispatch(closeTagsByType({ type: key, path: activeTag }));
+    }
+  };
+
   return (
     <div className={styles['layout_tags']}>
-      <Button
-        className={styles['layout_tags__btn']}
-        icon={<LeftOutlined />}
-        size="small"
-        disabled={!canMove}
-        onClick={() => handleMove(200)}
-      />
+      {canMove && (
+        <Button
+          className={styles['layout_tags__btn']}
+          icon={<LeftOutlined />}
+          size="small"
+          onClick={() => handleMove(200)}
+        />
+      )}
       <div ref={tagsMain} className={styles['layout_tags__main']} onWheel={handleScroll}>
         <div ref={tagsMainCont} className={styles['layout_tags__main-cont']} style={{ left: tagsContLeft + 'px' }}>
-          {visitedTags.map((item: RouteObject) => (
-            <span key={item.fullPath} data-path={item.fullPath}>
-              <TagItem
-                name={item.meta?.title!}
-                active={activeTag === item.fullPath}
-                fixed={item.meta?.affix}
-                onClick={() => handleClickTag(item.fullPath!)}
-                closeTag={() => handleCloseTag(item.fullPath!)}
-              />
-            </span>
-          ))}
+          {visitedTags.map((item: RouteObject) => {
+            return (
+              <span key={item.fullPath} data-path={item.fullPath}>
+                <TagItem
+                  name={item.meta?.title ?? ''}
+                  active={activeTag === item.fullPath}
+                  fixed={item.meta?.affix}
+                  onClick={() => handleClickTag(item.fullPath as string)}
+                  closeTag={() => handleCloseTag(item.fullPath as string)}
+                />
+              </span>
+            );
+          })}
         </div>
       </div>
-      <Button
-        className={styles['layout_tags__btn']}
-        icon={<RightOutlined />}
-        size="small"
-        disabled={!canMove}
-        onClick={() => handleMove(-200)}
-      />
+      {canMove && (
+        <Button
+          className={styles['layout_tags__btn']}
+          icon={<RightOutlined />}
+          size="small"
+          disabled={!canMove}
+          onClick={() => handleMove(-200)}
+        />
+      )}
       <Button
         className={classNames(`${styles.layout_tags}__btn`, `${styles.layout_tags}__btn-space`)}
         icon={<RedoOutlined />}

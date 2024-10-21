@@ -72,7 +72,9 @@ const LoginPage: FC = () => {
       if (redirect) {
         navigate(redirect);
       } else {
-        goHome && navigate(userInfo?.homePath || '/home');
+        if (goHome) {
+          navigate(userInfo?.homePath || '/home');
+        }
       }
     }
 

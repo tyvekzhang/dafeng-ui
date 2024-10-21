@@ -1,5 +1,3 @@
-type Nullable<T> = T | null | undefined;
-
 /**
  * 图片base64转blob
  * @returns {Blob}

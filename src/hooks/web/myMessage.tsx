@@ -22,10 +22,9 @@ function getIcon(iconType: string) {
 
 function renderContent({ content }: Pick<ModalOptionsEx, 'content'>) {
   if (isString(content)) {
-    // @ts-ignore
-    return <div dangerouslySetInnerHTML={`<div>${content as string}</div>`}></div>;
+    return <div dangerouslySetInnerHTML={{ __html: `<div>${content}</div>` }} />;
   } else {
-    return content;
+    return content; // 直接返回 content
   }
 }
 
@@ -46,7 +45,7 @@ function createConfirm(options: ModalOptionsEx) {
   return Modal.confirm(opt);
 }
 
-export function useMessage() {
+export function myMessage() {
   return {
     createMessage: Message,
     createConfirm,

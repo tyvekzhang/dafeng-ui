@@ -1,6 +1,6 @@
 import headerImg from '@/assets/images/avatar.jpeg';
 import { TOKEN_KEY } from '@/enums/cacheEnum';
-import { useMessage } from '@/hooks/web/useMessage';
+import { myMessage } from '@/hooks/web/myMessage';
 import { logoutApi } from '@/services';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { resetState } from '@/stores/modules/user';
@@ -54,7 +54,7 @@ export default function UserDropdown() {
   const handleLock = () => {};
 
   const handleLogout = () => {
-    const { createConfirm } = useMessage();
+    const { createConfirm } = myMessage();
 
     createConfirm({
       iconType: 'warning',
@@ -70,14 +70,16 @@ export default function UserDropdown() {
     if (getToken()) {
       try {
         await logoutApi();
-      } catch (error) {
-        const { createMessage } = useMessage();
+      } catch{
+        const { createMessage } = myMessage();
         createMessage.error('注销失败!');
       }
     }
     dispatch(resetState());
     clearAuthCache();
-    goLogin && navigate('/login');
+    if (goLogin) {
+      navigate('/login');
+    }
   };
 
   return (

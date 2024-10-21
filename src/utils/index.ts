@@ -1,7 +1,5 @@
 import { isObject } from './is';
 
-type TargetContext = '_blank' | '_self' | '_parent' | '_top' | string;
-
 export function openWindow(
   url: string,
   opt?: {
@@ -30,8 +28,8 @@ export function promiseTimeout(ms: number, throwOnTimeout = false, reason = 'Tim
   });
 }
 
-interface Route {
-  path: string;
+export interface Route {
+  path?: string;
   fullPath?: string; // 可选属性
   children?: Route[]; // 子路由
 }
@@ -47,7 +45,7 @@ export const searchRoute = (path: string, routes: Route[] = []): Route | null =>
   return null;
 };
 
-export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
+export function deepMerge<T = object>(src: any = {}, target: any = {}): T {
   let key: string;
   for (key in target) {
     src[key] = isObject(src[key]) ? deepMerge(src[key], target[key]) : (src[key] = target[key]);

@@ -11,7 +11,7 @@ export default function LayoutBreadcrumb() {
   useEffect(() => {
     const matchRouteList = matchRoutes(getMenuList, pathname) || [];
     const breadcrumbList = matchRouteList.map((item: any) => {
-      const { name } = item?.route;
+      const { name } = item?.route ?? '';
       return {
         title: (
           <>

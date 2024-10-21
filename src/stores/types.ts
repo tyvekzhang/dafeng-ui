@@ -43,5 +43,7 @@ export interface AppState {
 
   themeMode?: ThemeEnum;
 
-  appConfig: AppConfig | null;
+  appConfig: Nullable<AppConfig>;
 }
+
+export type AuthCacheValue = string | UserInfo | null;

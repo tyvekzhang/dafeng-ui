@@ -3,8 +3,6 @@ import type { EncryptParams } from '../cipher';
 import { AesEncrypt } from '../cipher';
 import { isNullOrUnDef } from '../is';
 
-type Nullable<T> = T | null | undefined;
-
 export interface CreateStorageParams extends EncryptParams {
   prefixKey: string;
   storage: Storage;
@@ -36,7 +34,7 @@ export const createStorage = ({
     private storage: Storage;
     private prefixKey?: string;
     private encrypt: AesEncrypt;
-    private hasEncrypt: boolean;
+    private readonly hasEncrypt: boolean;
 
     constructor() {
       this.storage = storage;
@@ -84,7 +82,7 @@ export const createStorage = ({
           return value;
         }
         this.remove(key);
-      } catch (e) {
+      } catch {
         return def;
       }
     }

@@ -5,7 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { persistor, store } from './stores';
+import { myPersiStore, store } from './stores';
 
 // register svg icon
 import router from '@/router';
@@ -15,7 +15,7 @@ import 'virtual:svg-icons-register';
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <Provider store={store}>
-      <PersistGate persistor={persistor}>
+      <PersistGate persistor={myPersiStore}>
         <ConfigProvider locale={zhCN}>
           <App>
             <RouterProvider router={router} />
