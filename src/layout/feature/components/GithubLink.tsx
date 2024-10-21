@@ -4,7 +4,7 @@ import { Tooltip } from 'antd';
 
 export default function GithubLink() {
   function openGithub() {
-    openWindow('https://github.com/baimingxuan/react-admin-design');
+    openWindow('https://github.com/tyvekzhang/dafeng-ui');
   }
 
   return (

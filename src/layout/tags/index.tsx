@@ -3,11 +3,11 @@ import type { RouteObject } from '@/router/types';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { addVisitedTags, closeAllTags, closeTagByKey, closeTagsByType } from '@/stores/modules/tags';
 import { searchRoute } from '@/utils';
-import { CloseOutlined, LeftOutlined, RedoOutlined, RightOutlined } from '@ant-design/icons';
+import { CloseOutlined, RedoOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown } from 'antd';
 import classNames from 'classnames';
-import { FC, useEffect, useRef, useState, WheelEvent } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TagItem } from './components';
 import styles from './index.module.less';
@@ -28,7 +28,6 @@ const TagsLayout: FC = () => {
   const tagsMain = useRef<HTMLDivElement>(null);
   const tagsMainCont = useRef<HTMLDivElement>(null);
 
-  const [canMove, setCanMove] = useState(false);
   const [tagsContLeft, setTagsContLeft] = useState(0);
   const [activeTag, setActiveTag] = useState(pathname);
 
@@ -53,7 +52,7 @@ const TagsLayout: FC = () => {
     const mainWidth = tagsMain.current?.offsetWidth || 0;
     const mainContWidth = tagsMainCont.current?.offsetWidth || 0;
 
-    let leftOffset: number = 0;
+    let leftOffset: number;
 
     if (mainContWidth < mainWidth) {
       leftOffset = 0;
@@ -82,37 +81,6 @@ const TagsLayout: FC = () => {
     const activeTagNode = Array.from(tagNodeList).find((item) => item.dataset.path === activeTag) || null;
     moveToActiveTag(activeTagNode);
   }, [activeTag]);
-
-  useEffect(() => {
-    const mainWidth = tagsMain.current?.offsetWidth || 0;
-    const mainContWidth = tagsMainCont.current?.offsetWidth || 0;
-
-    setCanMove(mainContWidth > mainWidth);
-  }, [visitedTags.length]);
-
-  const handleMove = (offset: number) => {
-    let leftOffset: number = 0;
-    const mainWidth = tagsMain.current?.offsetWidth || 0;
-    const mainContWidth = tagsMainCont.current?.offsetWidth || 0;
-
-    if (offset > 0) {
-      leftOffset = Math.min(0, tagsContLeft + offset);
-    } else {
-      if (mainWidth < mainContWidth) {
-        if (tagsContLeft >= -(mainContWidth - mainWidth)) {
-          leftOffset = Math.max(tagsContLeft + offset, mainWidth - mainContWidth);
-        }
-      } else {
-        leftOffset = 0;
-      }
-    }
-    setTagsContLeft(leftOffset);
-  };
-
-  const handleScroll = (e: WheelEvent) => {
-    const distance = e.deltaY ? e.deltaY * 2 : -(e.detail || 0) * 2;
-    handleMove(distance);
-  };
 
   const handleCloseTag = (path: string) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -161,21 +129,13 @@ const TagsLayout: FC = () => {
 
   return (
     <div className={styles['layout_tags']}>
-      {canMove && (
-        <Button
-          className={styles['layout_tags__btn']}
-          icon={<LeftOutlined />}
-          size="small"
-          onClick={() => handleMove(200)}
-        />
-      )}
-      <div ref={tagsMain} className={styles['layout_tags__main']} onWheel={handleScroll}>
+      <div ref={tagsMain} className={styles['layout_tags__main']}>
         <div ref={tagsMainCont} className={styles['layout_tags__main-cont']} style={{ left: tagsContLeft + 'px' }}>
           {visitedTags.map((item: RouteObject) => {
             return (
               <span key={item.fullPath} data-path={item.fullPath}>
                 <TagItem
-                  name={item.meta?.title ?? ''}
+                  name={item.meta?.title ?? '默认'}
                   active={activeTag === item.fullPath}
                   fixed={item.meta?.affix}
                   onClick={() => handleClickTag(item.fullPath as string)}
@@ -186,15 +146,6 @@ const TagsLayout: FC = () => {
           })}
         </div>
       </div>
-      {canMove && (
-        <Button
-          className={styles['layout_tags__btn']}
-          icon={<RightOutlined />}
-          size="small"
-          disabled={!canMove}
-          onClick={() => handleMove(-200)}
-        />
-      )}
       <Button
         className={classNames(`${styles.layout_tags}__btn`, `${styles.layout_tags}__btn-space`)}
         icon={<RedoOutlined />}

@@ -84,7 +84,7 @@ const User: React.FC = () => {
       title: '状态',
       dataIndex: 'state',
       key: 'state',
-      render: (text, record) => <Switch checked={record.state} />,
+      render: (text: any, record: { state: boolean | undefined }) => <Switch checked={record.state} />,
     },
     {
       title: '创建时间',
@@ -105,7 +105,7 @@ const User: React.FC = () => {
 
   return (
     <>
-      <Card style={{ marginBottom: 2 }} bordered={false}>
+      <Card style={{ marginBottom: 1, boxShadow: '0 3px 0 -4px rgba(0, 0, 0, 0.12)' }} bordered={false}>
         <Form>
           <Space wrap>
             <Form.Item name="username" label="用户名">

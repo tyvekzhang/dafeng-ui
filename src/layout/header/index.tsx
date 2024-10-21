@@ -15,7 +15,10 @@ const LayoutHeader = () => {
         background: '#fff',
       }}
     >
-      <div className="flex-between-h" style={{ padding: '0 12px' }}>
+      <div
+        className="flex-between-h"
+        style={{ padding: '0 12px', marginBottom: '2px', boxShadow: '0 3px 6px -4px rgba(0, 0, 0, 0.12)' }}
+      >
         <div className="flex-center-v">
           <FoldTrigger />
           <Breadcrumb />
