@@ -54,8 +54,8 @@
 
     @keyframes appear {
     0%, 100% {
-    r: 0;
-    opacity: 0;
+    r: 8;
+    opacity: 0.6;
     }
     50% {
     r: 8;

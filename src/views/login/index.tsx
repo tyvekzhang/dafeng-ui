@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/stores';
 import { setSessionTimeout, setToken, setUserInfo } from '@/stores/modules/user';
 import type { LoginParams, UserInfo } from '@/types';
 import { getAuthCache } from '@/utils/auth';
-import { LockOutlined, SafetyCertificateOutlined, UserOutlined } from '@ant-design/icons';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import classNames from 'classnames';
 import { type FC, useState } from 'react';
@@ -118,23 +118,9 @@ const LoginPage: FC = () => {
               prefix={<LockOutlined style={{ color: 'rgba(0, 0, 0, 0.25)' }} rev={undefined} />}
             />
           </Form.Item>
-          <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-            <Input
-              placeholder="请输入"
-              prefix={
-                <SafetyCertificateOutlined
-                  style={{ color: 'rgba(0, 0, 0, 0.25)', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
-                  rev={undefined}
-                />
-              }
-            />
-          </Form.Item>
           <Form.Item>
             <Form.Item name="remember" className={classNames('fl', styles['no-margin'])} valuePropName="checked">
               <Checkbox>记住我</Checkbox>
-            </Form.Item>
-            <Form.Item className={classNames('fr', styles['no-margin'])}>
-              <a href="">忘记密码？</a>
             </Form.Item>
           </Form.Item>
           <Form.Item>
