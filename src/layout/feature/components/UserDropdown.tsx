@@ -1,4 +1,4 @@
-import headerImg from '@/assets/images/avatar.jpeg';
+import headerImg from '@/assets/images/avatar.jpg';
 import { TOKEN_KEY } from '@/enums/cacheEnum';
 import { myMessage } from '@/hooks/web/myMessage';
 import { logoutApi } from '@/services';
