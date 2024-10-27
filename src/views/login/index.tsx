@@ -51,9 +51,10 @@ const LoginPage: FC = () => {
     try {
       const { goHome = true, ...loginParams } = params;
       const data = await loginApi(loginParams);
+      console.log(data);
 
       // 保存 Token
-      dispatch(setToken(data?.token));
+      dispatch(setToken(data?.access_token));
       return afterLoginAction(goHome);
     } catch (error) {
       return Promise.reject(error);

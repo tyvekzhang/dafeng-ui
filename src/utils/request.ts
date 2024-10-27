@@ -2,8 +2,8 @@ import { clearAuthCache, getToken } from '@/utils/auth';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
-import { message } from '@/components/GlobalToast';
 import NProgress from '@/settings/n_progress';
+import { message } from 'antd';
 import { Recordable } from 'vite-plugin-mock';
 
 class HttpRequest {
@@ -20,7 +20,6 @@ class HttpRequest {
         if (token) {
           (config as Recordable).headers['Authorization'] = `${token}`;
         }
-        (config as Recordable).headers['Content-Type'] = 'application/json';
         return config;
       },
       (error) => Promise.reject(error),
@@ -34,8 +33,8 @@ class HttpRequest {
         if (data.code === 0) {
           return data.data;
         } else {
-          message.error(data.message);
-          return Promise.reject('error');
+          message.error(data.msg);
+          return;
         }
       },
       (error) => {
@@ -46,8 +45,8 @@ class HttpRequest {
           clearAuthCache();
           location.href = '/login';
         }
-        message.error(error.message || '服务出错啦');
-        return Promise.reject(error);
+        message.error(data.msg || '服务出小差啦');
+        return;
       },
     );
   }
@@ -72,12 +71,14 @@ class HttpRequest {
 
 const config = {
   // 默认地址请求地址，在 .env 开头文件中修改
-  baseURL: '/api',
+  baseURL: '/api/v1',
   // 设置超时时间（10s）
   timeout: 10 * 1000,
   // 跨域时候允许携带凭证
   withCredentials: true,
 };
 const httpClient = new HttpRequest(config);
+
+export const axiosClient = axios.create(config);
 
 export default httpClient;

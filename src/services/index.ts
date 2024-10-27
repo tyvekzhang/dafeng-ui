@@ -1,4 +1,5 @@
 import type { AppMenu } from '@/router/types';
+import { LoginResponse } from '@/types/user';
 import httpClient from '@/utils/request';
 
 interface LoginParams {
@@ -7,8 +8,16 @@ interface LoginParams {
 }
 
 // User login services
-export function loginApi(data: LoginParams): Promise<any> {
-  return httpClient.post('/login', data); // 使用 httpClient 的 post 方法
+export function loginApi(data: LoginParams) {
+  return httpClient.post<LoginResponse>(
+    '/user/login',
+    data,
+    //   {
+    //   headers: {
+    //     'Content-Type': 'application/x-www-form-urlencoded'
+    //   }
+    // }
+  );
 }
 
 // Get User info
