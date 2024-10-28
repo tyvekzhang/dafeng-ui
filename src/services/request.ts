@@ -2,8 +2,8 @@ import { clearAuthCache, getToken } from '@/utils/auth';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
+import { message } from '@/components/GlobalToast';
 import NProgress from '@/settings/n_progress';
-import { message } from 'antd';
 import { Recordable } from 'vite-plugin-mock';
 
 class HttpRequest {
@@ -17,8 +17,8 @@ class HttpRequest {
         NProgress.start();
         // 添加token
         const token = getToken();
-        if (token) {
-          (config as Recordable).headers['Authorization'] = `${token}`;
+        if (token && !(config as Recordable).headers['Authorization']) {
+          (config as Recordable).headers['Authorization'] = `${token.token_type} ${token.access_token}`;
         }
         return config;
       },

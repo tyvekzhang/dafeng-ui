@@ -8,6 +8,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { myPersiStore, store } from './stores';
 
 // register svg icon
+import { GlobalToast } from '@/components/GlobalToast';
 import router from '@/router';
 import { RouterProvider } from 'react-router-dom';
 import 'virtual:svg-icons-register';
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           locale={zhCN}
         >
           <App>
+            <GlobalToast />
             <RouterProvider router={router} />
           </App>
         </ConfigProvider>

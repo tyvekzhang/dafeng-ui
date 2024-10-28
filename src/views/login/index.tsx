@@ -1,9 +1,10 @@
 import { TOKEN_KEY } from '@/enums/cacheEnum';
-import { getUserInfo, loginApi } from '@/services';
+import { getUserInfo, login } from '@/services';
 import { appSetting } from '@/settings/appBaseSetting';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { setSessionTimeout, setToken, setUserInfo } from '@/stores/modules/user';
 import type { LoginParams, UserInfo } from '@/types';
+import { LoginForm } from '@/types/user';
 import { getAuthCache } from '@/utils/auth';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message } from 'antd';
@@ -26,7 +27,7 @@ const LoginPage: FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const handleLogin = async (values: any) => {
+  const handleLogin = async (values: LoginForm) => {
     try {
       setLoading(true);
       const userInfo = await loginAction({
@@ -50,11 +51,10 @@ const LoginPage: FC = () => {
   ): Promise<UserInfo | null> => {
     try {
       const { goHome = true, ...loginParams } = params;
-      const data = await loginApi(loginParams);
-      console.log(data);
+      const data = await login(loginParams);
 
       // 保存 Token
-      dispatch(setToken(data?.access_token));
+      dispatch(setToken(data));
       return afterLoginAction(goHome);
     } catch (error) {
       return Promise.reject(error);

@@ -1,13 +1,14 @@
 import { CacheTypeEnum, TOKEN_KEY } from '@/enums/cacheEnum';
 import { appSetting } from '@/settings/appBaseSetting';
 import { AuthCacheValue } from '@/stores/types';
+import { LoginResponse } from '@/types/user';
 import { Persistent, type BasicKeys } from './cache/persistent';
 
 const { permissionCacheType } = appSetting;
 const isLocal = permissionCacheType === CacheTypeEnum.LOCAL;
 
 export function getToken() {
-  return getAuthCache(TOKEN_KEY);
+  return getAuthCache(TOKEN_KEY) as LoginResponse;
 }
 
 export function getAuthCache<T>(key: BasicKeys) {

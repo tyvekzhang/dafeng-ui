@@ -1,4 +1,10 @@
-interface UserCreate {
+export type LoginForm = {
+  username: string;
+  password: string;
+  remember: string;
+};
+
+export interface UserCreate {
   username: string;
   password: string;
   nickname: string;
