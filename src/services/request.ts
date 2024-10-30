@@ -1,8 +1,10 @@
-import { clearAuthCache, getToken } from '@/utils/auth';
+import { clearAuthCache, getToken, setAuthCache } from '@/utils/auth';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 import { message } from '@/components/GlobalToast';
+import { TOKEN_KEY } from '@/enums/cacheEnum';
+import { refreshTokens } from '@/services/user';
 import NProgress from '@/settings/n_progress';
 import { Recordable } from 'vite-plugin-mock';
 
@@ -17,7 +19,7 @@ class HttpRequest {
         NProgress.start();
         // 添加token
         const token = getToken();
-        if (token && !(config as Recordable).headers['Authorization']) {
+        if (token) {
           (config as Recordable).headers['Authorization'] = `${token.token_type} ${token.access_token}`;
         }
         return config;
@@ -32,21 +34,35 @@ class HttpRequest {
 
         if (data.code === 0) {
           return data.data;
+        } else if (data.refresh_token) {
+          return data;
         } else {
           message.error(data.msg);
-          return;
+          return Promise.reject(new Error(data.msg));
         }
       },
-      (error) => {
+      async (error) => {
         NProgress.done();
-        const data = error.response?.data;
+        const originalRequest = error.config;
+
         // 判断认证失败和认证过期的情况
-        if (data && (data.code === 401 || data.code === 400)) {
-          clearAuthCache();
-          location.href = '/login';
+        if (error.response.status === 401 && !originalRequest._retry) {
+          debugger;
+          originalRequest._retry = true;
+          try {
+            const oldToken = getToken();
+            const token = await refreshTokens({ refresh_token: oldToken.refresh_token });
+            setAuthCache(TOKEN_KEY, token as any);
+            return this.instance(originalRequest);
+          } catch (error) {
+            console.log(error);
+            debugger;
+            clearAuthCache();
+            location.href = '/login';
+          }
         }
-        message.error(data.msg || '服务出小差啦');
-        return;
+        message.error(error.msg || '服务开小差啦');
+        return Promise.reject(error.message || error);
       },
     );
   }
@@ -60,7 +76,7 @@ class HttpRequest {
     return this.instance.post(url, data, _object);
   }
 
-  put<T>(url: string, data?: object, _object = {}): Promise<T> {
+  put<T>(url: string, data?: object | string, _object = {}): Promise<T> {
     return this.instance.put(url, data, _object);
   }
 
@@ -70,15 +86,14 @@ class HttpRequest {
 }
 
 const config = {
-  // 默认地址请求地址，在 .env 开头文件中修改
-  baseURL: '/api/v1',
-  // 设置超时时间（10s）
-  timeout: 10 * 1000,
-  // 跨域时候允许携带凭证
-  withCredentials: true,
+  // API 基础地址
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
+  // 超时时间
+  timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10 * 1000,
+  // 是否允许跨域携带凭证
+  withCredentials: import.meta.env.VITE_WITH_CREDENTIALS === 'true' || true,
 };
-const httpClient = new HttpRequest(config);
 
-export const axiosClient = axios.create(config);
+const axiosInstance = new HttpRequest(config);
 
-export default httpClient;
+export default axiosInstance;

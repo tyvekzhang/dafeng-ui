@@ -1,9 +1,7 @@
-import { TOKEN_KEY } from '@/enums/cacheEnum';
 import { ExceptionEnum } from '@/enums/exceptionEnum';
-import { getAuthCache } from '@/utils/auth';
 import PageException from '@/views/exception';
 import LoginPage from '@/views/login';
-import { Navigate, createBrowserRouter, redirect } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { genFullPath } from './helpers';
 import type { RouteModule, RouteObject } from './types';
 
@@ -31,12 +29,6 @@ const rootRoutes: RouteObject[] = [
     meta: {
       title: '登录页',
       key: 'login',
-    },
-    loader: () => {
-      if (getAuthCache<string>(TOKEN_KEY)) {
-        return redirect('/');
-      }
-      return null;
     },
   },
   ...routeList,

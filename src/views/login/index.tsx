@@ -7,13 +7,14 @@ import type { LoginParams, UserInfo } from '@/types';
 import { LoginForm } from '@/types/user';
 import { getAuthCache } from '@/utils/auth';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, message } from 'antd';
+import { App, Button, Checkbox, Form, Input } from 'antd';
 import classNames from 'classnames';
 import { type FC, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './index.module.less';
 
 const LoginPage: FC = () => {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
