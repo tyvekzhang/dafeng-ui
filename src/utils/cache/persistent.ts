@@ -7,18 +7,20 @@ import {
   type USER_INFO_KEY,
   APP_LOCAL_CACHE_KEY,
   APP_SESSION_CACHE_KEY,
+  REMEMBER_KEY,
 } from '@/enums/cacheEnum';
-import { DEFAULT_CACHE_TIME } from '@/settings/encryptionSetting';
+
 import type { UserInfo } from '@/types';
 import type { AppConfig } from '@/types/config';
+import { LoginResponse } from '@/types/user';
 import { createLocalStorage, createSessionStorage } from '@/utils/cache';
-import { Memory } from './memory';
 
 interface BasicStore {
-  [TOKEN_KEY]: string | number | null | undefined;
+  [TOKEN_KEY]: string | number | null | undefined | LoginResponse | boolean;
   [USER_INFO_KEY]: UserInfo;
   [APP_CONFIG_KEY]: AppConfig;
   [APP_TAGS_KEY]: RouteObject[];
+  [REMEMBER_KEY]: string;
 }
 
 type Nullable<T> = T | null | undefined;
@@ -33,82 +35,56 @@ type SessionKeys = keyof SessionStore;
 const ls = createLocalStorage();
 const ss = createSessionStorage();
 
-const localMemory = new Memory(DEFAULT_CACHE_TIME);
-const sessionMemory = new Memory(DEFAULT_CACHE_TIME);
-
-function initPersistentMemory() {
-  const localCache = ls.get(APP_LOCAL_CACHE_KEY);
-  const sessionCache = ss.get(APP_SESSION_CACHE_KEY);
-
-  if (localCache) {
-    localMemory.resetCache(localCache);
-  }
-
-  if (sessionCache) {
-    sessionMemory.resetCache(sessionCache);
-  }
-}
-
 export class Persistent {
   static getLocal<T>(key: LocalKeys) {
-    return localMemory.get(key)?.value as Nullable<T>;
+    const cacheResult = ls.get(key);
+    if (cacheResult === null) {
+      return cacheResult as Nullable<T>;
+    }
+    if (cacheResult.value) {
+      return cacheResult.value as Nullable<T>;
+    }
+    return cacheResult as Nullable<T>;
   }
 
-  static setLocal(key: LocalKeys, value: LocalStore[LocalKeys], immediate = false): void {
-    localMemory.set(key, value);
-
-    if (immediate) {
-      ls.set(APP_LOCAL_CACHE_KEY, localMemory.getCache);
-    }
+  static setLocal(key: LocalKeys, value: LocalStore[LocalKeys]): void {
+    ls.set(key, value);
   }
 
-  static removeLocal(key: LocalKeys, immediate = false): void {
-    localMemory.remove(key);
-
-    if (immediate) {
-      ls.set(APP_LOCAL_CACHE_KEY, localMemory.getCache);
-    }
+  static removeLocal(key: LocalKeys): void {
+    ls.remove(key);
   }
 
-  static clearLocal(immediate = false): void {
-    localMemory.clear();
-    if (immediate) {
-      ls.clear();
-    }
+  static clearLocal(): void {
+    ls.clear();
   }
 
   static getSession<T>(key: SessionKeys) {
-    return sessionMemory.get(key)?.value as Nullable<T>;
+    const cacheResult = ss.get(key);
+    if (cacheResult === null) {
+      return cacheResult as Nullable<T>;
+    }
+    if (cacheResult.value) {
+      return cacheResult.value as Nullable<T>;
+    }
+    return cacheResult as Nullable<T>;
   }
 
-  static setSession(key: SessionKeys, value: SessionStore[SessionKeys], immediate = false): void {
-    sessionMemory.set(key, value);
-    if (immediate) {
-      ss.set(APP_SESSION_CACHE_KEY, sessionMemory.getCache);
-    }
+  static setSession(key: SessionKeys, value: SessionStore[SessionKeys]): void {
+    ss.set(key, value);
   }
 
-  static removeSession(key: SessionKeys, immediate = false): void {
-    sessionMemory.remove(key);
-    if (immediate) {
-      ss.set(APP_SESSION_CACHE_KEY, sessionMemory.getCache);
-    }
+  static removeSession(key: SessionKeys): void {
+    ss.remove(key);
   }
 
-  static clearSession(immediate = false): void {
-    sessionMemory.clear();
-    if (immediate) {
-      ls.clear();
-    }
+  static clearSession(): void {
+    ss.clear();
   }
 
-  static clearAll(immediate = false) {
-    sessionMemory.clear();
-    localMemory.clear();
-    if (immediate) {
-      ls.clear();
-      ss.clear();
-    }
+  static clearAll() {
+    ss.clear();
+    ls.clear();
   }
 }
 
@@ -131,5 +107,3 @@ function storageChange(e: any) {
 }
 
 window.addEventListener('storage', storageChange);
-
-initPersistentMemory();

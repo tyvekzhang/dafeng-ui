@@ -1,6 +1,7 @@
 import type { AppModeEnum, ThemeEnum } from '@/enums/appEnum';
 import type { RouteObject } from '@/router/types';
 import type { AppConfig } from '@/types/config';
+import { LoginResponse } from '@/types/user';
 
 export interface UserInfo {
   userId: string | number;
@@ -14,9 +15,8 @@ export interface UserInfo {
 
 export interface UserState {
   userInfo: Nullable<UserInfo>;
-  token?: string;
-  sessionTimeout?: boolean;
-  lastUpdateTime: number;
+  token?: LoginResponse;
+  rememberMe: undefined;
 }
 
 export interface MenuOptions {
@@ -46,4 +46,4 @@ export interface AppState {
   appConfig: Nullable<AppConfig>;
 }
 
-export type AuthCacheValue = string | UserInfo | null;
+export type AuthCacheValue = string | UserInfo | null | LoginResponse | boolean;

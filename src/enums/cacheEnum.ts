@@ -1,5 +1,7 @@
 export const TOKEN_KEY = 'TOKEN_KEY';
 
+export const REMEMBER_KEY = 'REMEMBER_KEY';
+
 export const LOCALE_KEY = 'LOCALE_KEY';
 
 export const USER_INFO_KEY = 'USER_INFO_KEY';

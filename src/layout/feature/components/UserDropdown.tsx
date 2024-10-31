@@ -1,10 +1,12 @@
 import headerImg from '@/assets/images/avatar.jpg';
-import { TOKEN_KEY } from '@/enums/cacheEnum';
+import { message } from '@/components/GlobalToast';
+import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
 import { myMessage } from '@/hooks/web/myMessage';
 import { logoutApi } from '@/services';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { resetState } from '@/stores/modules/user';
-import { clearAuthCache, getAuthCache } from '@/utils/auth';
+import { LoginResponse } from '@/types/user';
+import { clearAllAuthCache, getAuthCache } from '@/utils/auth';
 import { LockOutlined, PoweroffOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
@@ -16,8 +18,8 @@ export default function UserDropdown() {
       key: 'lock',
       label: (
         <Space size={4}>
-          <LockOutlined rev={undefined} />
-          <span>锁定屏幕</span>
+          <LockOutlined />
+          <span>个人中心</span>
         </Space>
       ),
     },
@@ -25,7 +27,7 @@ export default function UserDropdown() {
       key: 'logout',
       label: (
         <Space size={4}>
-          <PoweroffOutlined rev={undefined} />
+          <PoweroffOutlined />
           <span>退出登录</span>
         </Space>
       ),
@@ -47,8 +49,15 @@ export default function UserDropdown() {
 
   const dispatch = useAppDispatch();
   const { token } = useAppSelector((state) => state.user);
-  const getToken = (): string => {
-    return token || getAuthCache<string>(TOKEN_KEY);
+  const getToken = (): LoginResponse | null => {
+    if (token) {
+      return token;
+    }
+    const localRemember = getAuthCache<boolean>(true, REMEMBER_KEY);
+    if (localRemember !== undefined) {
+      return getAuthCache<LoginResponse>(localRemember, TOKEN_KEY);
+    }
+    return null;
   };
 
   const handleLock = () => {};
@@ -72,14 +81,15 @@ export default function UserDropdown() {
         await logoutApi();
       } catch {
         const { createMessage } = myMessage();
-        createMessage.error('注销失败!');
+        createMessage.error('注销失败');
       }
     }
     dispatch(resetState());
-    clearAuthCache();
+    clearAllAuthCache();
     if (goLogin) {
       navigate('/login');
     }
+    message.success('注销成功');
   };
 
   return (

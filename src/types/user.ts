@@ -1,7 +1,7 @@
 export type LoginForm = {
   username: string;
   password: string;
-  remember: string;
+  remember: boolean;
 };
 
 export interface UserCreate {
@@ -16,4 +16,5 @@ export interface LoginResponse {
   expired_at: number;
   refresh_token: string;
   re_expired_at: number;
+  remember: boolean;
 }

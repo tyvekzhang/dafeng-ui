@@ -1,12 +1,11 @@
-import { clearAuthCache, getToken, setAuthCache } from '@/utils/auth';
-import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { clearAllAuthCache, getAuthCache, getCacheToken, setAuthCache } from '@/utils/auth';
+import type { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 import { message } from '@/components/GlobalToast';
-import { TOKEN_KEY } from '@/enums/cacheEnum';
+import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
 import { refreshTokens } from '@/services/user';
 import NProgress from '@/settings/n_progress';
-import { Recordable } from 'vite-plugin-mock';
 
 class HttpRequest {
   instance: AxiosInstance;
@@ -15,12 +14,11 @@ class HttpRequest {
     this.instance = axios.create(config);
 
     this.instance.interceptors.request.use(
-      (config) => {
+      (config: InternalAxiosRequestConfig) => {
         NProgress.start();
-        // 添加token
-        const token = getToken();
+        const token = getCacheToken();
         if (token) {
-          (config as Recordable).headers['Authorization'] = `${token.token_type} ${token.access_token}`;
+          config.headers.Authorization = `${token.token_type} ${token.access_token}`;
         }
         return config;
       },
@@ -37,32 +35,32 @@ class HttpRequest {
         } else if (data.refresh_token) {
           return data;
         } else {
-          message.error(data.msg);
-          return Promise.reject(new Error(data.msg));
+          return Promise.reject(new Error(data.msg || '服务器出小差啦'));
         }
       },
       async (error) => {
         NProgress.done();
         const originalRequest = error.config;
-
         // 判断认证失败和认证过期的情况
         if (error.response.status === 401 && !originalRequest._retry) {
-          debugger;
           originalRequest._retry = true;
           try {
-            const oldToken = getToken();
-            const token = await refreshTokens({ refresh_token: oldToken.refresh_token });
-            setAuthCache(TOKEN_KEY, token as any);
+            const oldToken = getCacheToken();
+            const localRemember = getAuthCache(true, REMEMBER_KEY) as boolean;
+            if (oldToken) {
+              const token = await refreshTokens(oldToken);
+              setAuthCache(localRemember, TOKEN_KEY, token);
+            }
             return this.instance(originalRequest);
           } catch (error) {
-            console.log(error);
-            debugger;
-            clearAuthCache();
+            message.error('登录状态已失效, 请重新登录');
+            clearAllAuthCache();
             location.href = '/login';
+            return Promise.reject(error);
           }
         }
-        message.error(error.msg || '服务开小差啦');
-        return Promise.reject(error.message || error);
+        message.error(error.response.data.msg ? error.response.data.msg : '服务开小差啦');
+        return Promise.reject(error);
       },
     );
   }
