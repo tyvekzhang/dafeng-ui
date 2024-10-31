@@ -17,7 +17,7 @@ const AppLogo: FC = () => {
   };
 
   return (
-    <div className={classNames('anticon', styles.appLogo)} onClick={handleClick}>
+    <div className={classNames('scicon', styles.appLogo)} onClick={handleClick}>
       <Space>
         {/* 图标 */}
         <img className={styles.logoImg} src={logoImg} alt="logo" />

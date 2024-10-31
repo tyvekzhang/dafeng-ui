@@ -1,6 +1,6 @@
 import type { AppMenu } from '@/router/types';
 import axiosInstance from '@/services/request';
-import { LoginForm, LoginResponse } from '@/types/user';
+import { LoginForm, LoginResponse, UserCreate } from '@/types/user';
 
 // User login services
 export function login(data: LoginForm) {
@@ -31,4 +31,8 @@ export function dynamicMenu(): Promise<AppMenu[]> {
 
 export function logoutApi() {
   return axiosInstance.get('/user/logout');
+}
+
+export function register(data: UserCreate) {
+  return axiosInstance.post('/user/register', data);
 }

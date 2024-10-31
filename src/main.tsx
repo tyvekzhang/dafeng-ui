@@ -13,6 +13,7 @@ import { store } from './stores';
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
     <ConfigProvider
+      prefixCls="sc"
       theme={{
         token: themeToken,
         components: customCompTheme,

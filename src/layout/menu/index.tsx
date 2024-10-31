@@ -44,7 +44,7 @@ const LayoutMenu = memo((props: any) => {
   const addIcon = (icon?: string) => {
     if (!icon) return null;
     return (
-      <span className="anticon">
+      <span className="scicon">
         <SvgIcon name={icon} size={16} />
       </span>
     );

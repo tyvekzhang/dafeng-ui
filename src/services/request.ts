@@ -35,6 +35,7 @@ class HttpRequest {
         } else if (data.refresh_token) {
           return data;
         } else {
+          message.error(data.msg ? data.msg : '服务器出小差啦');
           return Promise.reject(new Error(data.msg || '服务器出小差啦'));
         }
       },

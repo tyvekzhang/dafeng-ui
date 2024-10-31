@@ -8,6 +8,7 @@ export interface UserCreate {
   username: string;
   password: string;
   nickname: string;
+  remark?: string;
 }
 
 export interface LoginResponse {

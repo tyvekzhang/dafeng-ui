@@ -1,12 +1,18 @@
+import { message } from '@/components/GlobalToast';
+import { register } from '@/services';
+import { UserCreate } from '@/types/user';
 import type { DatePickerProps } from 'antd';
 import { Button, Card, DatePicker, Form, Input, Modal, Select, Space, Switch, Table, theme } from 'antd';
 import type { Dayjs } from 'dayjs';
 import React, { useState } from 'react';
+import useStyles from './style';
 
 const User: React.FC = () => {
+  const { styles } = useStyles();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const formItemLayout = {
     labelCol: { span: 4 },
@@ -47,22 +53,7 @@ const User: React.FC = () => {
     );
   };
   // 表格展示
-  const dataSource = [
-    {
-      no: '1',
-      username: 'Dill',
-      nickname: '迪丽热巴',
-      state: 1,
-      createDate: '2024-10-18',
-    },
-    {
-      no: '2',
-      username: 'Gull',
-      nickname: '古力娜扎',
-      state: 0,
-      createDate: '2024-10-18',
-    },
-  ];
+  const dataSource: readonly { state: boolean | undefined }[] | undefined = [];
 
   const columns = [
     {
@@ -103,16 +94,32 @@ const User: React.FC = () => {
     },
   ];
 
+  const handleAddUser = async (values: UserCreate) => {
+    setLoading(true);
+    try {
+      await register(values);
+      form.resetFields();
+      handleCancel();
+      message.success('用户新增成功');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <>
-      <Card style={{ marginBottom: 1, boxShadow: '0 3px 0 -4px rgba(0, 0, 0, 0.12)' }} bordered={false}>
+    <div className={styles.container}>
+      <Card bordered={false} className={styles.searchContainer}>
         <Form>
-          <Space wrap>
+          <Space wrap className={styles.searchContent}>
             <Form.Item name="username" label="用户名">
               <Input placeholder="请输入" />
             </Form.Item>
             <Form.Item name="nickname" label="用户昵称">
               <Input placeholder="请输入" />
+            </Form.Item>
+
+            <Form.Item name="createDate" label="创建日期">
+              <DatePicker.RangePicker cellRender={cellRender} />
             </Form.Item>
             <Form.Item name="state" label="状态">
               <Select
@@ -120,7 +127,7 @@ const User: React.FC = () => {
                 placeholder="请选择"
                 optionFilterProp="label"
                 onChange={onChange}
-                style={{ width: 100 }}
+                style={{ width: 112 }}
                 options={[
                   {
                     value: '1',
@@ -133,26 +140,39 @@ const User: React.FC = () => {
                 ]}
               />
             </Form.Item>
-            <Form.Item name="createDate" label="创建日期">
-              <DatePicker.RangePicker cellRender={cellRender} />
-            </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                搜索
-              </Button>
-            </Form.Item>
+            <div className={styles.searchOperation}>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" style={{ margin: '0 8px 0 0' }}>
+                  搜索
+                </Button>
+                <Button>重置</Button>
+              </Form.Item>
+            </div>
           </Space>
         </Form>
       </Card>
-      <Card bordered={false}>
-        <Space style={{ margin: '0 0 12px 0' }}>
-          <Button onClick={showModal} type="primary">
-            新建
+      <Card bordered={false} className={styles.resultContainer}>
+        <Space className={styles.resultSearch}>
+          <Button onClick={showModal} className={`${styles.button} btn-add`}>
+            新增
           </Button>
-          <Button>导入</Button>
+          <Button className={`${styles.button} btn-import`}>导入</Button>
+          <Button className={`${styles.button} btn-delete`}>删除</Button>
         </Space>
-        <Modal title="用户新增:" open={isModalVisible} onCancel={handleCancel}>
-          <Form form={form} name="user_add_rule">
+        <Modal
+          title="用户新增:"
+          open={isModalVisible}
+          onCancel={handleCancel}
+          footer={
+            <>
+              <Button type={'primary'} htmlType="submit" onClick={() => form.submit()} loading={loading}>
+                确定
+              </Button>
+              <Button onClick={handleCancel}>取消</Button>
+            </>
+          }
+        >
+          <Form form={form} name="user_add_rule" onFinish={handleAddUser}>
             <Form.Item
               {...formItemLayout}
               name="username"
@@ -161,10 +181,25 @@ const User: React.FC = () => {
             >
               <Input placeholder="请输入" />
             </Form.Item>
-            <Form.Item {...formItemLayout} name="password" label="密码" rules={[{ required: true, message: '必填项' }]}>
+            <Form.Item
+              {...formItemLayout}
+              name="password"
+              label="密码"
+              rules={[
+                { required: true, message: '必填项' },
+                {
+                  min: 6,
+                  message: '请设置密码不少于6位',
+                },
+                {
+                  pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/,
+                  message: '需要有数字和字母',
+                },
+              ]}
+              validateTrigger="onBlur"
+            >
               <Input.Password
                 placeholder="请输入"
-                defaultValue={123456}
                 visibilityToggle={{ visible: passwordVisible, onVisibleChange: setPasswordVisible }}
               />
             </Form.Item>
@@ -188,7 +223,7 @@ const User: React.FC = () => {
         </Modal>
         <Table dataSource={dataSource} columns={columns} />
       </Card>
-    </>
+    </div>
   );
 };
 
