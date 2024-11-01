@@ -7,4 +7,7 @@ export enum ExceptionEnum {
 
   // server error
   SERVER_ERROR = 500,
+
+  // unknown error
+  UNKNOWN_ERROR = -1,
 }

@@ -1,8 +1,7 @@
 import type { AppMenu } from '@/router/types';
 import axiosInstance from '@/services/request';
-import { LoginForm, LoginResponse, UserCreate } from '@/types/user';
+import { LoginForm, LoginResponse, UserCreate, UserQuery } from '@/types/user';
 
-// User login services
 export function login(data: LoginForm) {
   return axiosInstance.post<LoginResponse>('/user/login', data, {
     headers: {
@@ -11,7 +10,6 @@ export function login(data: LoginForm) {
   });
 }
 
-// Refresh token
 export function refreshTokens(data: LoginResponse) {
   return axiosInstance.post<LoginResponse>('/user/refreshTokens', {
     refresh_token: data.refresh_token,
@@ -19,14 +17,12 @@ export function refreshTokens(data: LoginResponse) {
   });
 }
 
-// Get User info
-export function getUserInfo(): Promise<never> {
-  return axiosInstance.get('/user/me'); // 使用 httpClient 的 get 方法
+export function meInfo(): Promise<never> {
+  return axiosInstance.get('/user/me');
 }
 
-// Get dynamic menu
-export function dynamicMenu(): Promise<AppMenu[]> {
-  return axiosInstance.get('/user/dynamicMenu'); // 使用 httpClient 的 get 方法
+export function userMenu(): Promise<AppMenu[]> {
+  return axiosInstance.get('/user/menu');
 }
 
 export function logoutApi() {
@@ -35,4 +31,20 @@ export function logoutApi() {
 
 export function register(data: UserCreate) {
   return axiosInstance.post('/user/register', data);
+}
+
+export function userList() {
+  return axiosInstance.post<UserQuery[]>('/user/list', {});
+}
+
+export function userUpdate(data: UserQuery) {
+  return axiosInstance.put<UserQuery>('/user/', data);
+}
+
+export function userDelete(data: UserQuery) {
+  return axiosInstance.delete(`/user/${data.id}`);
+}
+
+export function userRecover(data: UserQuery) {
+  return axiosInstance.post(`/user/recover`, data);
 }

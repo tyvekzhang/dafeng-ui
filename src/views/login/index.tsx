@@ -1,5 +1,5 @@
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
-import { getUserInfo, login } from '@/services';
+import { login, meInfo } from '@/services';
 import { appSetting } from '@/settings/appBaseSetting';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { setRememberMe, setToken, setUserInfo } from '@/stores/modules/user';
@@ -90,7 +90,7 @@ const LoginPage: FC = () => {
   };
 
   const getUserInfoAction = async (): Promise<UserInfo | null> => {
-    const userInfo = await getUserInfo();
+    const userInfo = await meInfo();
 
     dispatch(setUserInfo(userInfo));
 

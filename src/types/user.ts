@@ -1,3 +1,5 @@
+import { baseModel } from '@/types/common';
+
 export type LoginForm = {
   username: string;
   password: string;
@@ -8,6 +10,14 @@ export interface UserCreate {
   username: string;
   password: string;
   nickname: string;
+  remark?: string;
+}
+
+export interface UserQuery extends baseModel {
+  username: string;
+  password: string;
+  nickname: string;
+  status: number;
   remark?: string;
 }
 

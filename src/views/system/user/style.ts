@@ -15,16 +15,19 @@ export default createStyles(({ css }) => ({
   },
   searchContent: {
     display: 'flex',
+    justifyContent: 'space-between',
   },
   searchOperation: {
-    display: 'flex',
-    justifyContent: 'flex-end',
+    marginLeft: 'auto',
   },
   resultContainer: {
     width: '100%',
   },
   resultSearch: {
-    margin: '0 0 16px 0',
+    display: 'flex',
+    width: '100%',
+    padding: '16px 0 0 24px',
+    backgroundColor: '#fff',
   },
   button: css`
     #root & {
@@ -45,6 +48,17 @@ export default createStyles(({ css }) => ({
 
         &:hover {
           background-color: #73d13d;
+          color: #fff;
+          border: none;
+        }
+      }
+
+      &.btn-export {
+        background-color: #f5f5f5ff;
+        color: #8c8c8c;
+
+        &:hover {
+          background-color: #8c8c8c;
           color: #fff;
           border: none;
         }

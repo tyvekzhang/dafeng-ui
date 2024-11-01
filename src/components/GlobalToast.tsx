@@ -1,9 +1,5 @@
-/**
- * 用来转化message等类方法
- */
-
 import { App } from 'antd';
-import { memo } from 'react';
+import React, { memo } from 'react';
 
 import type { MessageInstance } from 'antd/es/message/interface';
 import type { ModalStaticFunctions } from 'antd/es/modal/confirm';
