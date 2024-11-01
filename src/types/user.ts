@@ -21,6 +21,11 @@ export interface UserQuery extends baseModel {
   remark?: string;
 }
 
+export interface UserTableData {
+  records: UserQuery[] | undefined;
+  total_count: number | undefined;
+}
+
 export interface LoginResponse {
   access_token: string;
   token_type: string;
@@ -28,4 +33,11 @@ export interface LoginResponse {
   refresh_token: string;
   re_expired_at: number;
   remember: boolean;
+}
+
+export interface userSearch {
+  username?: string;
+  nickname?: string;
+  status?: number;
+  created_time?: string;
 }

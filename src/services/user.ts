@@ -1,6 +1,7 @@
 import type { AppMenu } from '@/router/types';
 import axiosInstance from '@/services/request';
-import { LoginForm, LoginResponse, UserCreate, UserQuery } from '@/types/user';
+import { TableParams } from '@/types/common';
+import { LoginForm, LoginResponse, UserCreate, UserQuery, UserTableData } from '@/types/user';
 
 export function login(data: LoginForm) {
   return axiosInstance.post<LoginResponse>('/user/login', data, {
@@ -33,8 +34,12 @@ export function register(data: UserCreate) {
   return axiosInstance.post('/user/register', data);
 }
 
-export function userList() {
-  return axiosInstance.post<UserQuery[]>('/user/list', {});
+export function userList(pagination: TableParams) {
+  const data = {
+    page: pagination?.page,
+    size: pagination?.size,
+  };
+  return axiosInstance.post<UserTableData>('/user/list', data);
 }
 
 export function userUpdate(data: UserQuery) {

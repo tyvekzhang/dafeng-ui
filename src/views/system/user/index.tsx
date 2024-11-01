@@ -1,10 +1,24 @@
 import { message } from '@/components/GlobalToast';
 import UndoComp from '@/components/Undo';
 import { register, userDelete, userList, userRecover, userUpdate } from '@/services';
+import { TableParams } from '@/types/common';
 import { UserCreate, UserQuery } from '@/types/user';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import type { DatePickerProps } from 'antd';
-import { Button, Card, DatePicker, Form, Input, Modal, Select, Space, Switch, Table, theme } from 'antd';
+import {
+  Button,
+  Card,
+  DatePicker,
+  DatePickerProps,
+  Form,
+  Input,
+  Modal,
+  Pagination,
+  Select,
+  Space,
+  Switch,
+  Table,
+  theme,
+} from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import useStyles from './style';
@@ -94,38 +108,31 @@ const columns = (
   },
 ];
 
+const formItemLayout = {
+  labelCol: { span: 4 },
+  wrapperCol: { span: 12 },
+};
+
 const UserPage: React.FC = () => {
   const { styles } = useStyles();
-  const [addUserForm] = Form.useForm();
-  const [updateUserForm] = Form.useForm();
-  const [isAddUserModalVisible, setIsAddUserModalVisible] = useState<boolean>(false);
-  const [isEditUserModalVisible, setIsUpdateUserModalVisible] = useState<boolean>(false);
-  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
+  const [userCreateForm] = Form.useForm();
+  const [userUpdateForm] = Form.useForm();
+  const [userSearchForm] = Form.useForm();
+  const [isUserCreateModalVisible, setIsUserCreateModalVisible] = useState<boolean>(false);
+  const [isUserUpdateModalVisible, setIsUpdateUserModalVisible] = useState<boolean>(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
+  const [isShowUndo, setIsShowUndo] = useState<boolean>(false);
   const [dataSource, setDataSource] = useState<UserQuery[] | undefined>([]);
-  const [value, setValue] = useState('');
   const [editingUser, setUpdatingUser] = useState<UserQuery | null>(null);
   const [recoverUser, setRecoverUser] = useState<UserQuery | null>(null);
-  const [showUndo, setShowUndo] = useState(false);
-
-  const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 12 },
-  };
-
-  const showModal = () => {
-    setIsAddUserModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsAddUserModalVisible(false);
-    setIsUpdateUserModalVisible(false);
-  };
-
-  const onChange = (value: string) => {
-    console.log(`selected ${value}`);
-  };
+  const [value, setValue] = useState<string>('');
+  const [totalCount, setTotal] = useState<number | undefined>(0);
+  const [tableParams, setTableParams] = useState<TableParams>({
+    page: 1,
+    size: 10,
+  });
 
   // 日期选择
   const { token } = theme.useToken();
@@ -147,16 +154,65 @@ const UserPage: React.FC = () => {
     );
   };
 
+  const onChange = (value: string) => {
+    console.log(`selected ${value}`);
+  };
+
+  const onUpdate = (user: UserQuery) => {
+    setUpdatingUser(user);
+    userUpdateForm.setFieldsValue(user);
+    setIsUpdateUserModalVisible(true);
+  };
+
+  const setUserTableData = async () => {
+    const { records, total_count } = await userList(tableParams);
+    setDataSource(records);
+    setTotal(total_count);
+  };
+
+  const handleUndo = async () => {
+    if (recoverUser) {
+      await userRecover(recoverUser);
+    }
+    setIsShowUndo(false);
+    await setUserTableData();
+  };
+
+  const handleShowModal = () => {
+    setIsUserCreateModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsUserCreateModalVisible(false);
+    setIsUpdateUserModalVisible(false);
+  };
+
+  const handleHide = () => {
+    setIsShowUndo(false);
+  };
+
   const handleAddUser = async (values: UserCreate) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       await register(values);
-      addUserForm.resetFields();
+      userCreateForm.resetFields();
       handleCancel();
       message.success('新增成功');
-      setDataSource(await userList());
+      await setUserTableData();
     } finally {
-      setLoading(false);
+      setIsLoading(false);
+    }
+  };
+
+  const handleUserDelete = async (user: UserQuery) => {
+    setIsLoadingDelete(true);
+    try {
+      setRecoverUser(user);
+      await userDelete(user);
+      await setUserTableData();
+      setIsShowUndo(true);
+    } finally {
+      setIsLoadingDelete(false);
     }
   };
 
@@ -164,68 +220,49 @@ const UserPage: React.FC = () => {
     const updatedStatus = user.status === 1 ? 0 : 1;
     await userUpdate({ ...user, status: updatedStatus });
     message.success('更新成功');
-    setDataSource(await userList());
+    await setUserTableData();
   };
 
   const handleUserUpdate = async (values: UserQuery) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       if (editingUser === null) {
         return;
       }
       await userUpdate({ ...editingUser, ...values });
       handleCancel();
-      updateUserForm.resetFields();
+      userUpdateForm.resetFields();
       message.success('更新成功');
-      setDataSource(await userList());
+      await setUserTableData();
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const onUpdate = (user: UserQuery) => {
-    setUpdatingUser(user);
-    updateUserForm.setFieldsValue(user);
-    setIsUpdateUserModalVisible(true);
+  const handleUserSearch = (values: any) => {
+    alert(JSON.stringify(values));
   };
 
-  const handleHide = () => {
-    setShowUndo(false);
-  };
-
-  const handleUserDelete = async (user: UserQuery) => {
-    setLoadingDelete(true);
-    try {
-      setRecoverUser(user);
-      await userDelete(user);
-      setDataSource(await userList());
-      setShowUndo(true);
-    } finally {
-      setLoadingDelete(false);
-    }
-  };
-
-  const handleUndo = async () => {
-    if (recoverUser) {
-      await userRecover(recoverUser);
-      setDataSource(await userList());
-    }
-    setShowUndo(false);
+  const handlePaginationSearch = async (current: number, size: number) => {
+    setTableParams((prev) => ({
+      ...prev,
+      page: current,
+      size: size,
+    }));
+    await setUserTableData();
   };
 
   useEffect(() => {
-    userList().then((res) => {
-      setDataSource(res);
-    });
-    return () => {
-      setDataSource([]);
+    const getUserData = async () => {
+      await setUserTableData();
     };
-  }, []);
+    getUserData().catch((err) => console.log(err));
+  }, [tableParams]);
 
   return (
     <div className={styles.container}>
       <Card bordered={false} className={styles.searchContainer}>
-        <Form>
+        <Form form={userSearchForm} name="user_search_rule" onFinish={handleUserSearch}>
           <Space wrap className={styles.searchContent}>
             <Form.Item name="username" label="用户名">
               <Input placeholder="请输入" />
@@ -233,7 +270,6 @@ const UserPage: React.FC = () => {
             <Form.Item name="nickname" label="用户昵称">
               <Input placeholder="请输入" />
             </Form.Item>
-
             <Form.Item name="createDate" label="创建日期">
               <DatePicker.RangePicker cellRender={cellRender} />
             </Form.Item>
@@ -261,14 +297,14 @@ const UserPage: React.FC = () => {
                 <Button type="primary" htmlType="submit" style={{ margin: '0 8px 0 0' }}>
                   搜索
                 </Button>
-                <Button>重置</Button>
+                <Button onClick={() => userSearchForm.resetFields()}>重置</Button>
               </Form.Item>
             </div>
           </Space>
         </Form>
       </Card>
       <Space className={styles.resultSearch}>
-        <Button onClick={showModal} className={`${styles.button} btn-add`}>
+        <Button onClick={handleShowModal} className={`${styles.button} btn-add`}>
           新增
         </Button>
         <Button className={`${styles.button} btn-import`}>导入</Button>
@@ -278,18 +314,18 @@ const UserPage: React.FC = () => {
       <Card bordered={false} className={styles.resultContainer}>
         <Modal
           title="用户新增:"
-          open={isAddUserModalVisible}
+          open={isUserCreateModalVisible}
           onCancel={handleCancel}
           footer={
             <>
-              <Button type={'primary'} htmlType="submit" onClick={() => addUserForm.submit()} loading={loading}>
+              <Button type={'primary'} htmlType="submit" onClick={() => userCreateForm.submit()} loading={isLoading}>
                 确定
               </Button>
               <Button onClick={handleCancel}>取消</Button>
             </>
           }
         >
-          <Form form={addUserForm} name="user_add_rule" onFinish={handleAddUser}>
+          <Form form={userCreateForm} name="user_add_rule" onFinish={handleAddUser}>
             <Form.Item
               {...formItemLayout}
               name="username"
@@ -320,7 +356,7 @@ const UserPage: React.FC = () => {
             >
               <Input.Password
                 placeholder="请输入"
-                visibilityToggle={{ visible: passwordVisible, onVisibleChange: setPasswordVisible }}
+                visibilityToggle={{ visible: isPasswordVisible, onVisibleChange: setIsPasswordVisible }}
               />
             </Form.Item>
             <Form.Item
@@ -343,18 +379,18 @@ const UserPage: React.FC = () => {
         </Modal>
         <Modal
           title="用户修改:"
-          open={isEditUserModalVisible}
+          open={isUserUpdateModalVisible}
           onCancel={handleCancel}
           footer={
             <>
-              <Button type={'primary'} htmlType="submit" onClick={() => updateUserForm.submit()} loading={loading}>
+              <Button type={'primary'} htmlType="submit" onClick={() => userUpdateForm.submit()} loading={isLoading}>
                 确定
               </Button>
               <Button onClick={handleCancel}>取消</Button>
             </>
           }
         >
-          <Form form={updateUserForm} name="user_edit_rule" onFinish={handleUserUpdate}>
+          <Form form={userUpdateForm} name="user_edit_rule" onFinish={handleUserUpdate}>
             <Form.Item
               {...formItemLayout}
               name="nickname"
@@ -375,13 +411,24 @@ const UserPage: React.FC = () => {
         </Modal>
         <Table
           dataSource={dataSource}
-          columns={columns(onUpdate, handleUserDelete, loadingDelete, handleStatusChange)}
+          columns={columns(onUpdate, handleUserDelete, isLoadingDelete, handleStatusChange)}
           rowKey={'username'}
-          pagination={{ pageSize: 5 }}
+          pagination={false}
           scroll={{ y: 50 * 6 }}
           rowSelection={{ type: 'checkbox' }}
         />
-        {showUndo && <UndoComp duration={5} onUndo={handleUndo} onHide={handleHide} />}
+        <div style={{ margin: 8 }}>
+          <Pagination
+            defaultCurrent={tableParams?.page}
+            pageSize={tableParams?.size}
+            total={totalCount}
+            align="end"
+            showSizeChanger
+            showQuickJumper
+            onChange={handlePaginationSearch}
+          />
+        </div>
+        {isShowUndo && <UndoComp duration={5} onUndo={handleUndo} onHide={handleHide} />}
       </Card>
     </div>
   );
