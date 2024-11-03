@@ -23,7 +23,7 @@ const app = createSlice({
     },
     setAppConfig: (state, action) => {
       state.appConfig = deepMerge(state.appConfig || {}, action.payload);
-      Persistent.setLocal(APP_CONFIG_KEY, state.appConfig, true);
+      Persistent.setLocal(APP_CONFIG_KEY, state.appConfig);
     },
     resetState(state) {
       state.appMode = undefined;

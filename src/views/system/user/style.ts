@@ -32,22 +32,21 @@ export default createStyles(({ css }) => ({
   button: css`
     #root & {
       &.btn-add {
-        background-color: #fcffe6;
-        color: #a0d911;
-
-        &:hover {
-          background-color: #bae637;
-          color: #fff;
-          border: none;
-        }
-      }
-
-      &.btn-import {
         background-color: #f6ffed;
         color: #52c41a;
 
         &:hover {
           background-color: #73d13d;
+          color: #fff;
+          border: none;
+        }
+      }
+      &.btn-import {
+        background-color: #fcffe6;
+        color: #a0d911;
+
+        &:hover {
+          background-color: #bae637;
           color: #fff;
           border: none;
         }

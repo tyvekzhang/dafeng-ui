@@ -1,10 +1,10 @@
-import { createStyles } from 'antd-style'; // 确保这个导入是正确的
+import { createStyles } from 'antd-style';
 
 export default createStyles(() => ({
-  layout_wrapper: {
+  layoutWrapper: {
     display: 'flex',
     width: '100%',
-    height: '100vh',
+    minHeight: '100vh',
     overflowX: 'hidden',
   },
 }));

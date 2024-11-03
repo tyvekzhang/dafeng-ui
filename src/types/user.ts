@@ -1,4 +1,4 @@
-import { baseModel } from '@/types/common';
+import { BaseModel, BasePage } from '@/types/common';
 
 export type LoginForm = {
   username: string;
@@ -13,7 +13,16 @@ export interface UserCreate {
   remark?: string;
 }
 
-export interface UserQuery extends baseModel {
+export interface UserSearch {
+  username?: string;
+  nickname?: string;
+  status?: number;
+  create_time?: any;
+}
+
+export type UserResearchForm = BasePage & UserSearch;
+
+export interface UserQuery extends BaseModel {
   username: string;
   password: string;
   nickname: string;

@@ -3,29 +3,36 @@ import { useTitle } from '@/hooks/web/useTitle';
 import TagsLayout from '@/layout/tags';
 import { useAppSelector } from '@/stores';
 import { Layout } from 'antd';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import HeaderLayout from './header';
 import Menu from './menu';
 import useStyles from './style';
 
 const BasicLayout: React.FC = () => {
-  useTitle();
   const { styles } = useStyles();
+  useTitle();
   const { Sider, Content } = Layout;
-  const { state } = useLocation();
-  const { key = 'key' } = state || {};
-  const getMenuFold = useAppSelector((st) => st.app.appConfig?.menuSetting?.menuFold);
+  const location = useLocation();
+  const key = location.state?.key || 'defaultKey';
+  const menuFold = useAppSelector((st) => st.app.appConfig?.menuSetting?.menuFold);
+  const layoutClasses = useMemo(
+    () => ({
+      sider: { width: 200, collapsed: menuFold },
+      layout: styles.layoutWrapper,
+    }),
+    [menuFold, styles.layoutWrapper],
+  );
 
   return (
-    <Layout className={styles.layout_wrapper}>
-      <Sider width={200} collapsed={getMenuFold}>
+    <Layout className={layoutClasses.layout}>
+      <Sider {...layoutClasses.sider}>
         <AppLogo />
         <Menu />
       </Sider>
       <Layout>
         <HeaderLayout />
-        <Layout id="mainCont">
+        <Layout id="mainContent">
           <TagsLayout />
           <Content>
             <Outlet key={key} />
@@ -35,5 +42,4 @@ const BasicLayout: React.FC = () => {
     </Layout>
   );
 };
-
 export default BasicLayout;

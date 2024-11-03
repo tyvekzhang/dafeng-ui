@@ -1,6 +1,7 @@
 import { clearAllAuthCache, getAuthCache, getCacheToken, setAuthCache } from '@/utils/auth';
 import type { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
+import qs from 'qs';
 
 import { message } from '@/components/GlobalToast';
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
@@ -11,7 +12,10 @@ class HttpRequest {
   instance: AxiosInstance;
 
   public constructor(config: AxiosRequestConfig) {
-    this.instance = axios.create(config);
+    this.instance = axios.create({
+      ...config,
+      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
+    });
 
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
@@ -28,8 +32,12 @@ class HttpRequest {
     this.instance.interceptors.response.use(
       (response) => {
         NProgress.done();
+        debugger;
+        const contentDisposition = response.headers['content-disposition'];
+        if (contentDisposition && contentDisposition.includes('attachment')) {
+          return response;
+        }
         const data = response.data;
-
         if (data.code === 0) {
           return data.data;
         } else if (data.refresh_token) {

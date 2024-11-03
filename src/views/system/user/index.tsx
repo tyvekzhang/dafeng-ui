@@ -1,25 +1,25 @@
 import { message } from '@/components/GlobalToast';
 import UndoComp from '@/components/Undo';
-import { register, userDelete, userList, userRecover, userUpdate } from '@/services';
-import { TableParams } from '@/types/common';
-import { UserCreate, UserQuery } from '@/types/user';
+import { register, userDelete, userExport, userList, userRecover, userRemove, userUpdate } from '@/services';
+import { UserCreate, UserQuery, UserResearchForm, UserSearch } from '@/types/user';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
   DatePicker,
-  DatePickerProps,
   Form,
   Input,
   Modal,
   Pagination,
+  Popconfirm,
+  PopconfirmProps,
   Select,
   Space,
   Switch,
   Table,
-  theme,
 } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import { TableRowSelection } from 'antd/es/table/interface';
+import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import useStyles from './style';
 
@@ -29,6 +29,12 @@ const columns = (
   loadingDelete: boolean,
   handleStatusChange: (user: UserQuery) => void,
 ) => [
+  {
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
+    hidden: true,
+  },
   {
     title: '序号',
     dataIndex: 'No',
@@ -124,38 +130,58 @@ const UserPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const [isShowUndo, setIsShowUndo] = useState<boolean>(false);
+  const [deleteEnabled, setDeleteEnabled] = useState<boolean>(true);
   const [dataSource, setDataSource] = useState<UserQuery[] | undefined>([]);
   const [editingUser, setUpdatingUser] = useState<UserQuery | null>(null);
   const [recoverUser, setRecoverUser] = useState<UserQuery | null>(null);
   const [value, setValue] = useState<string>('');
   const [totalCount, setTotal] = useState<number | undefined>(0);
-  const [tableParams, setTableParams] = useState<TableParams>({
+  const [page, setPage] = useState<number>(1);
+  const [size, setSize] = useState<number>(10);
+  const [userSearch, setUserSearch] = useState<UserSearch>({
+    username: undefined,
+    nickname: undefined,
+    status: undefined,
+    create_time: undefined,
+  });
+  const [userResearchForm, setUserResearchForm] = useState<UserResearchForm>({
     page: 1,
     size: 10,
+    ...userSearch,
   });
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-  // 日期选择
-  const { token } = theme.useToken();
-  const style: React.CSSProperties = {
-    border: `1px solid ${token.colorPrimary}`,
-    borderRadius: '50%',
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    if (newSelectedRowKeys.length > 0) {
+      setDeleteEnabled(false);
+    }
+    setSelectedRowKeys(newSelectedRowKeys);
   };
-  const cellRender: DatePickerProps<Dayjs>['cellRender'] = (current, info) => {
-    if (info.type !== 'date') {
-      return info.originNode;
-    }
-    if (typeof current === 'number' || typeof current === 'string') {
-      return <div className="ant-picker-cell-inner">{current}</div>;
-    }
-    return (
-      <div className="ant-picker-cell-inner" style={current.date() === 1 ? style : {}}>
-        {current.date()}
-      </div>
-    );
+
+  const confirmDelete: PopconfirmProps['onConfirm'] = async () => {
+    const ids = selectedRowKeys.map((key) => Number(key));
+    console.log(ids);
+    await userRemove(ids);
+    await setUserTableData();
+    message.success('删除成功');
+  };
+
+  const confirmCancel: PopconfirmProps['onCancel'] = async () => {
+    setSelectedRowKeys([]);
+    message.success('删除撤销');
+  };
+
+  const rowSelection: TableRowSelection<UserQuery> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
   };
 
   const onChange = (value: string) => {
-    console.log(`selected ${value}`);
+    const status = value ? Number(value) : undefined;
+    setUserSearch((prev) => ({
+      ...prev,
+      status: status,
+    }));
   };
 
   const onUpdate = (user: UserQuery) => {
@@ -165,7 +191,7 @@ const UserPage: React.FC = () => {
   };
 
   const setUserTableData = async () => {
-    const { records, total_count } = await userList(tableParams);
+    const { records, total_count } = await userList(userResearchForm);
     setDataSource(records);
     setTotal(total_count);
   };
@@ -176,6 +202,10 @@ const UserPage: React.FC = () => {
     }
     setIsShowUndo(false);
     await setUserTableData();
+  };
+
+  const handleExport = async () => {
+    await userExport(page, size);
   };
 
   const handleShowModal = () => {
@@ -239,25 +269,77 @@ const UserPage: React.FC = () => {
     }
   };
 
-  const handleUserSearch = (values: any) => {
-    alert(JSON.stringify(values));
+  const handleUserSearch = async (values: UserResearchForm) => {
+    const { create_time } = values;
+    let timeRange: string | undefined;
+    if (create_time && create_time.length === 2) {
+      const startDate = create_time[0].startOf('day').unix();
+      const endDate = create_time[1].endOf('day').unix();
+      timeRange = startDate + ',' + endDate;
+    }
+    setUserSearch((prev) => ({
+      ...prev,
+      username: values.username?.trim(),
+      nickname: values.nickname?.trim(),
+      status: values.status,
+      create_time: timeRange,
+    }));
+    setPage(1);
+    setSize(10);
+    setUserResearchForm((prev) => ({
+      ...prev,
+      ...userSearch,
+      page: page,
+      size: size,
+    }));
   };
 
   const handlePaginationSearch = async (current: number, size: number) => {
-    setTableParams((prev) => ({
+    setPage(current);
+    setSize(size);
+    setUserResearchForm((prev) => ({
       ...prev,
-      page: current,
+      page: page,
       size: size,
     }));
-    await setUserTableData();
+  };
+
+  const handleSearchReset = () => {
+    userSearchForm.resetFields();
+    setPage(1);
+    setSize(10);
+    setUserSearch((prev) => ({
+      ...prev,
+      page: page,
+      size: size,
+      username: undefined,
+      nickname: undefined,
+      status: undefined,
+      create_time: undefined,
+    }));
+    setUserResearchForm((prev) => ({
+      ...prev,
+      ...userSearch,
+    }));
   };
 
   useEffect(() => {
-    const getUserData = async () => {
+    userList(userResearchForm).then(async () => {
       await setUserTableData();
+    });
+    return () => {
+      setDataSource([]);
     };
-    getUserData().catch((err) => console.log(err));
-  }, [tableParams]);
+  }, [userResearchForm]);
+
+  useEffect(() => {
+    setUserResearchForm((prev) => ({
+      ...prev,
+      ...userSearch,
+      page: page,
+      size: size,
+    }));
+  }, [userSearch, page, size]);
 
   return (
     <div className={styles.container}>
@@ -270,10 +352,10 @@ const UserPage: React.FC = () => {
             <Form.Item name="nickname" label="用户昵称">
               <Input placeholder="请输入" />
             </Form.Item>
-            <Form.Item name="createDate" label="创建日期">
-              <DatePicker.RangePicker cellRender={cellRender} />
+            <Form.Item name="create_time" label="创建日期">
+              <DatePicker.RangePicker />
             </Form.Item>
-            <Form.Item name="state" label="状态">
+            <Form.Item name="status" label="状态">
               <Select
                 allowClear
                 placeholder="请选择"
@@ -297,7 +379,7 @@ const UserPage: React.FC = () => {
                 <Button type="primary" htmlType="submit" style={{ margin: '0 8px 0 0' }}>
                   搜索
                 </Button>
-                <Button onClick={() => userSearchForm.resetFields()}>重置</Button>
+                <Button onClick={handleSearchReset}>重置</Button>
               </Form.Item>
             </div>
           </Space>
@@ -308,8 +390,21 @@ const UserPage: React.FC = () => {
           新增
         </Button>
         <Button className={`${styles.button} btn-import`}>导入</Button>
-        <Button className={`${styles.button} btn-export`}>导出</Button>
-        <Button className={`${styles.button} btn-delete`}>删除</Button>
+        <Button onClick={handleExport} className={`${styles.button} btn-export`}>
+          导出
+        </Button>
+        <Popconfirm
+          title="删除所选的内容"
+          description="你确定删除吗? 删除后将无法找回"
+          onConfirm={confirmDelete}
+          onCancel={confirmCancel}
+          okText="是"
+          cancelText="否"
+        >
+          <Button disabled={deleteEnabled} className={`${styles.button} btn-delete`}>
+            删除
+          </Button>
+        </Popconfirm>
       </Space>
       <Card bordered={false} className={styles.resultContainer}>
         <Modal
@@ -412,15 +507,15 @@ const UserPage: React.FC = () => {
         <Table
           dataSource={dataSource}
           columns={columns(onUpdate, handleUserDelete, isLoadingDelete, handleStatusChange)}
-          rowKey={'username'}
+          rowKey={'id'}
           pagination={false}
-          scroll={{ y: 50 * 6 }}
-          rowSelection={{ type: 'checkbox' }}
+          rowSelection={rowSelection}
+          style={{ minHeight: 640 }}
         />
         <div style={{ margin: 8 }}>
           <Pagination
-            defaultCurrent={tableParams?.page}
-            pageSize={tableParams?.size}
+            current={page}
+            pageSize={size}
             total={totalCount}
             align="end"
             showSizeChanger
