@@ -13,12 +13,9 @@ export function extractFilename(disposition: string | undefined): string | null 
   return filename;
 }
 
-export function downloadBlob(blob: Blob, filename: string): void {
-  const binaryData = [];
-  binaryData.push(blob);
-  const url = window.URL.createObjectURL(
-    new Blob(binaryData, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
-  );
+export function downloadBlob(data: ArrayBuffer, filename: string, type: string): void {
+  const url = window.URL.createObjectURL(new Blob([data], { type: type }));
+
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;

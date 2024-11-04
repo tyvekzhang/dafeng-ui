@@ -32,7 +32,6 @@ class HttpRequest {
     this.instance.interceptors.response.use(
       (response) => {
         NProgress.done();
-        debugger;
         const contentDisposition = response.headers['content-disposition'];
         if (contentDisposition && contentDisposition.includes('attachment')) {
           return response;

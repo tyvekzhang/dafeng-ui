@@ -1,8 +1,18 @@
 import { message } from '@/components/GlobalToast';
 import UndoComp from '@/components/Undo';
-import { register, userDelete, userExport, userList, userRecover, userRemove, userUpdate } from '@/services';
+import {
+  register,
+  userDelete,
+  userExport,
+  userExportTemplate,
+  userImport,
+  userList,
+  userRecover,
+  userRemove,
+  userUpdate,
+} from '@/services';
 import { UserCreate, UserQuery, UserResearchForm, UserSearch } from '@/types/user';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, InboxOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -17,9 +27,11 @@ import {
   Space,
   Switch,
   Table,
+  Upload,
 } from 'antd';
 import { TableRowSelection } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
+import type { RcFile, UploadRequestOption } from 'rc-upload/lib/interface';
 import React, { useEffect, useState } from 'react';
 import useStyles from './style';
 
@@ -70,7 +82,7 @@ const columns = (
     dataIndex: 'remark',
     key: 'remark',
     render: (remark: string) => {
-      if (remark.length > 0) {
+      if (remark && remark.length > 0) {
         return remark;
       }
       return '-';
@@ -130,7 +142,10 @@ const UserPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const [isShowUndo, setIsShowUndo] = useState<boolean>(false);
+  const [userImportModalVisible, setUserImportModalVisible] = useState<boolean>(false);
+  const [userImportLoading, setUserImportLoading] = useState<boolean>(false);
   const [deleteEnabled, setDeleteEnabled] = useState<boolean>(true);
+  const [userImportFile, setUserImportFile] = useState<RcFile | null>(null);
   const [dataSource, setDataSource] = useState<UserQuery[] | undefined>([]);
   const [editingUser, setUpdatingUser] = useState<UserQuery | null>(null);
   const [recoverUser, setRecoverUser] = useState<UserQuery | null>(null);
@@ -188,6 +203,46 @@ const UserPage: React.FC = () => {
     setUpdatingUser(user);
     userUpdateForm.setFieldsValue(user);
     setIsUpdateUserModalVisible(true);
+  };
+
+  const onUserImport = () => {
+    setUserImportModalVisible(true);
+  };
+
+  const onUserImportCancel = () => {
+    setUserImportModalVisible(false);
+  };
+
+  const onUserExportTemplate = async () => {
+    await userExportTemplate();
+  };
+
+  const customUploadRequest = (options: UploadRequestOption): void | undefined => {
+    const { onSuccess, onError } = options;
+    const file = options.file as RcFile;
+    if (!file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
+      message.error('仅支持xls、xlsx格式文件');
+      onError?.(new Error('仅支持xls、xlsx格式文件'));
+      setUserImportFile(null);
+      return;
+    }
+    setUserImportFile(file);
+    setTimeout(() => {
+      onSuccess?.(file);
+    }, 300);
+  };
+
+  const handleUserImport = async () => {
+    try {
+      setUserImportLoading(true);
+      if (userImportFile) {
+        await userImport(userImportFile);
+        setUserImportModalVisible(false);
+      }
+    } finally {
+      setUserImportLoading(false);
+      setUserImportFile(null);
+    }
   };
 
   const setUserTableData = async () => {
@@ -389,7 +444,9 @@ const UserPage: React.FC = () => {
         <Button onClick={handleShowModal} className={`${styles.button} btn-add`}>
           新增
         </Button>
-        <Button className={`${styles.button} btn-import`}>导入</Button>
+        <Button onClick={onUserImport} className={`${styles.button} btn-import`}>
+          导入
+        </Button>
         <Button onClick={handleExport} className={`${styles.button} btn-export`}>
           导出
         </Button>
@@ -503,6 +560,28 @@ const UserPage: React.FC = () => {
               />
             </Form.Item>
           </Form>
+        </Modal>
+        <Modal
+          title="用户导入:"
+          open={userImportModalVisible}
+          onCancel={onUserImportCancel}
+          onOk={handleUserImport}
+          loading={userImportLoading}
+        >
+          <div>
+            <Upload.Dragger name="file" maxCount={1} accept=".xlsx" customRequest={customUploadRequest as any}>
+              <p className="sc-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="sc-upload-text">{'点击或拖拽到此上传'}</p>
+              <p className="sc-upload-hint">仅支持xls、xlsx格式文件</p>
+            </Upload.Dragger>
+          </div>
+          <div>
+            <Button type={'link'} onClick={onUserExportTemplate}>
+              下载模板
+            </Button>
+          </div>
         </Modal>
         <Table
           dataSource={dataSource}
