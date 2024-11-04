@@ -260,7 +260,7 @@ const UserPage: React.FC = () => {
   };
 
   const handleExport = async () => {
-    await userExport(page, size);
+    await userExport(userResearchForm);
   };
 
   const handleShowModal = () => {
@@ -574,7 +574,7 @@ const UserPage: React.FC = () => {
                 <InboxOutlined />
               </p>
               <p className="sc-upload-text">{'点击或拖拽到此上传'}</p>
-              <p className="sc-upload-hint">仅支持xls、xlsx格式文件</p>
+              <p className="sc-upload-hint">仅支持上传xls、xlsx格式文件</p>
             </Upload.Dragger>
           </div>
           <div>

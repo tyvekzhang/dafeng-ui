@@ -1,6 +1,6 @@
 import type { AppMenu } from '@/router/types';
 import axiosInstance from '@/services/request';
-import { downloadBlob, extractFilename } from '@/services/util';
+import { downloadBlob } from '@/services/util';
 import { LoginForm, LoginResponse, UserCreate, UserQuery, UserResearchForm, UserTableData } from '@/types/user';
 import { AxiosResponse } from 'axios';
 import { RcFile } from 'rc-upload/lib/interface';
@@ -56,38 +56,26 @@ export function userRemove(ids: number[]) {
   return axiosInstance.delete(`/user/remove`, { ids: ids });
 }
 
-export async function userExport(page: number, size: number, fileName: string = 'users.xlsx') {
+export async function userExport(userFilterForm: UserResearchForm, fileName: string = 'users.xlsx') {
   try {
-    const response = await axiosInstance.get<AxiosResponse>(
-      '/user/export',
-      {
-        params: {
-          page: page,
-          size: size,
-          count: false,
-        },
-      },
-      {
-        headers: { Accept: 'application/vnd.ms-excel' },
-      },
-    );
-    const data = response.data;
-    const disposition = response.headers['content-disposition'] || response.headers['contentDisposition'];
-    const filename = extractFilename(disposition) || fileName;
-    const type = response.headers['content-type'] || response.headers['contentType'];
-    downloadBlob(data, filename, type);
+    const response = await axiosInstance.get<AxiosResponse>('/user/export', userFilterForm, {
+      responseType: 'blob',
+    });
+    downloadBlob(response, fileName);
   } catch (error) {
     console.error(error);
   }
 }
 
 export async function userExportTemplate(fileName: string = 'user_import_template.xlsx') {
-  const response = await axiosInstance.get<AxiosResponse>('/user/exportTemplate');
-  const data = response.data;
-  const disposition = response.headers['content-disposition'] || response.headers['contentDisposition'];
-  const filename = extractFilename(disposition) || fileName;
-  const type = response.headers['content-type'] || response.headers['contentType'];
-  downloadBlob(data, filename, type);
+  const response = await axiosInstance.get<AxiosResponse>(
+    '/user/exportTemplate',
+    {},
+    {
+      responseType: 'blob',
+    },
+  );
+  downloadBlob(response, fileName);
 }
 
 export function userImport(file: RcFile) {

@@ -1,3 +1,5 @@
+import { AxiosResponse } from 'axios';
+
 export function extractFilename(disposition: string | undefined): string | null {
   if (!disposition) return null;
 
@@ -13,8 +15,11 @@ export function extractFilename(disposition: string | undefined): string | null 
   return filename;
 }
 
-export function downloadBlob(data: ArrayBuffer, filename: string, type: string): void {
-  const url = window.URL.createObjectURL(new Blob([data], { type: type }));
+export function downloadBlob(response: AxiosResponse, default_filename: string): void {
+  const data: Blob = response.data;
+  const disposition = response.headers['content-disposition'] || response.headers['contentDisposition'];
+  const filename = extractFilename(disposition) || default_filename;
+  const url = window.URL.createObjectURL(data);
 
   const a = document.createElement('a');
   a.href = url;
