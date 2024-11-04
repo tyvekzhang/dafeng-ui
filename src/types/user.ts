@@ -44,9 +44,8 @@ export interface LoginResponse {
   remember: boolean;
 }
 
-export interface userSearch {
-  username?: string;
-  nickname?: string;
+export interface UserBatchUpdate {
+  password?: string;
   status?: number;
-  created_time?: string;
+  remark?: string;
 }

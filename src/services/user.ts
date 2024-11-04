@@ -1,7 +1,15 @@
 import type { AppMenu } from '@/router/types';
 import axiosInstance from '@/services/request';
 import { downloadBlob } from '@/services/util';
-import { LoginForm, LoginResponse, UserCreate, UserQuery, UserResearchForm, UserTableData } from '@/types/user';
+import {
+  LoginForm,
+  LoginResponse,
+  UserBatchUpdate,
+  UserCreate,
+  UserQuery,
+  UserResearchForm,
+  UserTableData,
+} from '@/types/user';
 import { AxiosResponse } from 'axios';
 import { RcFile } from 'rc-upload/lib/interface';
 
@@ -86,5 +94,12 @@ export function userImport(file: RcFile) {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+  });
+}
+
+export function userBatchUpdate(ids_data: number[], user_batch_update_data: UserBatchUpdate) {
+  return axiosInstance.put('/user/batchUpdate', {
+    ids_data: { ids: ids_data },
+    user_batch_update_data: user_batch_update_data,
   });
 }

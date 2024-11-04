@@ -43,7 +43,7 @@ export default createStyles(({ css }) => ({
       }
       &.btn-import {
         background-color: #fcffe6;
-        color: #a0d911;
+        color: #7cb305;
 
         &:hover {
           background-color: #bae637;
@@ -69,6 +69,17 @@ export default createStyles(({ css }) => ({
 
         &:hover {
           background-color: #ff7a45;
+          color: #fff;
+          border: none;
+        }
+      }
+
+      &.btn-batch-update {
+        background-color: #e6f4ff;
+        color: #4096ff;
+
+        &:hover {
+          background-color: #4096ff;
           color: #fff;
           border: none;
         }

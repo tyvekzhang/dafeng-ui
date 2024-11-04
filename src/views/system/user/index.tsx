@@ -2,6 +2,7 @@ import { message } from '@/components/GlobalToast';
 import UndoComp from '@/components/Undo';
 import {
   register,
+  userBatchUpdate,
   userDelete,
   userExport,
   userExportTemplate,
@@ -11,7 +12,7 @@ import {
   userRemove,
   userUpdate,
 } from '@/services';
-import { UserCreate, UserQuery, UserResearchForm, UserSearch } from '@/types/user';
+import { UserBatchUpdate, UserCreate, UserQuery, UserResearchForm, UserSearch } from '@/types/user';
 import { DeleteOutlined, EditOutlined, InboxOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -23,6 +24,8 @@ import {
   Pagination,
   Popconfirm,
   PopconfirmProps,
+  Radio,
+  RadioChangeEvent,
   Select,
   Space,
   Switch,
@@ -135,10 +138,14 @@ const UserPage: React.FC = () => {
   const { styles } = useStyles();
   const [userCreateForm] = Form.useForm();
   const [userUpdateForm] = Form.useForm();
+  const [userBatchUpdateForm] = Form.useForm();
   const [userSearchForm] = Form.useForm();
   const [isUserCreateModalVisible, setIsUserCreateModalVisible] = useState<boolean>(false);
   const [isUserUpdateModalVisible, setIsUpdateUserModalVisible] = useState<boolean>(false);
+  const [userBatchUpdateModalVisible, setUserBatchUpdateModalVisible] = useState<boolean>(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const [userBatchUpdateLoading, setUserBatchUpdateLoading] = useState<boolean>(false);
+  const [userBatchUpdateEnable, setUserBatchUpdateEnable] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const [isShowUndo, setIsShowUndo] = useState<boolean>(false);
@@ -150,6 +157,7 @@ const UserPage: React.FC = () => {
   const [editingUser, setUpdatingUser] = useState<UserQuery | null>(null);
   const [recoverUser, setRecoverUser] = useState<UserQuery | null>(null);
   const [value, setValue] = useState<string>('');
+  const [batchStatusValue, setBatchStatusValue] = useState<number>(1);
   const [totalCount, setTotal] = useState<number | undefined>(0);
   const [page, setPage] = useState<number>(1);
   const [size, setSize] = useState<number>(10);
@@ -169,13 +177,13 @@ const UserPage: React.FC = () => {
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     if (newSelectedRowKeys.length > 0) {
       setDeleteEnabled(false);
+      setUserBatchUpdateEnable(false);
     }
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
   const confirmDelete: PopconfirmProps['onConfirm'] = async () => {
     const ids = selectedRowKeys.map((key) => Number(key));
-    console.log(ids);
     await userRemove(ids);
     await setUserTableData();
     message.success('删除成功');
@@ -197,6 +205,10 @@ const UserPage: React.FC = () => {
       ...prev,
       status: status,
     }));
+  };
+
+  const onBatchStatusChange = (e: RadioChangeEvent) => {
+    setBatchStatusValue(e.target.value);
   };
 
   const onUpdate = (user: UserQuery) => {
@@ -263,6 +275,10 @@ const UserPage: React.FC = () => {
     await userExport(userResearchForm);
   };
 
+  const onUserBatchUpdate = () => {
+    setUserBatchUpdateModalVisible(true);
+  };
+
   const handleShowModal = () => {
     setIsUserCreateModalVisible(true);
   };
@@ -270,6 +286,8 @@ const UserPage: React.FC = () => {
   const handleCancel = () => {
     setIsUserCreateModalVisible(false);
     setIsUpdateUserModalVisible(false);
+    setUserBatchUpdateModalVisible(false);
+    userBatchUpdateForm.resetFields();
   };
 
   const handleHide = () => {
@@ -321,6 +339,31 @@ const UserPage: React.FC = () => {
       await setUserTableData();
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleUserBatchUpdate = async (values: UserBatchUpdate) => {
+    const ids = selectedRowKeys.map((key) => Number(key));
+    if (ids.length === 0) {
+      message.warning('请先选择要更新的条目');
+      return;
+    }
+    if (JSON.stringify(values) === '{}') {
+      message.warning('请填写更新的信息');
+      return;
+    }
+    try {
+      await userBatchUpdate(ids, values);
+      setUserBatchUpdateLoading(true);
+      userBatchUpdateForm.resetFields();
+      message.success('更新成功');
+      userList(userResearchForm).then(async () => {
+        await setUserTableData();
+      });
+    } finally {
+      setUserBatchUpdateLoading(false);
+      setUserBatchUpdateModalVisible(false);
+      setSelectedRowKeys([]);
     }
   };
 
@@ -449,6 +492,13 @@ const UserPage: React.FC = () => {
         </Button>
         <Button onClick={handleExport} className={`${styles.button} btn-export`}>
           导出
+        </Button>
+        <Button
+          disabled={userBatchUpdateEnable}
+          onClick={onUserBatchUpdate}
+          className={`${styles.button} btn-batch-update`}
+        >
+          修改
         </Button>
         <Popconfirm
           title="删除所选的内容"
@@ -582,6 +632,59 @@ const UserPage: React.FC = () => {
               下载模板
             </Button>
           </div>
+        </Modal>
+        <Modal
+          title="用户批量修改:"
+          open={userBatchUpdateModalVisible}
+          onCancel={handleCancel}
+          footer={
+            <>
+              <Button
+                type={'primary'}
+                htmlType="submit"
+                onClick={() => userBatchUpdateForm.submit()}
+                loading={userBatchUpdateLoading}
+              >
+                确定
+              </Button>
+              <Button onClick={handleCancel}>取消</Button>
+            </>
+          }
+        >
+          <Form form={userBatchUpdateForm} name="user_batch_update_rule" onFinish={handleUserBatchUpdate}>
+            <Form.Item name="status" label="状态" {...formItemLayout}>
+              <Radio.Group onChange={onBatchStatusChange} value={batchStatusValue}>
+                <Space>
+                  <Radio value={1}>正常</Radio>
+                  <Radio value={0}>禁用</Radio>
+                </Space>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item
+              {...formItemLayout}
+              name="password"
+              label="密码"
+              rules={[
+                {
+                  min: 6,
+                  message: '请设置密码不少于6位',
+                },
+                {
+                  pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/,
+                  message: '需要有数字和字母',
+                },
+              ]}
+              validateTrigger="onBlur"
+            >
+              <Input.Password
+                placeholder="请输入"
+                visibilityToggle={{ visible: isPasswordVisible, onVisibleChange: setIsPasswordVisible }}
+              />
+            </Form.Item>
+            <Form.Item {...formItemLayout} name="remark" label="备注">
+              <Input.TextArea placeholder="请输入" autoSize={{ minRows: 3, maxRows: 5 }} />
+            </Form.Item>
+          </Form>
         </Modal>
         <Table
           dataSource={dataSource}
