@@ -28,7 +28,7 @@ function renderContent({ content }: Pick<ModalOptionsEx, 'content'>) {
   }
 }
 
-// Create confirmation box
+// Add confirmation box
 function createConfirm(options: ModalOptionsEx) {
   const iconType = options.iconType || 'warning';
   Reflect.deleteProperty(options, 'iconType');

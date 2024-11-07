@@ -1,40 +1,39 @@
 import { message } from '@/components/GlobalToast';
 import UndoComp from '@/components/Undo';
 import {
-  register,
+  userAdd,
   userBatchUpdate,
   userDelete,
   userExport,
-  userExportTemplate,
   userImport,
   userList,
   userRecover,
   userRemove,
   userUpdate,
 } from '@/services';
-import { UserBatchUpdate, UserCreate, UserQuery, UserResearchForm, UserSearch } from '@/types/user';
-import { DeleteOutlined, EditOutlined, InboxOutlined } from '@ant-design/icons';
+import { UserAdd, UserBatchUpdate, UserEdit, UserQuery, UserQueryForm, UserSearch } from '@/types/user';
+import Add from '@/views/system/user/components/Add';
+import BatchUpdate from '@/views/system/user/components/BatchUpdate';
+import Edit from '@/views/system/user/components/Edit';
+import Import from '@/views/system/user/components/Import';
+import Search from '@/views/system/user/components/Search';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
-  DatePicker,
   Form,
-  Input,
-  Modal,
   Pagination,
   Popconfirm,
   PopconfirmProps,
-  Radio,
   RadioChangeEvent,
-  Select,
   Space,
   Switch,
   Table,
-  Upload,
 } from 'antd';
 import { TableRowSelection } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
-import type { RcFile, UploadRequestOption } from 'rc-upload/lib/interface';
+import { UploadRequestOption } from 'rc-upload/es/interface';
+import type { RcFile } from 'rc-upload/lib/interface';
 import React, { useEffect, useState } from 'react';
 import useStyles from './style';
 
@@ -129,34 +128,90 @@ const columns = (
   },
 ];
 
-const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 12 },
-};
-
 const UserPage: React.FC = () => {
   const { styles } = useStyles();
-  const [userCreateForm] = Form.useForm();
-  const [userUpdateForm] = Form.useForm();
+
+  const [userAddForm] = Form.useForm();
+  const [isUserAddModalVisible, setIsUserAddModalVisible] = useState<boolean>(false);
+  const [isUserAddLoading, setIsUserAddLoading] = useState<boolean>(false);
+  const handleUserAddCancel = () => {
+    setIsUserAddModalVisible(false);
+    userAddForm.resetFields();
+  };
+
+  const [isUserEditModalVisible, setIsUpdateUserModalVisible] = useState<boolean>(false);
+  const [isUserEditLoading, setIsUserEditLoading] = useState<boolean>(false);
+  const [userEditForm] = Form.useForm();
+  const [editUser, setEditUser] = useState<UserEdit | null>(null);
+  const onUserEdit = (user: UserEdit) => {
+    setEditUser(user);
+    userEditForm.setFieldsValue(user);
+    setIsUpdateUserModalVisible(true);
+  };
+  const handleUserEditCancel = () => {
+    setIsUpdateUserModalVisible(false);
+    userEditForm.resetFields();
+  };
+  const handleUserEdit = async (data: UserQuery) => {
+    setIsUserEditLoading(true);
+    try {
+      if (editUser === null) {
+        return;
+      }
+      await userUpdate({ ...editUser, ...data });
+      handleUserEditCancel();
+      message.success('更新成功');
+      await setUserTableData();
+    } finally {
+      setIsUserEditLoading(false);
+    }
+  };
+
+  const [isUserImportModalVisible, setIsUserImportModalVisible] = useState<boolean>(false);
+  const [isUserImportLoading, setIsUserImportLoading] = useState<boolean>(false);
+  const [userImportFile, setUserImportFile] = useState<RcFile | null>(null);
+  const customUploadRequest = (options: UploadRequestOption): void | undefined => {
+    const { onSuccess, onError } = options;
+    const file = options.file as RcFile;
+    if (!file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
+      message.error('仅支持xls、xlsx格式文件');
+      onError?.(new Error('仅支持xls、xlsx格式文件'));
+      setUserImportFile(null);
+      return;
+    }
+    setUserImportFile(file);
+    setTimeout(() => {
+      onSuccess?.(file);
+    }, 300);
+  };
+  const handleUserImportCancel = () => {
+    setIsUserImportModalVisible(false);
+  };
+
+  const handleUserImport = async () => {
+    try {
+      setIsUserImportLoading(true);
+      if (userImportFile) {
+        await userImport(userImportFile);
+        setIsUserImportModalVisible(false);
+      }
+    } finally {
+      setIsUserImportLoading(false);
+      setUserImportFile(null);
+    }
+  };
+
   const [userBatchUpdateForm] = Form.useForm();
-  const [userSearchForm] = Form.useForm();
-  const [isUserCreateModalVisible, setIsUserCreateModalVisible] = useState<boolean>(false);
-  const [isUserUpdateModalVisible, setIsUpdateUserModalVisible] = useState<boolean>(false);
-  const [userBatchUpdateModalVisible, setUserBatchUpdateModalVisible] = useState<boolean>(false);
+  const [userQueryForm] = Form.useForm();
+  const [isUserBatchUpdateModalVisible, setIsUserBatchUpdateModalVisible] = useState<boolean>(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [userBatchUpdateLoading, setUserBatchUpdateLoading] = useState<boolean>(false);
+  const [isUserBatchUpdateLoading, setIsUserBatchUpdateLoading] = useState<boolean>(false);
   const [userBatchUpdateEnable, setUserBatchUpdateEnable] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const [isShowUndo, setIsShowUndo] = useState<boolean>(false);
-  const [userImportModalVisible, setUserImportModalVisible] = useState<boolean>(false);
-  const [userImportLoading, setUserImportLoading] = useState<boolean>(false);
   const [deleteEnabled, setDeleteEnabled] = useState<boolean>(true);
-  const [userImportFile, setUserImportFile] = useState<RcFile | null>(null);
   const [dataSource, setDataSource] = useState<UserQuery[] | undefined>([]);
-  const [editingUser, setUpdatingUser] = useState<UserQuery | null>(null);
   const [recoverUser, setRecoverUser] = useState<UserQuery | null>(null);
-  const [value, setValue] = useState<string>('');
   const [batchStatusValue, setBatchStatusValue] = useState<number>(1);
   const [totalCount, setTotal] = useState<number | undefined>(0);
   const [page, setPage] = useState<number>(1);
@@ -167,7 +222,7 @@ const UserPage: React.FC = () => {
     status: undefined,
     create_time: undefined,
   });
-  const [userResearchForm, setUserResearchForm] = useState<UserResearchForm>({
+  const [userResearchForm, setUserQueryForm] = useState<UserQueryForm>({
     page: 1,
     size: 10,
     ...userSearch,
@@ -199,7 +254,7 @@ const UserPage: React.FC = () => {
     onChange: onSelectChange,
   };
 
-  const onChange = (value: string) => {
+  const handleChangeState = (value: string) => {
     const status = value ? Number(value) : undefined;
     setUserSearch((prev) => ({
       ...prev,
@@ -210,59 +265,14 @@ const UserPage: React.FC = () => {
   const onBatchStatusChange = (e: RadioChangeEvent) => {
     setBatchStatusValue(e.target.value);
   };
-
-  const onUpdate = (user: UserQuery) => {
-    setUpdatingUser(user);
-    userUpdateForm.setFieldsValue(user);
-    setIsUpdateUserModalVisible(true);
-  };
-
   const onUserImport = () => {
-    setUserImportModalVisible(true);
+    setIsUserImportModalVisible(true);
   };
-
-  const onUserImportCancel = () => {
-    setUserImportModalVisible(false);
-  };
-
-  const onUserExportTemplate = async () => {
-    await userExportTemplate();
-  };
-
-  const customUploadRequest = (options: UploadRequestOption): void | undefined => {
-    const { onSuccess, onError } = options;
-    const file = options.file as RcFile;
-    if (!file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
-      message.error('仅支持xls、xlsx格式文件');
-      onError?.(new Error('仅支持xls、xlsx格式文件'));
-      setUserImportFile(null);
-      return;
-    }
-    setUserImportFile(file);
-    setTimeout(() => {
-      onSuccess?.(file);
-    }, 300);
-  };
-
-  const handleUserImport = async () => {
-    try {
-      setUserImportLoading(true);
-      if (userImportFile) {
-        await userImport(userImportFile);
-        setUserImportModalVisible(false);
-      }
-    } finally {
-      setUserImportLoading(false);
-      setUserImportFile(null);
-    }
-  };
-
   const setUserTableData = async () => {
     const { records, total_count } = await userList(userResearchForm);
     setDataSource(records);
     setTotal(total_count);
   };
-
   const handleUndo = async () => {
     if (recoverUser) {
       await userRecover(recoverUser);
@@ -276,17 +286,15 @@ const UserPage: React.FC = () => {
   };
 
   const onUserBatchUpdate = () => {
-    setUserBatchUpdateModalVisible(true);
+    setIsUserBatchUpdateModalVisible(true);
   };
 
   const handleShowModal = () => {
-    setIsUserCreateModalVisible(true);
+    setIsUserAddModalVisible(true);
   };
 
-  const handleCancel = () => {
-    setIsUserCreateModalVisible(false);
+  const handleUserBatchUpdateCancel = () => {
     setIsUpdateUserModalVisible(false);
-    setUserBatchUpdateModalVisible(false);
     userBatchUpdateForm.resetFields();
   };
 
@@ -294,16 +302,15 @@ const UserPage: React.FC = () => {
     setIsShowUndo(false);
   };
 
-  const handleAddUser = async (values: UserCreate) => {
-    setIsLoading(true);
+  const handleUserAdd = async (data: UserAdd) => {
+    setIsUserAddLoading(true);
     try {
-      await register(values);
-      userCreateForm.resetFields();
-      handleCancel();
+      await userAdd(data);
+      handleUserAddCancel();
       message.success('新增成功');
       await setUserTableData();
     } finally {
-      setIsLoading(false);
+      setIsUserAddLoading(false);
     }
   };
 
@@ -326,49 +333,33 @@ const UserPage: React.FC = () => {
     await setUserTableData();
   };
 
-  const handleUserUpdate = async (values: UserQuery) => {
-    setIsLoading(true);
-    try {
-      if (editingUser === null) {
-        return;
-      }
-      await userUpdate({ ...editingUser, ...values });
-      handleCancel();
-      userUpdateForm.resetFields();
-      message.success('更新成功');
-      await setUserTableData();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleUserBatchUpdate = async (values: UserBatchUpdate) => {
+  const handleUserBatchUpdate = async (data: UserBatchUpdate) => {
     const ids = selectedRowKeys.map((key) => Number(key));
     if (ids.length === 0) {
       message.warning('请先选择要更新的条目');
       return;
     }
-    if (JSON.stringify(values) === '{}') {
+    if (JSON.stringify(data) === '{}') {
       message.warning('请填写更新的信息');
       return;
     }
     try {
-      await userBatchUpdate(ids, values);
-      setUserBatchUpdateLoading(true);
+      await userBatchUpdate(ids, data);
+      setIsUserBatchUpdateLoading(true);
       userBatchUpdateForm.resetFields();
       message.success('更新成功');
       userList(userResearchForm).then(async () => {
         await setUserTableData();
       });
     } finally {
-      setUserBatchUpdateLoading(false);
-      setUserBatchUpdateModalVisible(false);
+      setIsUserBatchUpdateLoading(false);
+      setIsUserBatchUpdateModalVisible(false);
       setSelectedRowKeys([]);
     }
   };
 
-  const handleUserSearch = async (values: UserResearchForm) => {
-    const { create_time } = values;
+  const handleUserQuery = async (data: UserQueryForm) => {
+    const { create_time } = data;
     let timeRange: string | undefined;
     if (create_time && create_time.length === 2) {
       const startDate = create_time[0].startOf('day').unix();
@@ -377,14 +368,14 @@ const UserPage: React.FC = () => {
     }
     setUserSearch((prev) => ({
       ...prev,
-      username: values.username?.trim(),
-      nickname: values.nickname?.trim(),
-      status: values.status,
+      username: data.username?.trim(),
+      nickname: data.nickname?.trim(),
+      status: data.status,
       create_time: timeRange,
     }));
     setPage(1);
     setSize(10);
-    setUserResearchForm((prev) => ({
+    setUserQueryForm((prev) => ({
       ...prev,
       ...userSearch,
       page: page,
@@ -395,15 +386,15 @@ const UserPage: React.FC = () => {
   const handlePaginationSearch = async (current: number, size: number) => {
     setPage(current);
     setSize(size);
-    setUserResearchForm((prev) => ({
+    setUserQueryForm((prev) => ({
       ...prev,
       page: page,
       size: size,
     }));
   };
 
-  const handleSearchReset = () => {
-    userSearchForm.resetFields();
+  const handleQueryReset = () => {
+    userQueryForm.resetFields();
     setPage(1);
     setSize(10);
     setUserSearch((prev) => ({
@@ -415,7 +406,7 @@ const UserPage: React.FC = () => {
       status: undefined,
       create_time: undefined,
     }));
-    setUserResearchForm((prev) => ({
+    setUserQueryForm((prev) => ({
       ...prev,
       ...userSearch,
     }));
@@ -431,7 +422,7 @@ const UserPage: React.FC = () => {
   }, [userResearchForm]);
 
   useEffect(() => {
-    setUserResearchForm((prev) => ({
+    setUserQueryForm((prev) => ({
       ...prev,
       ...userSearch,
       page: page,
@@ -442,46 +433,12 @@ const UserPage: React.FC = () => {
   return (
     <div className={styles.container}>
       <Card bordered={false} className={styles.searchContainer}>
-        <Form form={userSearchForm} name="user_search_rule" onFinish={handleUserSearch}>
-          <Space wrap className={styles.searchContent}>
-            <Form.Item name="username" label="用户名">
-              <Input placeholder="请输入" />
-            </Form.Item>
-            <Form.Item name="nickname" label="用户昵称">
-              <Input placeholder="请输入" />
-            </Form.Item>
-            <Form.Item name="create_time" label="创建日期">
-              <DatePicker.RangePicker />
-            </Form.Item>
-            <Form.Item name="status" label="状态">
-              <Select
-                allowClear
-                placeholder="请选择"
-                optionFilterProp="label"
-                onChange={onChange}
-                style={{ width: 114 }}
-                options={[
-                  {
-                    value: '1',
-                    label: '正常',
-                  },
-                  {
-                    value: '0',
-                    label: '停用',
-                  },
-                ]}
-              />
-            </Form.Item>
-            <div className={styles.searchOperation}>
-              <Form.Item>
-                <Button type="primary" htmlType="submit" style={{ margin: '0 8px 0 0' }}>
-                  搜索
-                </Button>
-                <Button onClick={handleSearchReset}>重置</Button>
-              </Form.Item>
-            </div>
-          </Space>
-        </Form>
+        <Search
+          form={userQueryForm}
+          handleUserQuery={handleUserQuery}
+          handleChangeState={handleChangeState}
+          handleQueryReset={handleQueryReset}
+        />
       </Card>
       <Space className={styles.resultSearch}>
         <Button onClick={handleShowModal} className={`${styles.button} btn-add`}>
@@ -514,181 +471,41 @@ const UserPage: React.FC = () => {
         </Popconfirm>
       </Space>
       <Card bordered={false} className={styles.resultContainer}>
-        <Modal
-          title="用户新增:"
-          open={isUserCreateModalVisible}
-          onCancel={handleCancel}
-          footer={
-            <>
-              <Button type={'primary'} htmlType="submit" onClick={() => userCreateForm.submit()} loading={isLoading}>
-                确定
-              </Button>
-              <Button onClick={handleCancel}>取消</Button>
-            </>
-          }
-        >
-          <Form form={userCreateForm} name="user_add_rule" onFinish={handleAddUser}>
-            <Form.Item
-              {...formItemLayout}
-              name="username"
-              label="用户名"
-              rules={[
-                { required: true, message: '必填项' },
-                { min: 2, message: '至少2位' },
-              ]}
-            >
-              <Input placeholder="请输入" />
-            </Form.Item>
-            <Form.Item
-              {...formItemLayout}
-              name="password"
-              label="密码"
-              rules={[
-                { required: true, message: '必填项' },
-                {
-                  min: 6,
-                  message: '请设置密码不少于6位',
-                },
-                {
-                  pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/,
-                  message: '需要有数字和字母',
-                },
-              ]}
-              validateTrigger="onBlur"
-            >
-              <Input.Password
-                placeholder="请输入"
-                visibilityToggle={{ visible: isPasswordVisible, onVisibleChange: setIsPasswordVisible }}
-              />
-            </Form.Item>
-            <Form.Item
-              {...formItemLayout}
-              name="nickname"
-              label="用户昵称"
-              rules={[{ required: true, message: '必填项' }]}
-            >
-              <Input placeholder="请输入" />
-            </Form.Item>
-            <Form.Item {...formItemLayout} name="remark" label="备注">
-              <Input.TextArea
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="请输入"
-                autoSize={{ minRows: 3, maxRows: 5 }}
-              />
-            </Form.Item>
-          </Form>
-        </Modal>
-        <Modal
-          title="用户修改:"
-          open={isUserUpdateModalVisible}
-          onCancel={handleCancel}
-          footer={
-            <>
-              <Button type={'primary'} htmlType="submit" onClick={() => userUpdateForm.submit()} loading={isLoading}>
-                确定
-              </Button>
-              <Button onClick={handleCancel}>取消</Button>
-            </>
-          }
-        >
-          <Form form={userUpdateForm} name="user_edit_rule" onFinish={handleUserUpdate}>
-            <Form.Item
-              {...formItemLayout}
-              name="nickname"
-              label="用户昵称"
-              rules={[{ required: true, message: '必填项' }]}
-            >
-              <Input placeholder="请输入" />
-            </Form.Item>
-            <Form.Item {...formItemLayout} name="remark" label="备注">
-              <Input.TextArea
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="请输入"
-                autoSize={{ minRows: 3, maxRows: 5 }}
-              />
-            </Form.Item>
-          </Form>
-        </Modal>
-        <Modal
-          title="用户导入:"
-          open={userImportModalVisible}
-          onCancel={onUserImportCancel}
-          onOk={handleUserImport}
-          loading={userImportLoading}
-        >
-          <div>
-            <Upload.Dragger name="file" maxCount={1} accept=".xlsx" customRequest={customUploadRequest as any}>
-              <p className="sc-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="sc-upload-text">{'点击或拖拽到此上传'}</p>
-              <p className="sc-upload-hint">仅支持上传xls、xlsx格式文件</p>
-            </Upload.Dragger>
-          </div>
-          <div>
-            <Button type={'link'} onClick={onUserExportTemplate}>
-              下载模板
-            </Button>
-          </div>
-        </Modal>
-        <Modal
-          title="用户批量修改:"
-          open={userBatchUpdateModalVisible}
-          onCancel={handleCancel}
-          footer={
-            <>
-              <Button
-                type={'primary'}
-                htmlType="submit"
-                onClick={() => userBatchUpdateForm.submit()}
-                loading={userBatchUpdateLoading}
-              >
-                确定
-              </Button>
-              <Button onClick={handleCancel}>取消</Button>
-            </>
-          }
-        >
-          <Form form={userBatchUpdateForm} name="user_batch_update_rule" onFinish={handleUserBatchUpdate}>
-            <Form.Item name="status" label="状态" {...formItemLayout}>
-              <Radio.Group onChange={onBatchStatusChange} value={batchStatusValue}>
-                <Space>
-                  <Radio value={1}>正常</Radio>
-                  <Radio value={0}>禁用</Radio>
-                </Space>
-              </Radio.Group>
-            </Form.Item>
-            <Form.Item
-              {...formItemLayout}
-              name="password"
-              label="密码"
-              rules={[
-                {
-                  min: 6,
-                  message: '请设置密码不少于6位',
-                },
-                {
-                  pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/,
-                  message: '需要有数字和字母',
-                },
-              ]}
-              validateTrigger="onBlur"
-            >
-              <Input.Password
-                placeholder="请输入"
-                visibilityToggle={{ visible: isPasswordVisible, onVisibleChange: setIsPasswordVisible }}
-              />
-            </Form.Item>
-            <Form.Item {...formItemLayout} name="remark" label="备注">
-              <Input.TextArea placeholder="请输入" autoSize={{ minRows: 3, maxRows: 5 }} />
-            </Form.Item>
-          </Form>
-        </Modal>
+        <Add
+          isModalVisible={isUserAddModalVisible}
+          handleCancel={handleUserAddCancel}
+          handleUserAdd={handleUserAdd}
+          isLoading={isUserAddLoading}
+          form={userAddForm}
+        />
+        <Edit
+          isModalVisible={isUserEditModalVisible}
+          handleCancel={handleUserEditCancel}
+          handleUserEdit={handleUserEdit}
+          isLoading={isUserEditLoading}
+          form={userEditForm}
+        />
+        <Import
+          isModalVisible={isUserImportModalVisible}
+          isLoading={isUserImportLoading}
+          handleCancel={handleUserImportCancel}
+          handleUserImport={handleUserImport}
+          customUploadRequest={customUploadRequest as any}
+        />
+        <BatchUpdate
+          isModalVisible={isUserBatchUpdateModalVisible}
+          handleCancel={handleUserBatchUpdateCancel}
+          setIsPasswordVisible={setIsPasswordVisible}
+          userBatchUpdateForm={userBatchUpdateForm}
+          isUserBatchUpdateLoading={isUserBatchUpdateLoading}
+          handleUserBatchUpdate={handleUserBatchUpdate}
+          onBatchStatusChange={onBatchStatusChange}
+          batchStatusValue={batchStatusValue}
+          isPasswordVisible={isPasswordVisible}
+        />
         <Table
           dataSource={dataSource}
-          columns={columns(onUpdate, handleUserDelete, isLoadingDelete, handleStatusChange)}
+          columns={columns(onUserEdit, handleUserDelete, isLoadingDelete, handleStatusChange)}
           rowKey={'id'}
           pagination={false}
           rowSelection={rowSelection}

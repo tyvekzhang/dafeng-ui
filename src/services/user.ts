@@ -4,10 +4,10 @@ import { downloadBlob } from '@/services/util';
 import {
   LoginForm,
   LoginResponse,
+  UserAdd,
   UserBatchUpdate,
-  UserCreate,
   UserQuery,
-  UserResearchForm,
+  UserQueryForm,
   UserTableData,
 } from '@/types/user';
 import { AxiosResponse } from 'axios';
@@ -40,11 +40,11 @@ export function logoutApi() {
   return axiosInstance.get('/user/logout');
 }
 
-export function register(data: UserCreate) {
-  return axiosInstance.post('/user/register', data);
+export function userAdd(data: UserAdd) {
+  return axiosInstance.post('/user/create', data);
 }
 
-export function userList(userFilterForm: UserResearchForm) {
+export function userList(userFilterForm: UserQueryForm) {
   return axiosInstance.get<UserTableData>('/user/users', userFilterForm);
 }
 
@@ -64,7 +64,7 @@ export function userRemove(ids: number[]) {
   return axiosInstance.delete(`/user/remove`, { ids: ids });
 }
 
-export async function userExport(userFilterForm: UserResearchForm, fileName: string = 'users.xlsx') {
+export async function userExport(userFilterForm: UserQueryForm, fileName: string = 'users.xlsx') {
   try {
     const response = await axiosInstance.get<AxiosResponse>('/user/export', userFilterForm, {
       responseType: 'blob',

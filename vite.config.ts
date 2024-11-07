@@ -7,7 +7,6 @@ import { loadEnv } from 'vite';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import { ViteEnv, wrapperEnv } from './build/utils';
 
-/** @type {import('vite').UserConfig} */
 export default ({ mode }: ConfigEnv): UserConfig => {
   // 获取当前工作目录
   const root = process.cwd();
@@ -41,10 +40,10 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     plugins: [
       react(),
       imagemin({
-        // Default mode sharp. support squoosh and sharp
+        // 默认模式为sharp。支持squoosh和sharp
         mode: 'squoosh',
         beforeBundle: true,
-        // Default configuration options for compressing different pictures
+        // 压缩不同图片的默认配置选项
         compress: {
           jpg: {
             quality: 10,

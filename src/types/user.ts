@@ -6,12 +6,14 @@ export type LoginForm = {
   remember: boolean;
 };
 
-export interface UserCreate {
+export interface UserAdd {
   username: string;
   password: string;
   nickname: string;
   remark?: string;
 }
+
+export type UserEdit = UserQuery;
 
 export interface UserSearch {
   username?: string;
@@ -20,7 +22,7 @@ export interface UserSearch {
   create_time?: any;
 }
 
-export type UserResearchForm = BasePage & UserSearch;
+export type UserQueryForm = BasePage & UserSearch;
 
 export interface UserQuery extends BaseModel {
   username: string;
