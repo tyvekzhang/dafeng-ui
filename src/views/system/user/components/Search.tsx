@@ -6,9 +6,9 @@ import useStyles from './style';
 
 interface SearchProps {
   form: FormInstance;
+  handleQueryReset: () => void;
   handleUserQuery: (data: UserQueryForm) => void;
   handleChangeState: (data: string) => void;
-  handleQueryReset: () => void;
 }
 
 const Search: React.FC<SearchProps> = ({ form, handleUserQuery, handleChangeState, handleQueryReset }) => {
@@ -32,7 +32,7 @@ const Search: React.FC<SearchProps> = ({ form, handleUserQuery, handleChangeStat
               placeholder="请选择"
               optionFilterProp="label"
               onChange={handleChangeState}
-              style={{ width: 114 }}
+              className={styles.statusOption}
               options={[
                 {
                   value: '1',
@@ -47,7 +47,7 @@ const Search: React.FC<SearchProps> = ({ form, handleUserQuery, handleChangeStat
           </Form.Item>
           <div className={styles.searchOperation}>
             <Form.Item>
-              <Button type="primary" htmlType="submit" style={{ margin: '0 8px 0 0' }}>
+              <Button type="primary" htmlType="submit" className={styles.searchBtn}>
                 搜索
               </Button>
               <Button onClick={handleQueryReset}>重置</Button>

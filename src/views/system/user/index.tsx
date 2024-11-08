@@ -32,7 +32,6 @@ import {
 } from 'antd';
 import { TableRowSelection } from 'antd/es/table/interface';
 import dayjs from 'dayjs';
-import { UploadRequestOption } from 'rc-upload/es/interface';
 import type { RcFile } from 'rc-upload/lib/interface';
 import React, { useEffect, useState } from 'react';
 import useStyles from './style';
@@ -170,34 +169,28 @@ const UserPage: React.FC = () => {
   const [isUserImportModalVisible, setIsUserImportModalVisible] = useState<boolean>(false);
   const [isUserImportLoading, setIsUserImportLoading] = useState<boolean>(false);
   const [userImportFile, setUserImportFile] = useState<RcFile | null>(null);
-  const customUploadRequest = (options: UploadRequestOption): void | undefined => {
-    const { onSuccess, onError } = options;
-    const file = options.file as RcFile;
-    if (!file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
-      message.error('仅支持xls、xlsx格式文件');
-      onError?.(new Error('仅支持xls、xlsx格式文件'));
-      setUserImportFile(null);
-      return;
-    }
-    setUserImportFile(file);
-    setTimeout(() => {
-      onSuccess?.(file);
-    }, 300);
+  const handleFileUpload = (uploadFile: RcFile | null) => {
+    setUserImportFile(uploadFile);
   };
+
   const handleUserImportCancel = () => {
+    handleFileUpload(null);
     setIsUserImportModalVisible(false);
   };
 
   const handleUserImport = async () => {
     try {
       setIsUserImportLoading(true);
-      if (userImportFile) {
-        await userImport(userImportFile);
-        setIsUserImportModalVisible(false);
+      if (!userImportFile) {
+        message.warning('请先选择上传文件');
+        return;
       }
+      await userImport(userImportFile);
+      message.success('导入成功');
+      handleFileUpload(null);
+      setIsUserImportModalVisible(false);
     } finally {
       setIsUserImportLoading(false);
-      setUserImportFile(null);
     }
   };
 
@@ -476,7 +469,7 @@ const UserPage: React.FC = () => {
           handleCancel={handleUserAddCancel}
           handleUserAdd={handleUserAdd}
           isLoading={isUserAddLoading}
-          form={userAddForm}
+          formProp={userAddForm}
         />
         <Edit
           isModalVisible={isUserEditModalVisible}
@@ -490,7 +483,7 @@ const UserPage: React.FC = () => {
           isLoading={isUserImportLoading}
           handleCancel={handleUserImportCancel}
           handleUserImport={handleUserImport}
-          customUploadRequest={customUploadRequest as any}
+          handleFileUpload={handleFileUpload}
         />
         <BatchUpdate
           isModalVisible={isUserBatchUpdateModalVisible}

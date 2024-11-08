@@ -31,16 +31,11 @@ const Edit: React.FC<EditProps> = ({ isModalVisible, handleCancel, handleUserEdi
           </>
         }
       >
-        <Form form={form} name="user_edit_rule" onFinish={handleUserEdit}>
-          <Form.Item
-            {...formItemLayout}
-            name="nickname"
-            label="用户昵称"
-            rules={[{ required: true, message: '必填项' }]}
-          >
+        <Form form={form} name="user_edit_rule" onFinish={handleUserEdit} {...formItemLayout}>
+          <Form.Item name="nickname" label="用户昵称" rules={[{ required: true, message: '必填项' }]}>
             <Input placeholder="请输入" />
           </Form.Item>
-          <Form.Item {...formItemLayout} name="remark" label="备注">
+          <Form.Item name="remark" label="备注">
             <Input.TextArea placeholder="请输入" autoSize={{ minRows: 3, maxRows: 5 }} />
           </Form.Item>
         </Form>

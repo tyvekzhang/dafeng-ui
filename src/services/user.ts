@@ -1,6 +1,7 @@
 import type { AppMenu } from '@/router/types';
 import axiosInstance from '@/services/request';
 import { downloadBlob } from '@/services/util';
+import { UserInfo } from '@/types';
 import {
   LoginForm,
   LoginResponse,
@@ -28,12 +29,12 @@ export function refreshTokens(data: LoginResponse) {
   });
 }
 
-export function meInfo(): Promise<never> {
+export function meInfo(): Promise<UserInfo | null> {
   return axiosInstance.get('/user/me');
 }
 
-export function userMenu(): Promise<AppMenu[]> {
-  return axiosInstance.get('/user/menu');
+export function userMenu() {
+  return axiosInstance.get<AppMenu[]>('/user/menu');
 }
 
 export function logoutApi() {

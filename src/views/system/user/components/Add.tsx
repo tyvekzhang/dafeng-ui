@@ -3,7 +3,7 @@ import { Button, Form, Input, Modal, Progress, Space } from 'antd';
 import { FormInstance } from 'antd/es/form';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-const formItemLayout = {
+const formPropItemLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 12 },
 };
@@ -13,16 +13,16 @@ interface AddProps {
   handleCancel: () => void;
   handleUserAdd: (data: UserAdd) => void;
   isLoading: boolean;
-  form: FormInstance;
+  formProp: FormInstance;
 }
 
-const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, isLoading, form }) => {
+const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, isLoading, formProp }) => {
   const footerButtons = useMemo(
     () => [
       <Button key="back" onClick={handleCancel}>
         取消
       </Button>,
-      <Button key="submit" type="primary" loading={isLoading} onClick={() => form.submit()}>
+      <Button key="submit" type="primary" loading={isLoading} onClick={() => formProp.submit()}>
         确定
       </Button>,
     ],
@@ -49,8 +49,6 @@ const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, 
 
     switch (score) {
       case 0:
-        setStrength({ level: 0, text: '' });
-        break;
       case 1:
         setStrength({ level: 1, text: '弱' });
         break;
@@ -62,7 +60,7 @@ const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, 
         setStrength({ level: 3, text: '强' });
         break;
       default:
-        break;
+        setStrength({ level: 0, text: '' });
     }
   }, []);
 
@@ -70,11 +68,11 @@ const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, 
     const newPassword = e.target.value;
     setPassword(newPassword);
     checkPasswordStrength(newPassword);
-    form.setFieldsValue({ password: newPassword });
+    formProp.setFieldsValue({ password: newPassword });
   };
 
   const restField = () => {
-    form.resetFields();
+    formProp.resetFields();
     setStrength({ level: 0, text: '' });
     setPassword('');
   };
@@ -92,7 +90,7 @@ const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, 
   return (
     <div>
       <Modal title="用户新增" open={isModalVisible} onCancel={handleCancel} footer={footerButtons}>
-        <Form {...formItemLayout} form={form} name="userAdd" onFinish={onFinish}>
+        <Form {...formPropItemLayout} form={formProp} name="userAdd" onFinish={onFinish}>
           <Form.Item
             name="username"
             label="用户名"

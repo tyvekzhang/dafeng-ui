@@ -13,13 +13,6 @@ export default createStyles(({ css }) => ({
     width: '100%',
     borderBottom: '1px solid #0505050F',
   },
-  searchContent: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  searchOperation: {
-    marginLeft: 'auto',
-  },
   resultContainer: {
     width: '100%',
   },
