@@ -1,10 +1,18 @@
-import { BaseModel, BasePage } from '@/types/common';
+import { ModelBase, PageBase } from '@/types/common';
 
 export type LoginForm = {
   username: string;
   password: string;
   remember: boolean;
 };
+
+export interface Token {
+  access_token: string;
+  token_type: string;
+  expired_at: number;
+  refresh_token: string;
+  re_expired_at: number;
+}
 
 export interface UserAdd {
   username: string;
@@ -13,18 +21,14 @@ export interface UserAdd {
   remark?: string;
 }
 
-export type UserEdit = UserQuery;
-
-export interface UserSearch {
+export interface UserQueryForm extends PageBase {
   username?: string;
   nickname?: string;
   status?: number;
-  create_time?: any;
+  create_time?: string;
 }
 
-export type UserQueryForm = BasePage & UserSearch;
-
-export interface UserQuery extends BaseModel {
+export interface UserQuery extends ModelBase {
   username: string;
   password: string;
   nickname: string;
@@ -33,20 +37,13 @@ export interface UserQuery extends BaseModel {
 }
 
 export interface UserTableData {
-  records: UserQuery[] | undefined;
-  total_count: number | undefined;
+  records?: UserQuery[];
+  total_count?: number;
 }
 
-export interface LoginResponse {
-  access_token: string;
-  token_type: string;
-  expired_at: number;
-  refresh_token: string;
-  re_expired_at: number;
-  remember: boolean;
-}
+export type UserModify = UserQuery;
 
-export interface UserBatchUpdate {
+export interface UserBatchModify {
   password?: string;
   status?: number;
   remark?: string;

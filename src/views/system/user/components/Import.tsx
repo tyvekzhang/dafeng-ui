@@ -85,7 +85,7 @@ const Import: React.FC<ImportProps> = ({
               <InboxOutlined />
             </p>
             <p className="sc-upload-text">{'点击或拖拽到此上传'}</p>
-            <p className="sc-upload-hint">仅支持上传xls、xlsx格式文件</p>
+            <p className="sc-upload-hint">仅支持上传xls、xlsx格式的文件</p>
           </Upload.Dragger>
         </div>
         <div>

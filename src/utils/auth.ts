@@ -1,13 +1,13 @@
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
 import { AuthCacheValue } from '@/stores/types';
-import { LoginResponse } from '@/types/user';
+import { Token } from '@/types/user';
 import { isNullOrUnDef } from '@/utils/is';
 import { Persistent, type BasicKeys } from './cache/persistent';
 
 export function getCacheToken() {
   const rememberMe = getAuthCache<boolean>(true, REMEMBER_KEY);
   if (!isNullOrUnDef(rememberMe)) {
-    return getAuthCache<LoginResponse>(rememberMe, TOKEN_KEY);
+    return getAuthCache<Token>(rememberMe, TOKEN_KEY);
   }
   return null;
 }

@@ -1,4 +1,4 @@
-import { UserEdit } from '@/types/user';
+import { UserModify } from '@/types/user';
 import { Button, Form, Input, Modal } from 'antd';
 import { FormInstance } from 'antd/es/form';
 import React from 'react';
@@ -11,15 +11,15 @@ const formItemLayout = {
 interface EditProps {
   isModalVisible: boolean;
   handleCancel: () => void;
-  handleUserEdit: (values: UserEdit) => void;
+  handleUserEdit: (values: UserModify) => void;
   isLoading: boolean;
   form: FormInstance;
 }
-const Edit: React.FC<EditProps> = ({ isModalVisible, handleCancel, handleUserEdit, isLoading, form }) => {
+const Modify: React.FC<EditProps> = ({ isModalVisible, handleCancel, handleUserEdit, isLoading, form }) => {
   return (
     <div>
       <Modal
-        title="用户修改"
+        title="用户编辑"
         open={isModalVisible}
         onCancel={handleCancel}
         footer={
@@ -44,4 +44,4 @@ const Edit: React.FC<EditProps> = ({ isModalVisible, handleCancel, handleUserEdi
   );
 };
 
-export default Edit;
+export default Modify;

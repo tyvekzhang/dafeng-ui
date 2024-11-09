@@ -2,78 +2,30 @@ import type { AppMenu } from '@/router/types';
 import axiosInstance from '@/services/request';
 import { downloadBlob } from '@/services/util';
 import { UserInfo } from '@/types';
-import {
-  LoginForm,
-  LoginResponse,
-  UserAdd,
-  UserBatchUpdate,
-  UserQuery,
-  UserQueryForm,
-  UserTableData,
-} from '@/types/user';
+import { LoginForm, Token, UserAdd, UserBatchModify, UserQuery, UserQueryForm, UserTableData } from '@/types/user';
 import { AxiosResponse } from 'axios';
 import { RcFile } from 'rc-upload/lib/interface';
 
+export function userAdd(data: UserAdd) {
+  return axiosInstance.post('/user/add', data);
+}
+
 export function login(data: LoginForm) {
-  return axiosInstance.post<LoginResponse>('/user/login', data, {
+  return axiosInstance.post<Token>('/user/login', data, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
 }
 
-export function refreshTokens(data: LoginResponse) {
-  return axiosInstance.post<LoginResponse>('/user/refreshTokens', {
+export function refreshToken(data: Token) {
+  return axiosInstance.post<Token>('/user/refreshtoken', {
     refresh_token: data.refresh_token,
-    remember: data.remember,
   });
 }
 
-export function meInfo(): Promise<UserInfo | null> {
+export function me(): Promise<UserInfo | null> {
   return axiosInstance.get('/user/me');
-}
-
-export function userMenu() {
-  return axiosInstance.get<AppMenu[]>('/user/menu');
-}
-
-export function logoutApi() {
-  return axiosInstance.get('/user/logout');
-}
-
-export function userAdd(data: UserAdd) {
-  return axiosInstance.post('/user/create', data);
-}
-
-export function userList(userFilterForm: UserQueryForm) {
-  return axiosInstance.get<UserTableData>('/user/users', userFilterForm);
-}
-
-export function userUpdate(data: UserQuery) {
-  return axiosInstance.put<UserQuery>('/user/update', data);
-}
-
-export function userDelete(data: UserQuery) {
-  return axiosInstance.delete(`/user/delete/${data.id}`);
-}
-
-export function userRecover(data: UserQuery) {
-  return axiosInstance.post(`/user/recover`, data);
-}
-
-export function userRemove(ids: number[]) {
-  return axiosInstance.delete(`/user/remove`, { ids: ids });
-}
-
-export async function userExport(userFilterForm: UserQueryForm, fileName: string = 'users.xlsx') {
-  try {
-    const response = await axiosInstance.get<AxiosResponse>('/user/export', userFilterForm, {
-      responseType: 'blob',
-    });
-    downloadBlob(response, fileName);
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 export async function userExportTemplate(fileName: string = 'user_import_template.xlsx') {
@@ -98,9 +50,48 @@ export function userImport(file: RcFile) {
   });
 }
 
-export function userBatchUpdate(ids_data: number[], user_batch_update_data: UserBatchUpdate) {
-  return axiosInstance.put('/user/batchUpdate', {
-    ids_data: { ids: ids_data },
-    user_batch_update_data: user_batch_update_data,
+export function users(userFilterForm: UserQueryForm) {
+  return axiosInstance.get<UserTableData>('/user/users', userFilterForm);
+}
+
+export async function userExport(userFilterForm: UserQueryForm, fileName: string = 'users.xlsx') {
+  try {
+    const response = await axiosInstance.get<AxiosResponse>('/user/export', userFilterForm, {
+      responseType: 'blob',
+    });
+    downloadBlob(response, fileName);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export function userModify(data: UserQuery) {
+  return axiosInstance.put<UserQuery>('/user/modify', data);
+}
+
+export function userBatchModify(ids_data: number[], user_batch_modify_data: UserBatchModify) {
+  return axiosInstance.put('/user/batchmodify', {
+    ids: { ids: ids_data },
+    data: user_batch_modify_data,
   });
+}
+
+export function userRemove(data: UserQuery) {
+  return axiosInstance.delete(`/user/remove/${data.id}`);
+}
+
+export function userRecover(data: UserQuery) {
+  return axiosInstance.post(`/user/recover`, data);
+}
+
+export function userBatchRemove(ids: number[]) {
+  return axiosInstance.delete(`/user/batchremove`, { ids: ids });
+}
+
+export function logout() {
+  return axiosInstance.post('/user/logout');
+}
+
+export function userMenus() {
+  return axiosInstance.get<AppMenu[]>('/user/menus');
 }

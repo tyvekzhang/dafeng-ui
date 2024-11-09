@@ -1,4 +1,4 @@
-import { UserBatchUpdate } from '@/types/user';
+import { UserBatchModify } from '@/types/user';
 import { Button, Form, Input, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { FormInstance } from 'antd/es/form';
 import React from 'react';
@@ -8,33 +8,33 @@ const formItemLayout = {
   wrapperCol: { span: 12 },
 };
 
-interface BatchUpdateProps {
+interface BatchModifyProps {
   isModalVisible: boolean;
   handleCancel: () => void;
-  setIsPasswordVisible: any;
-  userBatchUpdateForm: FormInstance;
-  isUserBatchUpdateLoading: boolean;
-  handleUserBatchUpdate: (data: UserBatchUpdate) => void;
-  onBatchStatusChange: (e: RadioChangeEvent) => void;
+  handlePasswordVisible: any;
+  userBatchModifyForm: FormInstance;
+  isUserBatchModifyLoading: boolean;
+  handleUserBatchModify: (data: UserBatchModify) => void;
+  handleBatchStatusChange: (e: RadioChangeEvent) => void;
   batchStatusValue: number;
   isPasswordVisible: boolean;
 }
 
-const BatchUpdate: React.FC<BatchUpdateProps> = ({
+const BatchModify: React.FC<BatchModifyProps> = ({
   isModalVisible,
   handleCancel,
-  userBatchUpdateForm,
-  isUserBatchUpdateLoading,
-  handleUserBatchUpdate,
-  onBatchStatusChange,
+  userBatchModifyForm,
+  isUserBatchModifyLoading,
+  handleUserBatchModify,
+  handleBatchStatusChange,
   batchStatusValue,
   isPasswordVisible,
-  setIsPasswordVisible,
+  handlePasswordVisible,
 }) => {
   return (
     <div>
       <Modal
-        title="用户批量修改"
+        title="用户批量编辑"
         open={isModalVisible}
         onCancel={handleCancel}
         footer={
@@ -42,8 +42,8 @@ const BatchUpdate: React.FC<BatchUpdateProps> = ({
             <Button
               type={'primary'}
               htmlType="submit"
-              onClick={() => userBatchUpdateForm.submit()}
-              loading={isUserBatchUpdateLoading}
+              onClick={() => userBatchModifyForm.submit()}
+              loading={isUserBatchModifyLoading}
             >
               确定
             </Button>
@@ -51,9 +51,9 @@ const BatchUpdate: React.FC<BatchUpdateProps> = ({
           </>
         }
       >
-        <Form form={userBatchUpdateForm} name="user_batch_update_rule" onFinish={handleUserBatchUpdate}>
+        <Form form={userBatchModifyForm} name="user_batch_update_rule" onFinish={handleUserBatchModify}>
           <Form.Item name="status" label="状态" {...formItemLayout}>
-            <Radio.Group onChange={onBatchStatusChange} value={batchStatusValue}>
+            <Radio.Group onChange={handleBatchStatusChange} value={batchStatusValue}>
               <Space>
                 <Radio value={1}>正常</Radio>
                 <Radio value={0}>禁用</Radio>
@@ -78,7 +78,7 @@ const BatchUpdate: React.FC<BatchUpdateProps> = ({
           >
             <Input.Password
               placeholder="请输入"
-              visibilityToggle={{ visible: isPasswordVisible, onVisibleChange: setIsPasswordVisible }}
+              visibilityToggle={{ visible: isPasswordVisible, onVisibleChange: handlePasswordVisible }}
             />
           </Form.Item>
           <Form.Item {...formItemLayout} name="remark" label="备注">
@@ -90,4 +90,4 @@ const BatchUpdate: React.FC<BatchUpdateProps> = ({
   );
 };
 
-export default BatchUpdate;
+export default BatchModify;

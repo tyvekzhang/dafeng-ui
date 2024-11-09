@@ -1,7 +1,7 @@
 import { UserQueryForm } from '@/types/user';
 import { Button, DatePicker, Form, Input, Select, Space } from 'antd';
 import { FormInstance } from 'antd/es/form';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import useStyles from './style';
 
 interface SearchProps {
@@ -9,10 +9,16 @@ interface SearchProps {
   handleQueryReset: () => void;
   handleUserQuery: (data: UserQueryForm) => void;
   handleChangeState: (data: string) => void;
+  status: string | undefined;
 }
 
-const Search: React.FC<SearchProps> = ({ form, handleUserQuery, handleChangeState, handleQueryReset }) => {
+const Search: React.FC<SearchProps> = ({ form, handleUserQuery, handleChangeState, handleQueryReset, status }) => {
   const { styles } = useStyles();
+  const [initStatus, setInitStatus] = useState(status);
+  useEffect(() => {
+    setInitStatus(status);
+  }, [form]);
+
   return (
     <div>
       <Form form={form} name="user_search_rule" onFinish={handleUserQuery}>
@@ -26,13 +32,13 @@ const Search: React.FC<SearchProps> = ({ form, handleUserQuery, handleChangeStat
           <Form.Item name="create_time" label="创建日期">
             <DatePicker.RangePicker />
           </Form.Item>
-          <Form.Item name="status" label="状态">
+          <Form.Item name="status" label="状态" className={styles.statusOption}>
             <Select
               allowClear
               placeholder="请选择"
               optionFilterProp="label"
+              defaultValue={initStatus}
               onChange={handleChangeState}
-              className={styles.statusOption}
               options={[
                 {
                   value: '1',

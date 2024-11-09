@@ -9,7 +9,7 @@ export default createStyles(() => ({
     marginLeft: 'auto',
   },
   statusOption: {
-    width: 114,
+    width: 128,
   },
   searchBtn: {
     margin: '0 8px 0 0',

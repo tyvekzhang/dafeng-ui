@@ -2,20 +2,20 @@ import { message } from '@/components/GlobalToast';
 import UndoComp from '@/components/Undo';
 import {
   userAdd,
-  userBatchUpdate,
-  userDelete,
+  userBatchModify,
+  userBatchRemove,
   userExport,
   userImport,
-  userList,
+  userModify,
   userRecover,
   userRemove,
-  userUpdate,
+  users,
 } from '@/services';
-import { UserAdd, UserBatchUpdate, UserEdit, UserQuery, UserQueryForm, UserSearch } from '@/types/user';
+import { UserAdd, UserBatchModify, UserModify, UserQuery, UserQueryForm } from '@/types/user';
 import Add from '@/views/system/user/components/Add';
-import BatchUpdate from '@/views/system/user/components/BatchUpdate';
-import Edit from '@/views/system/user/components/Edit';
+import BatchModify from '@/views/system/user/components/BatchModify';
 import Import from '@/views/system/user/components/Import';
+import Modify from '@/views/system/user/components/Modify';
 import Search from '@/views/system/user/components/Search';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import {
@@ -37,7 +37,7 @@ import React, { useEffect, useState } from 'react';
 import useStyles from './style';
 
 const columns = (
-  onUpdate: (user: UserQuery) => void,
+  onModify: (user: UserQuery) => void,
   onDelete: (user: UserQuery) => void,
   loadingDelete: boolean,
   handleStatusChange: (user: UserQuery) => void,
@@ -108,9 +108,9 @@ const columns = (
           size={'small'}
           icon={<EditOutlined style={{ marginRight: '-4px' }} />}
           type={'link'}
-          onClick={() => onUpdate(record)}
+          onClick={() => onModify(record)}
         >
-          修改
+          编辑
         </Button>
         <Button
           style={{ marginLeft: '-8px', fontSize: 12, color: '#4096ff' }}
@@ -130,26 +130,123 @@ const columns = (
 const UserPage: React.FC = () => {
   const { styles } = useStyles();
 
-  const [userAddForm] = Form.useForm();
   const [isUserAddModalVisible, setIsUserAddModalVisible] = useState<boolean>(false);
-  const [isUserAddLoading, setIsUserAddLoading] = useState<boolean>(false);
+  const handleShowModal = () => {
+    setIsUserAddModalVisible(true);
+  };
+  const [addForm] = Form.useForm();
   const handleUserAddCancel = () => {
     setIsUserAddModalVisible(false);
-    userAddForm.resetFields();
+    addForm.resetFields();
+  };
+  const [isUserAddLoading, setIsUserAddLoading] = useState<boolean>(false);
+  const handleUserAdd = async (data: UserAdd) => {
+    setIsUserAddLoading(true);
+    try {
+      await userAdd(data);
+      message.success('新增成功');
+      handleUserAddCancel();
+      await setUserTableData();
+    } finally {
+      setIsUserAddLoading(false);
+    }
   };
 
-  const [isUserEditModalVisible, setIsUpdateUserModalVisible] = useState<boolean>(false);
+  const [queryForm] = Form.useForm();
+  const [page, setPage] = useState<number>(1);
+  const [size, setSize] = useState<number>(10);
+  const [userQueryForm, setUserQueryForm] = useState<UserQueryForm>({
+    page: 1,
+    size: 10,
+    username: undefined,
+    nickname: undefined,
+    status: undefined,
+    create_time: undefined,
+  });
+  const [totalCount, setTotal] = useState<number | undefined>(0);
+  const [dataSource, setDataSource] = useState<UserQuery[] | undefined>([]);
+  const [status, setStatus] = useState<string | undefined>(undefined);
+  const handleChangeState = (data: string) => {
+    setStatus(data);
+  };
+  const [isTableLoading, setIsTableLoading] = useState<boolean>(false);
+  const setUserTableData = async () => {
+    try {
+      setIsTableLoading(true);
+      const { records, total_count } = await users(userQueryForm);
+      setDataSource(records);
+      setTotal(total_count);
+    } finally {
+      setIsTableLoading(false);
+    }
+  };
+  const handleUserQuery = async (data: UserQueryForm) => {
+    const { create_time } = data;
+    let timeRange: string | undefined;
+    if (create_time && create_time.length === 2) {
+      const startDate = dayjs(create_time[0]).valueOf() / 1000;
+      const endDate = dayjs(create_time[1]).valueOf() / 1000;
+      timeRange = startDate + ',' + endDate;
+    }
+    setPage(1);
+    setSize(10);
+    setUserQueryForm((prev) => ({
+      ...prev,
+      page: 1,
+      size: 10,
+      username: data.username?.trim(),
+      nickname: data.nickname?.trim(),
+      status: data.status,
+      create_time: timeRange,
+    }));
+  };
+  const handlePaginationSearch = async (current: number, size: number) => {
+    setPage(current);
+    setSize(size);
+    setUserQueryForm((prev) => ({
+      ...prev,
+      page: current,
+      size: size,
+    }));
+  };
+  const handleQueryReset = () => {
+    queryForm.resetFields();
+    setStatus(undefined);
+    setPage(1);
+    setSize(10);
+    setUserQueryForm((prev) => ({
+      ...prev,
+      page: 1,
+      size: 10,
+      username: undefined,
+      nickname: undefined,
+      status: undefined,
+      create_time: undefined,
+    }));
+  };
+
+  const handleExport = async () => {
+    await userExport(userQueryForm);
+  };
+
+  const [isUserEditModalVisible, setIsModifyUserModalVisible] = useState<boolean>(false);
   const [isUserEditLoading, setIsUserEditLoading] = useState<boolean>(false);
-  const [userEditForm] = Form.useForm();
-  const [editUser, setEditUser] = useState<UserEdit | null>(null);
-  const onUserEdit = (user: UserEdit) => {
+  const [editForm] = Form.useForm();
+  const [editUser, setEditUser] = useState<UserModify | null>(null);
+  const onUserEdit = (user: UserModify) => {
     setEditUser(user);
-    userEditForm.setFieldsValue(user);
-    setIsUpdateUserModalVisible(true);
+    editForm.setFieldsValue(user);
+    setIsModifyUserModalVisible(true);
   };
   const handleUserEditCancel = () => {
-    setIsUpdateUserModalVisible(false);
-    userEditForm.resetFields();
+    setIsModifyUserModalVisible(false);
+    editForm.resetFields();
+  };
+  const handleStatusChange = async (user: UserQuery) => {
+    const updatedStatus = user.status === 1 ? 0 : 1;
+    await userModify({ ...user, status: updatedStatus });
+    message.success('更新成功');
+    await setUserTableData();
   };
   const handleUserEdit = async (data: UserQuery) => {
     setIsUserEditLoading(true);
@@ -157,7 +254,7 @@ const UserPage: React.FC = () => {
       if (editUser === null) {
         return;
       }
-      await userUpdate({ ...editUser, ...data });
+      await userModify({ ...editUser, ...data });
       handleUserEditCancel();
       message.success('更新成功');
       await setUserTableData();
@@ -166,167 +263,22 @@ const UserPage: React.FC = () => {
     }
   };
 
-  const [isUserImportModalVisible, setIsUserImportModalVisible] = useState<boolean>(false);
-  const [isUserImportLoading, setIsUserImportLoading] = useState<boolean>(false);
-  const [userImportFile, setUserImportFile] = useState<RcFile | null>(null);
-  const handleFileUpload = (uploadFile: RcFile | null) => {
-    setUserImportFile(uploadFile);
+  const [isUserBatchModifyEnable, setIsUserBatchModifyEnable] = useState<boolean>(true);
+  const [isUserBatchEditModalVisible, setIsUserBatchEditModalVisible] = useState<boolean>(false);
+  const onUserBatchEdit = () => {
+    setIsUserBatchEditModalVisible(true);
   };
-
-  const handleUserImportCancel = () => {
-    handleFileUpload(null);
-    setIsUserImportModalVisible(false);
-  };
-
-  const handleUserImport = async () => {
-    try {
-      setIsUserImportLoading(true);
-      if (!userImportFile) {
-        message.warning('请先选择上传文件');
-        return;
-      }
-      await userImport(userImportFile);
-      message.success('导入成功');
-      handleFileUpload(null);
-      setIsUserImportModalVisible(false);
-    } finally {
-      setIsUserImportLoading(false);
-    }
-  };
-
-  const [userBatchUpdateForm] = Form.useForm();
-  const [userQueryForm] = Form.useForm();
-  const [isUserBatchUpdateModalVisible, setIsUserBatchUpdateModalVisible] = useState<boolean>(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [isUserBatchUpdateLoading, setIsUserBatchUpdateLoading] = useState<boolean>(false);
-  const [userBatchUpdateEnable, setUserBatchUpdateEnable] = useState<boolean>(true);
-  const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
-  const [isShowUndo, setIsShowUndo] = useState<boolean>(false);
-  const [deleteEnabled, setDeleteEnabled] = useState<boolean>(true);
-  const [dataSource, setDataSource] = useState<UserQuery[] | undefined>([]);
-  const [recoverUser, setRecoverUser] = useState<UserQuery | null>(null);
+  const [batchEditForm] = Form.useForm();
   const [batchStatusValue, setBatchStatusValue] = useState<number>(1);
-  const [totalCount, setTotal] = useState<number | undefined>(0);
-  const [page, setPage] = useState<number>(1);
-  const [size, setSize] = useState<number>(10);
-  const [userSearch, setUserSearch] = useState<UserSearch>({
-    username: undefined,
-    nickname: undefined,
-    status: undefined,
-    create_time: undefined,
-  });
-  const [userResearchForm, setUserQueryForm] = useState<UserQueryForm>({
-    page: 1,
-    size: 10,
-    ...userSearch,
-  });
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    if (newSelectedRowKeys.length > 0) {
-      setDeleteEnabled(false);
-      setUserBatchUpdateEnable(false);
-    }
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const confirmDelete: PopconfirmProps['onConfirm'] = async () => {
-    const ids = selectedRowKeys.map((key) => Number(key));
-    await userRemove(ids);
-    await setUserTableData();
-    message.success('删除成功');
-  };
-
-  const confirmCancel: PopconfirmProps['onCancel'] = async () => {
-    setSelectedRowKeys([]);
-    message.success('删除撤销');
-  };
-
-  const rowSelection: TableRowSelection<UserQuery> = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const handleChangeState = (value: string) => {
-    const status = value ? Number(value) : undefined;
-    setUserSearch((prev) => ({
-      ...prev,
-      status: status,
-    }));
-  };
-
   const onBatchStatusChange = (e: RadioChangeEvent) => {
     setBatchStatusValue(e.target.value);
   };
-  const onUserImport = () => {
-    setIsUserImportModalVisible(true);
+  const handleUserBatchModifyCancel = () => {
+    setIsUserBatchEditModalVisible(false);
+    batchEditForm.resetFields();
   };
-  const setUserTableData = async () => {
-    const { records, total_count } = await userList(userResearchForm);
-    setDataSource(records);
-    setTotal(total_count);
-  };
-  const handleUndo = async () => {
-    if (recoverUser) {
-      await userRecover(recoverUser);
-    }
-    setIsShowUndo(false);
-    await setUserTableData();
-  };
-
-  const handleExport = async () => {
-    await userExport(userResearchForm);
-  };
-
-  const onUserBatchUpdate = () => {
-    setIsUserBatchUpdateModalVisible(true);
-  };
-
-  const handleShowModal = () => {
-    setIsUserAddModalVisible(true);
-  };
-
-  const handleUserBatchUpdateCancel = () => {
-    setIsUpdateUserModalVisible(false);
-    userBatchUpdateForm.resetFields();
-  };
-
-  const handleHide = () => {
-    setIsShowUndo(false);
-  };
-
-  const handleUserAdd = async (data: UserAdd) => {
-    setIsUserAddLoading(true);
-    try {
-      await userAdd(data);
-      handleUserAddCancel();
-      message.success('新增成功');
-      await setUserTableData();
-    } finally {
-      setIsUserAddLoading(false);
-    }
-  };
-
-  const handleUserDelete = async (user: UserQuery) => {
-    setIsLoadingDelete(true);
-    try {
-      setRecoverUser(user);
-      await userDelete(user);
-      await setUserTableData();
-      setIsShowUndo(true);
-    } finally {
-      setIsLoadingDelete(false);
-    }
-  };
-
-  const handleStatusChange = async (user: UserQuery) => {
-    const updatedStatus = user.status === 1 ? 0 : 1;
-    await userUpdate({ ...user, status: updatedStatus });
-    message.success('更新成功');
-    await setUserTableData();
-  };
-
-  const handleUserBatchUpdate = async (data: UserBatchUpdate) => {
+  const [isUserBatchModifyLoading, setIsUserBatchModifyLoading] = useState<boolean>(false);
+  const handleUserBatchModify = async (data: UserBatchModify) => {
     const ids = selectedRowKeys.map((key) => Number(key));
     if (ids.length === 0) {
       message.warning('请先选择要更新的条目');
@@ -337,100 +289,131 @@ const UserPage: React.FC = () => {
       return;
     }
     try {
-      await userBatchUpdate(ids, data);
-      setIsUserBatchUpdateLoading(true);
-      userBatchUpdateForm.resetFields();
+      setIsUserBatchModifyLoading(true);
+      await userBatchModify(ids, data);
       message.success('更新成功');
-      userList(userResearchForm).then(async () => {
-        await setUserTableData();
-      });
-    } finally {
-      setIsUserBatchUpdateLoading(false);
-      setIsUserBatchUpdateModalVisible(false);
       setSelectedRowKeys([]);
+      batchEditForm.resetFields();
+      setIsUserBatchEditModalVisible(false);
+      await setUserTableData();
+    } finally {
+      setIsUserBatchModifyLoading(false);
     }
   };
 
-  const handleUserQuery = async (data: UserQueryForm) => {
-    const { create_time } = data;
-    let timeRange: string | undefined;
-    if (create_time && create_time.length === 2) {
-      const startDate = create_time[0].startOf('day').unix();
-      const endDate = create_time[1].endOf('day').unix();
-      timeRange = startDate + ',' + endDate;
+  const [isUserImportModalVisible, setIsUserImportModalVisible] = useState<boolean>(false);
+  const [isUserImportLoading, setIsUserImportLoading] = useState<boolean>(false);
+  const [userImportFile, setUserImportFile] = useState<RcFile | null>(null);
+  const onUserImport = () => {
+    setIsUserImportModalVisible(true);
+  };
+  const handleFileUpload = (uploadFile: RcFile | null) => {
+    setUserImportFile(uploadFile);
+  };
+  const handleUserImportCancel = () => {
+    handleFileUpload(null);
+    setIsUserImportModalVisible(false);
+  };
+  const handleUserImport = async () => {
+    try {
+      setIsUserImportLoading(true);
+      if (!userImportFile) {
+        message.warning('请先选择上传文件');
+        return;
+      }
+      await userImport(userImportFile);
+      message.success('导入成功');
+      await setUserTableData();
+      handleFileUpload(null);
+      setIsUserImportModalVisible(false);
+    } finally {
+      setIsUserImportLoading(false);
     }
-    setUserSearch((prev) => ({
-      ...prev,
-      username: data.username?.trim(),
-      nickname: data.nickname?.trim(),
-      status: data.status,
-      create_time: timeRange,
-    }));
-    setPage(1);
-    setSize(10);
-    setUserQueryForm((prev) => ({
-      ...prev,
-      ...userSearch,
-      page: page,
-      size: size,
-    }));
   };
 
-  const handlePaginationSearch = async (current: number, size: number) => {
-    setPage(current);
-    setSize(size);
-    setUserQueryForm((prev) => ({
-      ...prev,
-      page: page,
-      size: size,
-    }));
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  const rowSelection: TableRowSelection<UserQuery> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
   };
 
-  const handleQueryReset = () => {
-    userQueryForm.resetFields();
-    setPage(1);
-    setSize(10);
-    setUserSearch((prev) => ({
-      ...prev,
-      page: page,
-      size: size,
-      username: undefined,
-      nickname: undefined,
-      status: undefined,
-      create_time: undefined,
-    }));
-    setUserQueryForm((prev) => ({
-      ...prev,
-      ...userSearch,
-    }));
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const handlePasswordVisible = () => {
+    setIsPasswordVisible((prev) => !prev);
+  };
+
+  const [isBatchDeleteEnabled, setIsBatchDeleteEnabled] = useState<boolean>(true);
+  const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
+  const [isShowUndo, setIsShowUndo] = useState<boolean>(false);
+  const [recoverUser, setRecoverUser] = useState<UserQuery | null>(null);
+
+  const handleUndo = async () => {
+    if (recoverUser) {
+      await userRecover(recoverUser);
+    }
+    setIsShowUndo(false);
+    await setUserTableData();
+  };
+  const handleHide = () => {
+    setIsShowUndo(false);
+  };
+  const handleUserDelete = async (user: UserQuery) => {
+    setIsLoadingDelete(true);
+    try {
+      setRecoverUser(user);
+      await userRemove(user);
+      await setUserTableData();
+      setIsShowUndo(true);
+    } finally {
+      setIsLoadingDelete(false);
+    }
+  };
+  const confirmDelete: PopconfirmProps['onConfirm'] = async () => {
+    const ids = selectedRowKeys.map((key) => Number(key));
+    await userBatchRemove(ids);
+    await setUserTableData();
+    message.success('删除成功');
+  };
+  const confirmCancel: PopconfirmProps['onCancel'] = async () => {
+    setSelectedRowKeys([]);
+    message.success('删除撤销');
   };
 
   useEffect(() => {
-    userList(userResearchForm).then(async () => {
-      await setUserTableData();
+    setIsTableLoading(true);
+    users(userQueryForm).then(async (resp) => {
+      const { records, total_count } = resp;
+      setDataSource(records);
+      setTotal(total_count);
     });
+    setIsTableLoading(false);
     return () => {
       setDataSource([]);
     };
-  }, [userResearchForm]);
+  }, [userQueryForm]);
 
   useEffect(() => {
-    setUserQueryForm((prev) => ({
-      ...prev,
-      ...userSearch,
-      page: page,
-      size: size,
-    }));
-  }, [userSearch, page, size]);
+    if (selectedRowKeys.length > 0) {
+      setIsBatchDeleteEnabled(false);
+      setIsUserBatchModifyEnable(false);
+    } else {
+      setIsBatchDeleteEnabled(true);
+      setIsUserBatchModifyEnable(true);
+    }
+  }, [selectedRowKeys]);
 
   return (
     <div className={styles.container}>
       <Card bordered={false} className={styles.searchContainer}>
         <Search
-          form={userQueryForm}
+          form={queryForm}
           handleUserQuery={handleUserQuery}
           handleChangeState={handleChangeState}
           handleQueryReset={handleQueryReset}
+          status={status}
         />
       </Card>
       <Space className={styles.resultSearch}>
@@ -444,11 +427,11 @@ const UserPage: React.FC = () => {
           导出
         </Button>
         <Button
-          disabled={userBatchUpdateEnable}
-          onClick={onUserBatchUpdate}
+          disabled={isUserBatchModifyEnable}
+          onClick={onUserBatchEdit}
           className={`${styles.button} btn-batch-update`}
         >
-          修改
+          编辑
         </Button>
         <Popconfirm
           title="删除所选的内容"
@@ -458,7 +441,7 @@ const UserPage: React.FC = () => {
           okText="是"
           cancelText="否"
         >
-          <Button disabled={deleteEnabled} className={`${styles.button} btn-delete`}>
+          <Button disabled={isBatchDeleteEnabled} className={`${styles.button} btn-delete`}>
             删除
           </Button>
         </Popconfirm>
@@ -469,14 +452,14 @@ const UserPage: React.FC = () => {
           handleCancel={handleUserAddCancel}
           handleUserAdd={handleUserAdd}
           isLoading={isUserAddLoading}
-          formProp={userAddForm}
+          formProp={addForm}
         />
-        <Edit
+        <Modify
           isModalVisible={isUserEditModalVisible}
           handleCancel={handleUserEditCancel}
           handleUserEdit={handleUserEdit}
           isLoading={isUserEditLoading}
-          form={userEditForm}
+          form={editForm}
         />
         <Import
           isModalVisible={isUserImportModalVisible}
@@ -485,18 +468,19 @@ const UserPage: React.FC = () => {
           handleUserImport={handleUserImport}
           handleFileUpload={handleFileUpload}
         />
-        <BatchUpdate
-          isModalVisible={isUserBatchUpdateModalVisible}
-          handleCancel={handleUserBatchUpdateCancel}
-          setIsPasswordVisible={setIsPasswordVisible}
-          userBatchUpdateForm={userBatchUpdateForm}
-          isUserBatchUpdateLoading={isUserBatchUpdateLoading}
-          handleUserBatchUpdate={handleUserBatchUpdate}
-          onBatchStatusChange={onBatchStatusChange}
+        <BatchModify
+          isModalVisible={isUserBatchEditModalVisible}
+          handleCancel={handleUserBatchModifyCancel}
+          handlePasswordVisible={handlePasswordVisible}
+          userBatchModifyForm={batchEditForm}
+          isUserBatchModifyLoading={isUserBatchModifyLoading}
+          handleUserBatchModify={handleUserBatchModify}
+          handleBatchStatusChange={onBatchStatusChange}
           batchStatusValue={batchStatusValue}
           isPasswordVisible={isPasswordVisible}
         />
         <Table
+          loading={isTableLoading}
           dataSource={dataSource}
           columns={columns(onUserEdit, handleUserDelete, isLoadingDelete, handleStatusChange)}
           rowKey={'id'}

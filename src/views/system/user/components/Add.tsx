@@ -102,8 +102,17 @@ const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, 
           <Form.Item
             name="password"
             label="密码"
-            rules={[{ required: true, message: '必填项' }]}
-            tooltip="密码至少8位，包括大小写字母、数字"
+            rules={[
+              {
+                min: 6,
+                message: '请设置密码不少于6位',
+              },
+              {
+                pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/,
+                message: '需要有数字和字母',
+              },
+            ]}
+            tooltip="密码至少6位，包括大小写字母、数字"
           >
             <Input.Password placeholder="请输入" onChange={handleChange} value={password} />
             <div>
@@ -132,6 +141,9 @@ const Add: React.FC<AddProps> = ({ isModalVisible, handleCancel, handleUserAdd, 
           </Form.Item>
           <Form.Item name="nickname" label="昵称" rules={[{ required: true, message: '必填项' }]}>
             <Input placeholder="请输入" />
+          </Form.Item>
+          <Form.Item name="remark" label="备注">
+            <Input.TextArea placeholder="请输入" autoSize={{ minRows: 3, maxRows: 5 }} />
           </Form.Item>
         </Form>
       </Modal>

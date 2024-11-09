@@ -12,11 +12,11 @@ import {
 
 import type { UserInfo } from '@/types';
 import type { AppConfig } from '@/types/config';
-import { LoginResponse } from '@/types/user';
+import { Token } from '@/types/user';
 import { createLocalStorage, createSessionStorage } from '@/utils/cache';
 
 interface BasicStore {
-  [TOKEN_KEY]: string | number | null | undefined | LoginResponse | boolean;
+  [TOKEN_KEY]: string | number | null | undefined | Token | boolean;
   [USER_INFO_KEY]: UserInfo;
   [APP_CONFIG_KEY]: AppConfig;
   [APP_TAGS_KEY]: RouteObject[];

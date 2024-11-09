@@ -5,7 +5,7 @@ import qs from 'qs';
 
 import { message } from '@/components/GlobalToast';
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
-import { refreshTokens } from '@/services/user';
+import { refreshToken } from '@/services/user';
 import NProgress from '@/settings/n_progress';
 
 class HttpRequest {
@@ -56,7 +56,7 @@ class HttpRequest {
             const oldToken = getCacheToken();
             const localRemember = getAuthCache(true, REMEMBER_KEY) as boolean;
             if (oldToken) {
-              const token = await refreshTokens(oldToken);
+              const token = await refreshToken(oldToken);
               setAuthCache(localRemember, TOKEN_KEY, token);
             }
             return this.instance(originalRequest);

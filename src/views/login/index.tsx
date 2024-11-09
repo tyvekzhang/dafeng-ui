@@ -1,10 +1,10 @@
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
-import { login, meInfo } from '@/services';
+import { login, me } from '@/services';
 import { appSetting } from '@/settings/appBaseSetting';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { setRememberMe, setToken, setUserInfo } from '@/stores/modules/user';
 import type { UserInfo } from '@/types';
-import { LoginForm, LoginResponse } from '@/types/user';
+import { LoginForm, Token } from '@/types/user';
 import { getCacheToken, setAuthCache } from '@/utils/auth';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { App, Button, Checkbox, Form } from 'antd';
@@ -25,7 +25,7 @@ const LoginPage: FC = () => {
   const dispatch = useAppDispatch();
 
   const { token } = useAppSelector((state) => state.user);
-  const getToken = (): LoginResponse | null => {
+  const getToken = (): Token | null => {
     if (token) {
       return token;
     }
@@ -90,7 +90,7 @@ const LoginPage: FC = () => {
   };
 
   const getUserInfoAction = async (): Promise<UserInfo | null> => {
-    const userInfo = await meInfo();
+    const userInfo = await me();
 
     dispatch(setUserInfo(userInfo));
 

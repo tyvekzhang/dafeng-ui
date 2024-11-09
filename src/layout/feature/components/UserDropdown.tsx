@@ -2,10 +2,10 @@ import headerImg from '@/assets/images/avatar.jpg';
 import { message } from '@/components/GlobalToast';
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
 import { myMessage } from '@/hooks/web/myMessage';
-import { logoutApi } from '@/services';
+import { logout } from '@/services';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { resetState } from '@/stores/modules/user';
-import { LoginResponse } from '@/types/user';
+import { Token } from '@/types/user';
 import { clearAllAuthCache, getAuthCache } from '@/utils/auth';
 import { LockOutlined, PoweroffOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -49,13 +49,13 @@ export default function UserDropdown() {
 
   const dispatch = useAppDispatch();
   const { token } = useAppSelector((state) => state.user);
-  const getToken = (): LoginResponse | null => {
+  const getToken = (): Token | null => {
     if (token) {
       return token;
     }
     const localRemember = getAuthCache<boolean>(true, REMEMBER_KEY);
     if (localRemember !== undefined) {
-      return getAuthCache<LoginResponse>(localRemember, TOKEN_KEY);
+      return getAuthCache<Token>(localRemember, TOKEN_KEY);
     }
     return null;
   };
@@ -78,7 +78,7 @@ export default function UserDropdown() {
   const logoutAction = async (goLogin = false) => {
     if (getToken()) {
       try {
-        await logoutApi();
+        await logout();
       } catch {
         const { createMessage } = myMessage();
         createMessage.error('注销失败');
