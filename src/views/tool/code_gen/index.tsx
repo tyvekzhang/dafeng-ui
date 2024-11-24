@@ -1,4 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import EditableCell from '@/components/EditableCell';
+import {
+  fetchConnections,
+  fetchDatabases,
+  fetchIndexStructure,
+  fetchTables,
+  fetchTableStructure,
+  fieldGenerate,
+  tableAdd,
+} from '@/services/db_manage';
+import { Database, DatabaseConnection, TableAdd, TableColumn, TableIndex, TableInfo } from '@/types/db_manage';
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  ClearOutlined,
+  CloseOutlined,
+  DatabaseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  LinkOutlined,
+  SaveOutlined,
+  SearchOutlined,
+  TableOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Checkbox,
@@ -15,31 +38,8 @@ import {
   Tabs,
   Tooltip,
 } from 'antd';
-import {
-  ArrowDownOutlined,
-  ArrowUpOutlined,
-  ClearOutlined,
-  CloseOutlined,
-  DatabaseOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  LinkOutlined,
-  SaveOutlined,
-  SearchOutlined,
-  TableOutlined,
-} from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
 import useStates from './style';
-import { Database, DatabaseConnection, TableAdd, TableColumn, TableIndex, TableInfo } from '@/types/db_manage';
-import {
-  fetchConnections,
-  fetchDatabases,
-  fetchIndexStructure,
-  fetchTables,
-  fetchTableStructure,
-  fieldGenerate,
-  tableAdd,
-} from '@/services/db_manage';
-import EditableCell from '@/components/EditableCell';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
@@ -55,17 +55,13 @@ const DatabaseExplorer: React.FC = () => {
   const [connections, setConnections] = useState<DatabaseConnection[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const handleFieldChange = (newValue: Partial<TableColumn>, index: number, field: string) => {
-    setFieldDataSource(prevState =>
-      prevState.map((item, i) =>
-        i === index ? { ...item, [field]: newValue } : item,
-      ),
+    setFieldDataSource((prevState) =>
+      prevState.map((item, i) => (i === index ? { ...item, [field]: newValue } : item)),
     );
   };
   const handleIndexChange = (newValue: Partial<TableIndex>, index: number, field: string) => {
-    setIndexDataSource(prevState =>
-      prevState.map((item, i) =>
-        i === index ? { ...item, [field]: newValue } : item,
-      ),
+    setIndexDataSource((prevState) =>
+      prevState.map((item, i) => (i === index ? { ...item, [field]: newValue } : item)),
     );
   };
   const [databases, setDatabases] = useState<Database[]>([]);
@@ -106,7 +102,8 @@ const DatabaseExplorer: React.FC = () => {
       decimals: '',
       not_null: '',
       default: '',
-      remark: '', ...record,
+      remark: '',
+      ...record,
     });
     setEditingKey(record.key);
   };
@@ -122,7 +119,6 @@ const DatabaseExplorer: React.FC = () => {
   useEffect(() => {
     fetchConnections().then(setConnections);
   }, []);
-
 
   const handleEditableChange = (checked: boolean) => {
     setIsEditable(checked);
@@ -192,9 +188,7 @@ const DatabaseExplorer: React.FC = () => {
     setIndexDataSource([...indexDataSource, newIndex]);
   };
 
-  const handleSave = async () => {
-
-  };
+  const handleSave = async () => {};
 
   const handleSaveField = async () => {
     if (selectedTable) {
@@ -223,10 +217,7 @@ const DatabaseExplorer: React.FC = () => {
   };
 
   const handleMoveField = (index: number, direction: 'up' | 'down') => {
-    if (
-      (direction === 'up' && index > 0) ||
-      (direction === 'down' && index < fieldDataSource.length - 1)
-    ) {
+    if ((direction === 'up' && index > 0) || (direction === 'down' && index < fieldDataSource.length - 1)) {
       const newFieldDataSource = [...fieldDataSource];
       const temp = newFieldDataSource[index];
       newFieldDataSource[index] = newFieldDataSource[index + (direction === 'up' ? -1 : 1)];
@@ -236,10 +227,7 @@ const DatabaseExplorer: React.FC = () => {
   };
 
   const handleMoveIndex = (index: number, direction: 'up' | 'down') => {
-    if (
-      (direction === 'up' && index > 0) ||
-      (direction === 'down' && index < indexDataSource.length - 1)
-    ) {
+    if ((direction === 'up' && index > 0) || (direction === 'down' && index < indexDataSource.length - 1)) {
       const newIndexDataSource = [...indexDataSource];
       const temp = newIndexDataSource[index];
       newIndexDataSource[index] = newIndexDataSource[index + (direction === 'up' ? -1 : 1)];
@@ -350,21 +338,12 @@ const DatabaseExplorer: React.FC = () => {
         return (
           <Space>
             {editable ? (
-              <div style={{display: 'flex', gap: 8, }}>
+              <div style={{ display: 'flex', gap: 8 }}>
                 <Tooltip title="暂存">
-                  <Button
-                    size={'small'}
-                    onClick={() => save(record.key)}
-                    type="primary"
-                    icon={<SaveOutlined />}
-                  />
+                  <Button size={'small'} onClick={() => save(record.key)} type="primary" icon={<SaveOutlined />} />
                 </Tooltip>
                 <Tooltip title="取消">
-                  <Button
-                    size={'small'}
-                    onClick={() => setEditingKey('')}
-                    icon={<CloseOutlined />}
-                  />
+                  <Button size={'small'} onClick={() => setEditingKey('')} icon={<CloseOutlined />} />
                 </Tooltip>
               </div>
             ) : (
@@ -405,11 +384,7 @@ const DatabaseExplorer: React.FC = () => {
                   disabled={!!editingKey}
                 >
                   <Tooltip title="删除">
-                    <Button
-                      size={'small'}
-                      icon={<DeleteOutlined />}
-                      disabled={!isEditable || !!editingKey}
-                    />
+                    <Button size={'small'} icon={<DeleteOutlined />} disabled={!isEditable || !!editingKey} />
                   </Tooltip>
                 </Popconfirm>
               </>
@@ -504,12 +479,7 @@ const DatabaseExplorer: React.FC = () => {
             onClick={() => handleMoveIndex(index, 'down')}
             disabled={!isEditable || index === indexDataSource.length - 1}
           />
-          <Popconfirm
-            title="确定要删除这行吗？"
-            onConfirm={() => handleDeleteIndex(index)}
-            okText="是"
-            cancelText="否"
-          >
+          <Popconfirm title="确定要删除这行吗？" onConfirm={() => handleDeleteIndex(index)} okText="是" cancelText="否">
             <Button icon={<DeleteOutlined />} disabled={!isEditable} />
           </Popconfirm>
         </Space>
@@ -517,9 +487,10 @@ const DatabaseExplorer: React.FC = () => {
     },
   ];
 
-  const filteredFieldDataSource = fieldDataSource.filter(field =>
-    field?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    field?.remark?.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredFieldDataSource = fieldDataSource.filter(
+    (field) =>
+      field?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      field?.remark?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -552,8 +523,7 @@ const DatabaseExplorer: React.FC = () => {
                   <SubMenu
                     key={database.id}
                     icon={<DatabaseOutlined />}
-                    title
-                      ={database.database_name}
+                    title={database.database_name}
                     onTitleClick={() => handleDatabaseClick(database)}
                   >
                     {tables?.map((table) => (
@@ -578,12 +548,7 @@ const DatabaseExplorer: React.FC = () => {
                   <Button type="primary" onClick={handleSaveField} disabled={!isEditable}>
                     保存
                   </Button>
-                  <Popconfirm
-                    title="确定要清空所有字段吗？"
-                    onConfirm={handleClearFields}
-                    okText="是"
-                    cancelText="否"
-                  >
+                  <Popconfirm title="确定要清空所有字段吗？" onConfirm={handleClearFields} okText="是" cancelText="否">
                     <Button icon={<ClearOutlined />} disabled={!isClearAble}>
                       清空
                     </Button>
@@ -608,7 +573,6 @@ const DatabaseExplorer: React.FC = () => {
               </div>
               <Form form={fieldForm} component={false}>
                 <Table<TableColumn>
-
                   components={{
                     body: { cell: EditableCell },
                   }}
@@ -629,12 +593,7 @@ const DatabaseExplorer: React.FC = () => {
                   <Button type="primary" onClick={handleSave} disabled={!isEditable}>
                     保存
                   </Button>
-                  <Popconfirm
-                    title="确定要清空所有索引吗？"
-                    onConfirm={handleClearIndexes}
-                    okText="是"
-                    cancelText="否"
-                  >
+                  <Popconfirm title="确定要清空所有索引吗？" onConfirm={handleClearIndexes} okText="是" cancelText="否">
                     <Button icon={<ClearOutlined />} disabled={!isClearAble}>
                       清空
                     </Button>
@@ -733,7 +692,7 @@ const DatabaseExplorer: React.FC = () => {
             <Form form={tableForm} onFinish={handleTableSubmit} {...formPropItemLayout}>
               <Form.Item name="datasourceId" label="数据源" rules={[{ required: true }]}>
                 <Select onChange={handleTableDatasourceTypeChange} placeholder="请选择数据源">
-                  {connections?.map(connection => (
+                  {connections?.map((connection) => (
                     <Select.Option key={connection.id} value={connection.id}>
                       {connection.connection_name}
                     </Select.Option>
@@ -742,7 +701,7 @@ const DatabaseExplorer: React.FC = () => {
               </Form.Item>
               <Form.Item name="databaseId" label="数据库" rules={[{ required: true }]}>
                 <Select placeholder="请选择数据库">
-                  {tableDatabases?.map(tableDatabase => (
+                  {tableDatabases?.map((tableDatabase) => (
                     <Select.Option value={tableDatabase.id}>{tableDatabase.database_name}</Select.Option>
                   ))}
                 </Select>
@@ -764,4 +723,3 @@ const DatabaseExplorer: React.FC = () => {
 };
 
 export default DatabaseExplorer;
-
