@@ -12,11 +12,11 @@ export interface TableInfo {
   id: number;
   name: string;
   database_id: number;
-  remark?: string
+  remark?: string;
 }
 
 export interface TableColumn {
-  id: number
+  id: number;
   key: string;
   name: string;
   type: string;
@@ -39,4 +39,3 @@ export interface TableAdd {
   tableName: string;
   databaseId: number;
 }
-

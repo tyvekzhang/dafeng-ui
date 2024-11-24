@@ -22,7 +22,7 @@ export default createStyles(({ token, css }) => ({
     flexDirection: 'column',
     height: '100%',
     backgroundColor: '#fff',
-    overflow: 'scroll'
+    overflow: 'scroll',
   },
   addBtn: {
     width: '33%',
