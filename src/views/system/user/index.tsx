@@ -145,8 +145,8 @@ const UserPage: React.FC = () => {
     try {
       await userAdd(data);
       message.success('新增成功');
-      handleUserAddCancel();
       await setUserTableData();
+      handleUserAddCancel();
     } finally {
       setIsUserAddLoading(false);
     }
