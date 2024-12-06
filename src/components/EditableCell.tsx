@@ -1,21 +1,21 @@
-import React from 'react';
-import { Form, Input, InputNumber, Select, Checkbox, DatePicker } from 'antd';
 import { EditableCellProps } from '@/types/common';
+import { Checkbox, DatePicker, Form, Input, InputNumber, Select } from 'antd';
+import React from 'react';
 
 const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
-                                                                              editing,
-                                                                              dataIndex,
-                                                                              title,
-                                                                              inputType,
-                                                                              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                                                              record,
-                                                                              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                                                              index,
-                                                                              children,
-                                                                              required,
-                                                                              options,
-                                                                              ...restProps
-                                                                            }) => {
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  record,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  index,
+  children,
+  required,
+  options,
+  ...restProps
+}) => {
   let inputNode;
 
   switch (inputType) {
@@ -67,4 +67,3 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
 };
 
 export default EditableCell;
-

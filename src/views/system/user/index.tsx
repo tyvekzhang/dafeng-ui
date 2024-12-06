@@ -426,11 +426,7 @@ const UserPage: React.FC = () => {
         <Button onClick={handleExport} className={`btn-export`}>
           导出
         </Button>
-        <Button
-          disabled={isUserBatchModifyEnable}
-          onClick={onUserBatchEdit}
-          className={`btn-batch-update`}
-        >
+        <Button disabled={isUserBatchModifyEnable} onClick={onUserBatchEdit} className={`btn-batch-update`}>
           编辑
         </Button>
         <Popconfirm

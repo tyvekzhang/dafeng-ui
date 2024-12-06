@@ -1,11 +1,11 @@
-import { Modal, Tabs } from 'antd'
-import { CopyOutlined, CloseOutlined } from '@ant-design/icons'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { CloseOutlined, CopyOutlined } from '@ant-design/icons';
+import { Modal, Tabs } from 'antd';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface CodePreviewProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
 const sampleCode = {
@@ -47,8 +47,8 @@ public class SysOperLog extends BaseEntity
   mapperXml: '// Mapper XML here',
   sql: '-- SQL queries here',
   api: '// API endpoints here',
-  index: '<!-- Vue component here -->'
-}
+  index: '<!-- Vue component here -->',
+};
 
 export default function CodePreview({ open, onClose }: CodePreviewProps) {
   const items = [
@@ -60,24 +60,17 @@ export default function CodePreview({ open, onClose }: CodePreviewProps) {
     { key: 'mapperXml', label: 'mapper.xml', children: sampleCode.mapperXml },
     { key: 'sql', label: 'sql', children: sampleCode.sql },
     { key: 'api', label: 'api.js', children: sampleCode.api },
-    { key: 'index', label: 'index.vue', children: sampleCode.index }
-  ]
+    { key: 'index', label: 'index.vue', children: sampleCode.index },
+  ];
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-  }
+    navigator.clipboard.writeText(text);
+  };
 
   return (
-    <Modal
-      title="代码预览"
-      open={open}
-      onCancel={onClose}
-      width={1200}
-      footer={null}
-      closeIcon={<CloseOutlined />}
-    >
+    <Modal title="代码预览" open={open} onCancel={onClose} width={1200} footer={null} closeIcon={<CloseOutlined />}>
       <Tabs
-        items={items.map(item => ({
+        items={items.map((item) => ({
           key: item.key,
           label: item.label,
           children: (
@@ -95,16 +88,15 @@ export default function CodePreview({ open, onClose }: CodePreviewProps) {
                 customStyle={{
                   margin: 0,
                   borderRadius: '4px',
-                  fontSize: '14px'
+                  fontSize: '14px',
                 }}
               >
                 {item.children}
               </SyntaxHighlighter>
             </div>
-          )
+          ),
         }))}
       />
     </Modal>
-  )
+  );
 }
-

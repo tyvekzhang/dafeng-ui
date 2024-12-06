@@ -79,7 +79,12 @@ export const tableAdd = async (data: TableAdd): Promise<void> => {
   return axiosInstance.post('/table/add', tableAdd);
 };
 
-export const tableGenerate = async (database_id: number, tableMetadata: TableMetadata, fieldData: TableColumn[], indexData: TableIndex[]) => {
+export const tableGenerate = async (
+  database_id: number,
+  tableMetadata: TableMetadata,
+  fieldData: TableColumn[],
+  indexData: TableIndex[],
+) => {
   const tableGenerate = {
     database_id: database_id,
     table_name: tableMetadata.table_name,

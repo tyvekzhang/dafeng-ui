@@ -1,6 +1,6 @@
-import React from 'react';
 import type { TabsProps } from 'antd';
 import { Button, Form, Input, Modal, Select, Table, Tabs } from 'antd';
+import React from 'react';
 
 const { Option } = Select;
 
@@ -123,7 +123,6 @@ const CodeEdit: React.FC<CodeEditProps> = ({ open, onClose }) => {
       width: 100,
     },
 
-
     {
       title: '插入',
       dataIndex: 'insert',
@@ -229,17 +228,11 @@ const CodeEdit: React.FC<CodeEditProps> = ({ open, onClose }) => {
       label: '字段信息',
       children: (
         <>
-          <Table
-            columns={columns}
-            dataSource={data}
-            pagination={false}
-            scroll={{ x: 1500 }}
-            size="middle"
-          />
+          <Table columns={columns} dataSource={data} pagination={false} scroll={{ x: 1500 }} size="middle" />
           <div style={{ marginTop: 16, textAlign: 'center' }}>
-
-
-            <Button type="primary" style={{ marginRight: 8 }}>提交</Button>
+            <Button type="primary" style={{ marginRight: 8 }}>
+              提交
+            </Button>
             <Button onClick={onClose}>返回</Button>
           </div>
         </>
@@ -286,14 +279,7 @@ const CodeEdit: React.FC<CodeEditProps> = ({ open, onClose }) => {
   ];
 
   return (
-    <Modal
-      title="编辑表"
-      open={open}
-      onCancel={onClose}
-      footer={null}
-      width={1200}
-      style={{ top: 20 }}
-    >
+    <Modal title="编辑表" open={open} onCancel={onClose} footer={null} width={1200} style={{ top: 20 }}>
       <div style={{ padding: '12px 0' }}>
         <Tabs defaultActiveKey="2" items={items} />
       </div>

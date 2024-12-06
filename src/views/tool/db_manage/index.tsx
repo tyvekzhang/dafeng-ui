@@ -1,12 +1,13 @@
 import EditableCell from '@/components/EditableCell';
+import { message } from '@/components/GlobalToast';
 import {
   fetchConnections,
   fetchDatabases,
   fetchIndexStructure,
   fetchTables,
   fetchTableStructure,
-  tableGenerate,
   tableAdd,
+  tableGenerate,
 } from '@/services/db_manage';
 import {
   Database,
@@ -48,7 +49,6 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import useStates from './style';
-import { message } from '@/components/GlobalToast';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
@@ -69,7 +69,7 @@ const DatabaseExplorer: React.FC = () => {
   const [connections, setConnections] = useState<DatabaseConnection[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [fieldType, setFieldType] = useState<string>('varchar');
-  const [activateKey, setActivateKey] = useState<string>("1");
+  const [activateKey, setActivateKey] = useState<string>('1');
 
   const handleTabChange = (key: string) => {
     setActivateKey(key);
@@ -77,13 +77,9 @@ const DatabaseExplorer: React.FC = () => {
 
   const handleFieldTypeChange = (value: string) => {
     setFieldType(value);
-  }
+  };
   const handleFieldChange = (newValue: Partial<TableColumn>, index: number) => {
-    setFieldDataSource((prevState) =>
-      prevState.map((item, i) =>
-        i === index ? { ...item, ...newValue } : item
-      ),
-    );
+    setFieldDataSource((prevState) => prevState.map((item, i) => (i === index ? { ...item, ...newValue } : item)));
   };
   const handleIndexChange = (newValue: Partial<TableIndex>, index: number, field: string) => {
     setIndexDataSource((prevState) =>
@@ -159,18 +155,18 @@ const DatabaseExplorer: React.FC = () => {
 
   const cancel = () => {
     setEditingKey('');
-    fieldForm.resetFields()
+    fieldForm.resetFields();
   };
 
   const cancelIndex = () => {
     setEditingIndexKey('');
-    indexForm.resetFields()
+    indexForm.resetFields();
   };
 
   const tmpSaveFieldData = async (key: React.Key) => {
     try {
       // Validate and get the form values
-      const editRow = await fieldForm.validateFields() as TableColumn;
+      const editRow = (await fieldForm.validateFields()) as TableColumn;
 
       // Merge the form values with the field type
       const updatedRow = { ...editRow, type: fieldType };
@@ -195,8 +191,7 @@ const DatabaseExplorer: React.FC = () => {
       // Update the data source and reset the editing key
       setFieldDataSource(newData);
       setEditingKey('');
-      fieldForm.resetFields()
-
+      fieldForm.resetFields();
     } catch (errInfo) {
       // Log validation errors
       console.log('Validate Failed:', errInfo);
@@ -206,7 +201,7 @@ const DatabaseExplorer: React.FC = () => {
   const tmpSaveIndexData = async (key: React.Key) => {
     try {
       // Validate and get the form values
-      const editRow = await indexForm.validateFields() as TableIndex;
+      const editRow = (await indexForm.validateFields()) as TableIndex;
 
       // Merge the form values with the field type
       const updatedRow = { ...editRow, type: fieldType };
@@ -231,8 +226,7 @@ const DatabaseExplorer: React.FC = () => {
       // Update the data source and reset the editing key
       setIndexDataSource(newData);
       setEditingIndexKey('');
-      indexForm.resetFields()
-
+      indexForm.resetFields();
     } catch (errInfo) {
       // Log validation errors
       console.log('Validate Failed:', errInfo);
@@ -244,7 +238,7 @@ const DatabaseExplorer: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if(selectedDatabase !== null) {
+    if (selectedDatabase !== null) {
       setIsEditable(true);
     }
   }, [selectedDatabase]);
@@ -281,18 +275,18 @@ const DatabaseExplorer: React.FC = () => {
 
   const handleConnectionClick = async (connection: DatabaseConnection) => {
     fetchDatabases(connection.id).then(setDatabases);
-    setSelectedDatabase(null)
-    setSelectedTable(null)
-    setFieldDataSource([])
-    setIndexDataSource([])
+    setSelectedDatabase(null);
+    setSelectedTable(null);
+    setFieldDataSource([]);
+    setIndexDataSource([]);
   };
 
   const handleDatabaseClick = async (database: Database) => {
     fetchTables(database.id).then(setTables);
-    setSelectedDatabase(database)
-    setSelectedTable(null)
-    setFieldDataSource([])
-    setIndexDataSource([])
+    setSelectedDatabase(database);
+    setSelectedTable(null);
+    setFieldDataSource([]);
+    setIndexDataSource([]);
   };
 
   const handleTableClick = async (tableInfo: TableInfo) => {
@@ -317,7 +311,7 @@ const DatabaseExplorer: React.FC = () => {
       sort: 0,
     };
     setFieldDataSource([...fieldDataSource, newField]);
-    setEditingKey(newField.key)
+    setEditingKey(newField.key);
   };
 
   const handleAddIndex = () => {
@@ -329,29 +323,29 @@ const DatabaseExplorer: React.FC = () => {
       comment: undefined,
     };
     setIndexDataSource([...indexDataSource, newIndex]);
-    setEditingIndexKey(newIndex.key)
+    setEditingIndexKey(newIndex.key);
   };
 
   const handleSaveIndex = async () => {
-    setActivateKey("3")
+    setActivateKey('3');
   };
 
   const handleSave = async () => {
     if (selectedDatabase === null) {
       message.error('请先选择数据库再操作');
-      return
+      return;
     }
-    const tableMetadata = await tableMetadataForm.validateFields() as TableMetadata
+    const tableMetadata = (await tableMetadataForm.validateFields()) as TableMetadata;
     await tableGenerate(selectedDatabase.id, tableMetadata, fieldDataSource, indexDataSource);
-    setActivateKey("1");
+    setActivateKey('1');
   };
 
   const handleSaveField = async () => {
     if (fieldDataSource === null || fieldDataSource === undefined) {
-      message.error("请先添加字段信息")
-      return
+      message.error('请先添加字段信息');
+      return;
     }
-    setActivateKey("2")
+    setActivateKey('2');
   };
 
   const handleDeleteField = (index: number) => {
@@ -412,7 +406,7 @@ const DatabaseExplorer: React.FC = () => {
       editable: true,
       width: '15%',
       ellipsis: true,
-      required: true
+      required: true,
     },
     {
       title: '类型',
@@ -517,10 +511,15 @@ const DatabaseExplorer: React.FC = () => {
             {editable ? (
               <div style={{ display: 'flex', gap: 8 }}>
                 <Tooltip title="暂存">
-                  <Button size={'small'} onClick={() => tmpSaveFieldData(record.key)} type="primary" icon={<SaveOutlined />} />
+                  <Button
+                    size={'small'}
+                    onClick={() => tmpSaveFieldData(record.key)}
+                    type="primary"
+                    icon={<SaveOutlined />}
+                  />
                 </Tooltip>
                 <Tooltip title="取消">
-                  <Button size={'small'} onClick={()=> cancel()} icon={<CloseOutlined />} />
+                  <Button size={'small'} onClick={() => cancel()} icon={<CloseOutlined />} />
                 </Tooltip>
               </div>
             ) : (
@@ -583,7 +582,7 @@ const DatabaseExplorer: React.FC = () => {
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
-        required: col.required
+        required: col.required,
       }),
     };
   });
@@ -602,7 +601,7 @@ const DatabaseExplorer: React.FC = () => {
       ),
       editable: true,
       required: true,
-      width: "15%"
+      width: '15%',
     },
     {
       title: '类型',
@@ -620,7 +619,7 @@ const DatabaseExplorer: React.FC = () => {
           <Select.Option value="fulltext">FULLTEXT</Select.Option>
         </Select>
       ),
-      width: "15%"
+      width: '15%',
     },
     {
       title: '字段',
@@ -635,7 +634,7 @@ const DatabaseExplorer: React.FC = () => {
       ),
       editable: true,
       required: true,
-      width: "32%"
+      width: '32%',
     },
     {
       title: '备注',
@@ -649,7 +648,7 @@ const DatabaseExplorer: React.FC = () => {
         />
       ),
       editable: true,
-      width: "15%"
+      width: '15%',
     },
     {
       title: '操作',
@@ -665,10 +664,15 @@ const DatabaseExplorer: React.FC = () => {
             {editable ? (
               <div style={{ display: 'flex', gap: 8 }}>
                 <Tooltip title="暂存">
-                  <Button size={'small'} onClick={() => tmpSaveIndexData(record.key)} type="primary" icon={<SaveOutlined />} />
+                  <Button
+                    size={'small'}
+                    onClick={() => tmpSaveIndexData(record.key)}
+                    type="primary"
+                    icon={<SaveOutlined />}
+                  />
                 </Tooltip>
                 <Tooltip title="取消">
-                  <Button size={'small'} onClick={()=> cancelIndex()} icon={<CloseOutlined />} />
+                  <Button size={'small'} onClick={() => cancelIndex()} icon={<CloseOutlined />} />
                 </Tooltip>
               </div>
             ) : (
@@ -731,7 +735,7 @@ const DatabaseExplorer: React.FC = () => {
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isIndexEditing(record),
-        required: col.required
+        required: col.required,
       }),
     };
   });
@@ -874,7 +878,12 @@ const DatabaseExplorer: React.FC = () => {
                   <Button type="primary" onClick={handleSave} disabled={!isEditable}>
                     完成
                   </Button>
-                  <Popconfirm title="确定要清空所有表数据吗？" onConfirm={handleClearTableMetadata} okText="是" cancelText="否">
+                  <Popconfirm
+                    title="确定要清空所有表数据吗？"
+                    onConfirm={handleClearTableMetadata}
+                    okText="是"
+                    cancelText="否"
+                  >
                     <Button icon={<ClearOutlined />} disabled={!isClearAble}>
                       清空
                     </Button>
@@ -890,15 +899,15 @@ const DatabaseExplorer: React.FC = () => {
               </div>
               <Form {...tableFormPropItemLayout}>
                 <Form.Item label="数据库">
-                  <Input placeholder={"请选择数据库"} value={selectedDatabase?.database_name} disabled={true}/>
+                  <Input placeholder={'请选择数据库'} value={selectedDatabase?.database_name} disabled={true} />
                 </Form.Item>
               </Form>
               <Form form={tableMetadataForm} {...tableFormPropItemLayout}>
-                <Form.Item name="table_name" label="名称" rules={[{ required: true, message: "必填项" }]}>
-                  <Input disabled={!isEditable}/>
+                <Form.Item name="table_name" label="名称" rules={[{ required: true, message: '必填项' }]}>
+                  <Input disabled={!isEditable} />
                 </Form.Item>
                 <Form.Item name="comment" label="备注">
-                  <Input  disabled={!isEditable}/>
+                  <Input disabled={!isEditable} />
                 </Form.Item>
               </Form>
             </TabPane>

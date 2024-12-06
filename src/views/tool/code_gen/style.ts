@@ -26,7 +26,7 @@ export default createStyles(({ token, css }) => ({
   },
   addBtn: {
     width: '33%',
-    color: token.colorBgContainerDisabled
+    color: token.colorBgContainerDisabled,
   },
   rightContent: {
     height: '100%',

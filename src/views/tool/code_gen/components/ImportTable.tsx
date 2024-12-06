@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Modal, Table, Button, Form, Input, Select, Space, message } from 'antd';
 import type { TableProps } from 'antd';
+import { Button, Form, Input, Modal, Select, Space, Table, message } from 'antd';
+import React, { useState } from 'react';
 
 const { Option } = Select;
 
@@ -82,7 +82,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose, onImport }) =>
       message.warning('请选择要导入的表');
       return;
     }
-    const selectedTables = data.filter(item => selectedRowKeys.includes(item.key));
+    const selectedTables = data.filter((item) => selectedRowKeys.includes(item.key));
     onImport(selectedTables);
     message.success('导入成功');
     setSelectedRowKeys([]);
@@ -104,12 +104,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose, onImport }) =>
         </Button>,
       ]}
     >
-      <Form
-        form={form}
-        layout="inline"
-        onFinish={handleSearch}
-        style={{ marginBottom: 16 }}
-      >
+      <Form form={form} layout="inline" onFinish={handleSearch} style={{ marginBottom: 16 }}>
         <Form.Item name="dataSource" label="数据源">
           <Select style={{ width: 200 }} placeholder="请选择数据源">
             <Option value="mysql">MySQL</Option>
@@ -118,7 +113,6 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose, onImport }) =>
           </Select>
         </Form.Item>
         <Form.Item name="database" label="数据库">
-
           <Select style={{ width: 200 }} placeholder="请选择数据库">
             <Option value="db1">数据库1</Option>
             <Option value="db2">数据库2</Option>

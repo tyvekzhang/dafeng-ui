@@ -22,7 +22,7 @@ function getIcon(iconType: string) {
 
 function renderContent({ content }: Pick<ModalOptionsEx, 'content'>) {
   if (isString(content)) {
-    return <div dangerouslySetInnerHTML={{ __html: `<div>${content}</div>`}} />;
+    return <div dangerouslySetInnerHTML={{ __html: `<div>${content}</div>` }} />;
   } else {
     return content; // 直接返回 content
   }
