@@ -1,6 +1,14 @@
 import axiosInstance from '@/services/request';
 import { PageData } from '@/types/common';
-import { Database, DatabaseConnection, TableAdd, TableColumn, TableIndex, TableInfo } from '@/types/db_manage';
+import {
+  Database,
+  DatabaseConnection,
+  TableAdd,
+  TableColumn,
+  TableIndex,
+  TableInfo,
+  TableMetadata,
+} from '@/types/db_manage';
 
 export const fetchConnections = async (): Promise<DatabaseConnection[]> => {
   const params = {
@@ -71,11 +79,11 @@ export const tableAdd = async (data: TableAdd): Promise<void> => {
   return axiosInstance.post('/table/add', tableAdd);
 };
 
-export const fieldGenerate = async (tableInfo: TableInfo, fieldData: TableColumn[], indexData: TableIndex[]) => {
+export const tableGenerate = async (database_id: number, tableMetadata: TableMetadata, fieldData: TableColumn[], indexData: TableIndex[]) => {
   const tableGenerate = {
-    database_id: tableInfo.database_id,
-    table_name: tableInfo.name,
-    comment: tableInfo.remark,
+    database_id: database_id,
+    table_name: tableMetadata.table_name,
+    comment: tableMetadata.remark,
     field_metadata: fieldData,
     index_metadata: indexData,
   };

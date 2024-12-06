@@ -13,7 +13,7 @@ export default createStyles(({ token, css }) => ({
     height: '100%',
     flex: 1,
     display: 'grid',
-    gap: 4,
+    gap: 2,
     gridTemplateColumns: '3fr 11fr',
   },
   leftContent: {
@@ -26,7 +26,6 @@ export default createStyles(({ token, css }) => ({
   },
   addBtn: {
     width: '33%',
-    color: token.colorBgContainerDisabled
   },
   rightContent: {
     height: '100%',

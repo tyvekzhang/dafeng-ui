@@ -1,20 +1,47 @@
-import { EditableCellProps } from '@/types/common';
-import { Form, Input, InputNumber } from 'antd';
 import React from 'react';
+import { Form, Input, InputNumber, Select, Checkbox, DatePicker } from 'antd';
+import { EditableCellProps } from '@/types/common';
 
 const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  record,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  index,
-  children,
-  ...restProps
-}) => {
-  const inputNode = inputType === 'number' ? <InputNumber style={{ width: '64px' }} /> : <Input />;
+                                                                              editing,
+                                                                              dataIndex,
+                                                                              title,
+                                                                              inputType,
+                                                                              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                                              record,
+                                                                              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                                              index,
+                                                                              children,
+                                                                              required,
+                                                                              options,
+                                                                              ...restProps
+                                                                            }) => {
+  let inputNode;
+
+  switch (inputType) {
+    case 'number':
+      inputNode = <InputNumber style={{ width: '100%' }} />;
+      break;
+    case 'select':
+      inputNode = (
+        <Select style={{ width: '100%' }}>
+          {options?.map((option) => (
+            <Select.Option key={option.value} value={option.value}>
+              {option.label}
+            </Select.Option>
+          ))}
+        </Select>
+      );
+      break;
+    case 'checkbox':
+      inputNode = <Checkbox />;
+      break;
+    case 'date':
+      inputNode = <DatePicker style={{ width: '100%' }} />;
+      break;
+    default:
+      inputNode = <Input />;
+  }
 
   return (
     <td {...restProps}>
@@ -22,10 +49,11 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
         <Form.Item
           name={dataIndex}
           style={{ margin: 0 }}
+          valuePropName={inputType === 'checkbox' ? 'checked' : 'value'}
           rules={[
             {
-              required: true,
-              message: `Please Input ${title}!`,
+              required: required,
+              message: `必填项: ${title}!`,
             },
           ]}
         >
@@ -39,3 +67,4 @@ const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
 };
 
 export default EditableCell;
+

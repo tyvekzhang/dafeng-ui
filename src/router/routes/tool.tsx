@@ -23,6 +23,15 @@ const ToolRoute: RouteObject = {
         key: 'code',
       },
     },
+    {
+      path: 'db',
+      name: 'Db',
+      element: LazyLoad(lazy(() => import('@/views/tool/db_manage'))),
+      meta: {
+        title: '数据库管理',
+        key: 'db',
+      },
+    },
   ],
 };
 

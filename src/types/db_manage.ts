@@ -12,27 +12,35 @@ export interface TableInfo {
   id: number;
   name: string;
   database_id: number;
-  remark?: string;
+  comment?: string;
 }
 
 export interface TableColumn {
-  id: number;
+  id?: number;
   key: string;
   name: string;
-  type: string;
-  default: string;
+  type: string | undefined;
   length?: number;
-  decimals?: number;
-  not_null: boolean;
-  index_col: boolean;
-  remark: string;
+  scale?: number;
+  default: string;
+  comment: string;
+  nullable: boolean;
+  primary_key: boolean;
+  autoincrement: boolean;
+  sort: number;
 }
 
 export interface TableIndex {
+  key: string;
   name: string;
   type: string;
   field: string;
-  remark?: string;
+  comment?: string;
+}
+
+export interface TableMetadata {
+  table_name: string;
+  comment?: string;
 }
 
 export interface TableAdd {

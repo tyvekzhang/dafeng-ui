@@ -417,19 +417,19 @@ const UserPage: React.FC = () => {
         />
       </Card>
       <Space className={styles.resultSearch}>
-        <Button onClick={handleShowModal} className={`${styles.button} btn-add`}>
+        <Button onClick={handleShowModal} className={`btn-add`}>
           新增
         </Button>
-        <Button onClick={onUserImport} className={`${styles.button} btn-import`}>
+        <Button onClick={onUserImport} className={`btn-import`}>
           导入
         </Button>
-        <Button onClick={handleExport} className={`${styles.button} btn-export`}>
+        <Button onClick={handleExport} className={`btn-export`}>
           导出
         </Button>
         <Button
           disabled={isUserBatchModifyEnable}
           onClick={onUserBatchEdit}
-          className={`${styles.button} btn-batch-update`}
+          className={`btn-batch-update`}
         >
           编辑
         </Button>
@@ -441,7 +441,7 @@ const UserPage: React.FC = () => {
           okText="是"
           cancelText="否"
         >
-          <Button disabled={isBatchDeleteEnabled} className={`${styles.button} btn-delete`}>
+          <Button disabled={isBatchDeleteEnabled} className={`btn-delete`}>
             删除
           </Button>
         </Popconfirm>

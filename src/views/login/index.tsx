@@ -32,7 +32,7 @@ const LoginPage: FC = () => {
     return getCacheToken();
   };
 
-  const init_remember = getToken()?.remember;
+  const init_remember = getToken();
 
   const handlePasswordSwitch = (e: { preventDefault: () => void }) => {
     e.preventDefault();
