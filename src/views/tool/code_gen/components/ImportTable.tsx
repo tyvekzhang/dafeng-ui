@@ -1,162 +1,197 @@
+import { importTables } from '@/services/code_gen';
+import { fetchConnections, fetchDatabases, listTables } from '@/services/db_manage';
+import { Database, DatabaseConnection, TableInfo } from '@/types/db_manage';
 import type { TableProps } from 'antd';
-import { Button, Form, Input, Modal, Select, Space, Table, message } from 'antd';
-import React, { useState } from 'react';
+import { Button, Form, Input, message, Modal, Select, Space, Table } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
 interface ImportTableProps {
   open: boolean;
   onClose: () => void;
-  onImport: (tables: TableItem[]) => void;
 }
 
-interface TableItem {
-  key: string;
-  tableName: string;
-  description: string;
-  entity: string;
-  createTime: string;
-  updateTime?: string;
-}
-
-const ImportTable: React.FC<ImportTableProps> = ({ open, onClose, onImport }) => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
+  const [tableData, setTableData] = useState<TableInfo[]>([]);
+  const [databaseConnections, setDatabaseConnections] = useState<DatabaseConnection[]>([]);
+  const [databases, setDatabases] = useState<Database[]>([]);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  // 表格列定义
-  const columns: TableProps<TableItem>['columns'] = [
-    {
-      title: '表名称',
-      dataIndex: 'tableName',
-      width: 200,
-    },
-    {
-      title: '表描述',
-      dataIndex: 'description',
-      width: 200,
-    },
-    {
-      title: '实体',
-      dataIndex: 'entity',
-      width: 200,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      width: 180,
-    },
-  ];
+  // 获取数据库连接配置
+  useEffect(() => {
+    if (open) {
+      fetchConnections().then(setDatabaseConnections);
+    }
+  }, [open]);
 
-  // 模拟数据
-  const data: TableItem[] = [
-    {
-      key: '1',
-      tableName: 'sys_user',
-      description: '用户信息表',
-      entity: 'SysUser',
-      createTime: '2024-01-20 10:00:00',
-    },
-    {
-      key: '2',
-      tableName: 'sys_role',
-      description: '角色信息表',
-      entity: 'SysRole',
-      createTime: '2024-01-20 10:00:00',
-    },
-    {
-      key: '3',
-      tableName: 'sys_menu',
-      description: '菜单权限表',
-      entity: 'SysMenu',
-      createTime: '2024-01-20 10:00:00',
-    },
-  ];
-
-  const handleSearch = (values: any) => {
-    console.log('搜索条件：', values);
-    // 这里添加搜索逻辑
+  // 获取数据库列表
+  const handleConnectionChange = async (connectionId: number) => {
+    try {
+      setLoading(true);
+      const response = await fetchDatabases(connectionId);
+      setDatabases(response);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleImport = () => {
+  // 获取表信息
+  const fetchTables = async (values: any) => {
+    try {
+      setLoading(true);
+      const params = {
+        ...values,
+        page: currentPage,
+        pageSize,
+      };
+      const response = await listTables(params);
+      setTableData(response.records);
+      setTotal(response.total_count);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (values: any) => {
+    setCurrentPage(1);
+    fetchTables(values);
+  };
+
+  const handleImport = async () => {
     if (selectedRowKeys.length === 0) {
       message.warning('请选择要导入的表');
       return;
     }
-    const selectedTables = data.filter((item) => selectedRowKeys.includes(item.key));
-    onImport(selectedTables);
-    message.success('导入成功');
+
+    try {
+      setLoading(true);
+      const selectedTables = tableData.filter((item) => selectedRowKeys.includes(item.id));
+      const tableIds = selectedTables.map((item) => item.id);
+      const database_id = selectedTables[0].database_id;
+      await importTables(database_id, tableIds);
+      handleReset();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    form.resetFields();
     setSelectedRowKeys([]);
+    setTableData([]);
+    setCurrentPage(1);
     onClose();
   };
+
+  const columns: TableProps<TableInfo>['columns'] = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      hidden: true,
+    },
+    {
+      title: '表名称',
+      dataIndex: 'name',
+    },
+    {
+      title: '表描述',
+      dataIndex: 'comment',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'create_time',
+    },
+  ];
 
   return (
     <Modal
       title="导入表"
       open={open}
-      onCancel={onClose}
-      width={1000}
+      onCancel={handleReset}
+      width={1050}
+      confirmLoading={loading}
       footer={[
-        <Button key="cancel" onClick={onClose}>
+        <Button key="cancel" onClick={handleReset}>
           取消
         </Button>,
-        <Button key="import" type="primary" onClick={handleImport}>
+        <Button key="import" type="primary" loading={loading} onClick={handleImport}>
           导入
         </Button>,
       ]}
     >
       <Form form={form} layout="inline" onFinish={handleSearch} style={{ marginBottom: 16 }}>
-        <Form.Item name="dataSource" label="数据源">
-          <Select style={{ width: 200 }} placeholder="请选择数据源">
-            <Option value="mysql">MySQL</Option>
-            <Option value="oracle">Oracle</Option>
-            <Option value="postgresql">PostgreSQL</Option>
+        <Form.Item name="dataSource" label="数据源" rules={[{ required: true }]}>
+          <Select style={{ width: 128 }} placeholder="请选择数据源" onChange={handleConnectionChange}>
+            {databaseConnections.map((config) => (
+              <Option key={config.id} value={config.id}>
+                {config.connection_name}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
-        <Form.Item name="database" label="数据库">
-          <Select style={{ width: 200 }} placeholder="请选择数据库">
-            <Option value="db1">数据库1</Option>
-            <Option value="db2">数据库2</Option>
-            <Option value="db3">数据库3</Option>
+        <Form.Item name="database_id" label="数据库" rules={[{ required: true }]}>
+          <Select style={{ width: 156 }} placeholder="请选择数据库" onChange={() => fetchTables(form.getFieldsValue())}>
+            {databases.map((db) => (
+              <Option key={db.id} value={db.id}>
+                {db.database_name}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
         <Form.Item name="tableName" label="表名称">
-          <Input placeholder="请输入表名称" style={{ width: 200 }} />
+          <Input placeholder="请输入表名称" style={{ width: 128 }} />
         </Form.Item>
         <Form.Item name="description" label="表描述">
-          <Input placeholder="请输入表描述" style={{ width: 200 }} />
+          <Input placeholder="请输入表描述" style={{ width: 128 }} />
         </Form.Item>
         <Form.Item>
           <Space>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={loading}>
               搜索
             </Button>
-            <Button
-              onClick={() => {
-                form.resetFields();
-                handleSearch({});
-              }}
-            >
-              重置
-            </Button>
+            <Button onClick={handleReset}>重置</Button>
           </Space>
         </Form.Item>
       </Form>
 
       <Table
+        loading={loading}
         columns={columns}
-        dataSource={data}
+        dataSource={tableData}
+        rowKey={'id'}
         rowSelection={{
           selectedRowKeys,
           onChange: (newSelectedRowKeys) => {
-            setSelectedRowKeys(newSelectedRowKeys as string[]);
+            setSelectedRowKeys(newSelectedRowKeys as number[]);
           },
         }}
         pagination={{
-          total: data.length,
-          pageSize: 10,
+          current: currentPage,
+          pageSize: pageSize,
+          total: total,
           showTotal: (total) => `共 ${total} 条`,
           showSizeChanger: true,
           showQuickJumper: true,
+          onChange: async (page, size) => {
+            setCurrentPage(page);
+            setPageSize(size);
+            setLoading(true);
+            const params = {
+              ...form.getFieldsValue(),
+              page: currentPage,
+              pageSize,
+            };
+            const response = await listTables(params);
+            setTableData(response.records);
+            setTotal(response.total_count);
+          },
         }}
       />
     </Modal>

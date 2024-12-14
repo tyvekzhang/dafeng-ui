@@ -1,90 +1,75 @@
 import { CodeOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SyncOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
-import { Button, Card, DatePicker, Form, Input, Popconfirm, Space, Table, Tooltip } from 'antd';
-import { useState } from 'react';
+import { Button, Card, Form, Input, Popconfirm, Space, Table, Tooltip } from 'antd';
+import { useEffect, useState } from 'react';
 import CodeEdit from './components/CodeEdit';
 import CodePreview from './components/CodePreview';
 import ImportTable from './components/ImportTable';
 
-const { RangePicker } = DatePicker;
-
-interface TableItem {
-  key: string;
-  id: number;
-  tableName: string;
-  description: string;
-  entity: string;
-  createTime: string;
-  updateTime?: string;
-}
+import { codeList, downloadCode } from '@/services/code_gen';
+import { GenTableQueryResponse } from '@/types/code_gen';
 
 export default function CodeGen() {
   const searchForm = Form.useForm();
   const [editOpen, setEditOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [tableData, setTableData] = useState<TableItem[]>([
-    {
-      key: '1',
-      id: 1,
-      tableName: 'sys_oper_log',
-      description: '操作日志记录',
-      entity: 'SysOperLog',
-      createTime: '2024-11-26 15:29:18',
-      updateTime: '2024-11-27 11:22:29',
-    },
-    {
-      key: '2',
-      id: 2,
-      tableName: 'sys_config',
-      description: '参数配置表',
-      entity: 'SysConfig',
-      createTime: '2024-11-26 16:34:35',
-    },
-  ]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [currentTableId, setCurrentTableId] = useState<number>(0);
 
-  const handleImportTables = (importedTables: TableItem[]) => {
-    // 为导入的表生成新的 id
-    const lastId = Math.max(...tableData.map((item) => item.id));
-    const newTables = importedTables.map((table, index) => ({
-      ...table,
-      id: lastId + index + 1,
-      key: (lastId + index + 1).toString(),
-      createTime: new Date().toLocaleString(),
-    }));
-
-    setTableData([...tableData, ...newTables]);
+  const handlePreview = (record: GenTableQueryResponse) => {
+    setPreviewOpen(true);
+    setCurrentTableId(record.id);
   };
 
-  const columns: TableProps<TableItem>['columns'] = [
+  const handleCodeGenerate = async (record: GenTableQueryResponse) => {
+    setCurrentTableId(record.id);
+    await downloadCode(record.id);
+  };
+
+  const [tableData, setTableData] = useState<GenTableQueryResponse[]>([]);
+  useEffect(() => {
+    codeList().then((res) => {
+      setTableData(res.records);
+    });
+  }, [importOpen]);
+
+  const columns: TableProps<GenTableQueryResponse>['columns'] = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      hidden: true,
+    },
     {
       title: '序号',
-      dataIndex: 'id',
-      width: '6%',
+      dataIndex: 'No',
+      key: 'No',
+      render: (_: number, _record: GenTableQueryResponse, rowIndex: number) => rowIndex + 1,
+      width: '8%',
     },
     {
-      title: '连接名',
-      dataIndex: 'connection_name',
+      title: '连接',
+      dataIndex: 'connectionName',
       width: '10%',
     },
     {
-      title: '数据库名',
-      dataIndex: 'db_name',
+      title: '数据库',
+      dataIndex: 'databaseName',
       width: '10%',
     },
     {
-      title: '表名称',
+      title: '表名',
       dataIndex: 'tableName',
       width: '10%',
     },
     {
-      title: '表描述',
-      dataIndex: 'description',
+      title: '备注',
+      dataIndex: 'tableComment',
       width: '15%',
     },
     {
-      title: '模型',
+      title: '数据模型',
       dataIndex: 'entity',
       width: '15%',
     },
@@ -96,10 +81,10 @@ export default function CodeGen() {
     {
       title: '操作',
       key: 'action',
-      render: () => (
+      render: (record: GenTableQueryResponse) => (
         <Space size="small">
           <Tooltip title="预览">
-            <Button type="link" size={'small'} icon={<EyeOutlined />} onClick={() => setPreviewOpen(true)}></Button>
+            <Button type="link" size={'small'} icon={<EyeOutlined />} onClick={() => handlePreview(record)}></Button>
           </Tooltip>
           <Tooltip title="编辑">
             <Button type="link" size={'small'} icon={<EditOutlined />} onClick={() => setEditOpen(true)}></Button>
@@ -111,7 +96,12 @@ export default function CodeGen() {
             <Button size={'small'} type="link" icon={<SyncOutlined />}></Button>
           </Tooltip>
           <Tooltip title="生成代码">
-            <Button size={'small'} type="link" icon={<CodeOutlined />}></Button>
+            <Button
+              size={'small'}
+              type="link"
+              onClick={() => handleCodeGenerate(record)}
+              icon={<CodeOutlined />}
+            ></Button>
           </Tooltip>
         </Space>
       ),
@@ -122,27 +112,6 @@ export default function CodeGen() {
     labelCol: { span: 6 },
     wrapperCol: { span: 18 },
   };
-
-  const data: TableItem[] = [
-    {
-      key: '1',
-      id: 1,
-      tableName: 'sys_oper_log',
-      description: '操作日志记录',
-      entity: 'SysOperLog',
-      createTime: '2024-11-26 15:29:18',
-      updateTime: '2024-11-27 11:22:29',
-    },
-    {
-      key: '2',
-      id: 2,
-      tableName: 'sys_config',
-      description: '参数配置表',
-      entity: 'SysConfig',
-      createTime: '2024-11-26 16:34:35',
-    },
-    // Add more sample data as needed
-  ];
 
   return (
     <>
@@ -189,7 +158,7 @@ export default function CodeGen() {
 
         <Table
           columns={columns}
-          dataSource={data}
+          dataSource={tableData}
           rowSelection={{
             selectedRowKeys,
             onChange: (newSelectedRowKeys) => {
@@ -207,9 +176,9 @@ export default function CodeGen() {
         />
       </Card>
 
-      <CodePreview open={previewOpen} onClose={() => setPreviewOpen(false)} />
+      <CodePreview open={previewOpen} onClose={() => setPreviewOpen(false)} tableId={currentTableId} />
       <CodeEdit open={editOpen} onClose={() => setEditOpen(false)} />
-      <ImportTable open={importOpen} onClose={() => setImportOpen(false)} onImport={() => {}} />
+      <ImportTable open={importOpen} onClose={() => setImportOpen(false)} />
     </>
   );
 }

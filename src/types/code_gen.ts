@@ -1,0 +1,23 @@
+export interface CodePreviewResponse {
+  entity: string;
+  mapper: string;
+  service: string;
+  serviceImpl: string;
+  controller: string;
+}
+
+export interface GenTableQueryResponse {
+  id: number;
+  connectionName: string;
+  databaseName: string;
+  tableId: number;
+  tableName: string;
+  entity: string;
+  tableComment?: string;
+  createTime: number;
+}
+
+export interface TableDataResponse {
+  records: GenTableQueryResponse[];
+  total_count: number;
+}

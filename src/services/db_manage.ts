@@ -1,8 +1,11 @@
-import axiosInstance from '@/services/request';
+import httpClient from '@/services/request';
 import { PageData } from '@/types/common';
 import {
+  ConnectionCreate,
+  ConnectionQueryResponse,
   Database,
   DatabaseConnection,
+  SQLSchema,
   TableAdd,
   TableColumn,
   TableIndex,
@@ -15,9 +18,13 @@ export const fetchConnections = async (): Promise<DatabaseConnection[]> => {
     page: 1,
     size: 100,
   };
-  return axiosInstance.get<PageData<DatabaseConnection>>('/connection/connections', params).then((res) => {
+  return httpClient.get<PageData<DatabaseConnection>>('/connection/connections', params).then((res) => {
     return res.records;
   });
+};
+
+export const fetchConnection = async (connectionId: number) => {
+  return httpClient.get<ConnectionQueryResponse>('/connection/query/' + connectionId);
 };
 
 export const fetchDatabases = async (connectionId: number): Promise<Database[]> => {
@@ -26,7 +33,7 @@ export const fetchDatabases = async (connectionId: number): Promise<Database[]> 
     size: 1000,
     connection_id: connectionId,
   };
-  return axiosInstance.get<PageData<Database>>('/database/databases', params).then((res) => {
+  return httpClient.get<PageData<Database>>('/database/databases', params).then((res) => {
     return res.records;
   });
 };
@@ -37,9 +44,13 @@ export const fetchTables = async (databaseId: number): Promise<TableInfo[]> => {
     size: 1000,
     database_id: databaseId,
   };
-  return axiosInstance.get<PageData<TableInfo>>('/table/tables', params).then((res) => {
+  return httpClient.get<PageData<TableInfo>>('/table/tables', params).then((res) => {
     return res.records;
   });
+};
+
+export const listTables = async (params: Record<string, string>) => {
+  return httpClient.get<PageData<TableInfo>>('/table/tables', params);
 };
 
 export const fetchTableStructure = async (tableId: number): Promise<TableColumn[]> => {
@@ -49,12 +60,12 @@ export const fetchTableStructure = async (tableId: number): Promise<TableColumn[
     table_id: tableId,
   };
 
-  return axiosInstance.get<PageData<TableColumn>>('/field/fields', params).then((res) => {
+  return httpClient.get<PageData<TableColumn>>('/field/fields', params).then((res) => {
     const records = res.records;
     if (records) {
       return records.map((prev) => ({
         ...prev,
-        key: prev.id.toString(),
+        key: prev.id?.toString(),
       }));
     }
     return [];
@@ -66,7 +77,7 @@ export const fetchIndexStructure = async (tableId: number): Promise<TableIndex[]
     size: 1000,
     table_id: tableId,
   };
-  return axiosInstance.get<PageData<TableIndex>>('/index/indexes', params).then((res) => {
+  return httpClient.get<PageData<TableIndex>>('/index/indexes', params).then((res) => {
     return res.records;
   });
 };
@@ -76,7 +87,7 @@ export const tableAdd = async (data: TableAdd): Promise<void> => {
     database_id: data.databaseId,
     name: data.tableName,
   };
-  return axiosInstance.post('/table/add', tableAdd);
+  return httpClient.post('/table/add', tableAdd);
 };
 
 export const tableGenerate = async (
@@ -88,20 +99,17 @@ export const tableGenerate = async (
   const tableGenerate = {
     database_id: database_id,
     table_name: tableMetadata.table_name,
-    comment: tableMetadata.remark,
+    comment: tableMetadata.comment,
     field_metadata: fieldData,
     index_metadata: indexData,
   };
-  console.log(tableGenerate);
-  return axiosInstance.post('/table/generate', tableGenerate);
+  return httpClient.post('/table/generate', tableGenerate);
 };
 
-export const addField = async (
-  connectionId: string,
-  databaseId: string,
-  tableId: string,
-  field: TableColumn,
-): Promise<void> => {
-  // Simulated API call
-  return new Promise((resolve) => setTimeout(resolve, 100));
+export const createConnection = (data: ConnectionCreate) => {
+  return httpClient.post('/connection/create', data);
+};
+
+export const createDatabase = (data: SQLSchema) => {
+  return httpClient.post('/database/create', data);
 };

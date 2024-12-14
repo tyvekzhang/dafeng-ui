@@ -1,6 +1,9 @@
 import EditableCell from '@/components/EditableCell';
 import { message } from '@/components/GlobalToast';
 import {
+  createConnection,
+  createDatabase,
+  fetchConnection,
   fetchConnections,
   fetchDatabases,
   fetchIndexStructure,
@@ -10,8 +13,10 @@ import {
   tableGenerate,
 } from '@/services/db_manage';
 import {
+  ConnectionCreate,
   Database,
   DatabaseConnection,
+  SQLSchema,
   TableAdd,
   TableColumn,
   TableIndex,
@@ -63,9 +68,14 @@ const tableFormPropItemLayout = {
   wrapperCol: { span: 7 },
 };
 
+const databaseFormLayout = {
+  labelCol: { span: 2 },
+  wrapperCol: { span: 12 },
+};
+
 const DatabaseExplorer: React.FC = () => {
   const { styles } = useStates();
-  const [databaseType, setDatabaseType] = useState('');
+  const [databaseType, setDatabaseType] = useState<string | null>('');
   const [connections, setConnections] = useState<DatabaseConnection[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [fieldType, setFieldType] = useState<string>('varchar');
@@ -99,9 +109,14 @@ const DatabaseExplorer: React.FC = () => {
   const handleDatabaseTypeChange = (value: string) => {
     setDatabaseType(value);
     if (value === 'mysql') {
+      dataSourceForm.setFieldsValue({ host: 'localhost' });
       dataSourceForm.setFieldsValue({ port: '3306' });
+      dataSourceForm.setFieldsValue({ username: 'root' });
     } else if (value === 'postgresql') {
+      dataSourceForm.setFieldsValue({ host: 'localhost' });
       dataSourceForm.setFieldsValue({ port: '5432' });
+      dataSourceForm.setFieldsValue({ connection_database: 'postgres' });
+      dataSourceForm.setFieldsValue({ username: 'postgres' });
     }
   };
 
@@ -111,7 +126,6 @@ const DatabaseExplorer: React.FC = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [dataSourceForm] = Form.useForm();
-  const [databaseForm] = Form.useForm();
   const [tableForm] = Form.useForm();
   const [fieldForm] = Form.useForm();
   const [indexForm] = Form.useForm();
@@ -253,16 +267,13 @@ const DatabaseExplorer: React.FC = () => {
   };
 
   const handleCancel = () => {
+    setDatabaseType(null);
     setIsModalVisible(false);
     dataSourceForm.resetFields();
   };
 
-  const handleDatasourceSubmit = (values: any) => {
-    console.log('Form values:', values);
-
-    return;
-    // Here you would typically send this data to your backend
-    // and then update the state with the new connection/database/table
+  const handleDatasourceSubmit = async (values: ConnectionCreate) => {
+    await createConnection(values);
     setIsModalVisible(false);
     dataSourceForm.resetFields();
   };
@@ -746,6 +757,135 @@ const DatabaseExplorer: React.FC = () => {
       field?.comment?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  const [databaseForm] = Form.useForm();
+  const [databaseCreateType, setDatabaseCreateType] = useState('');
+
+  const handleDataSourceChange = async (value: number) => {
+    const response = await fetchConnection(value);
+    setDatabaseCreateType(response?.database_type);
+  };
+
+  const handleDbFormSubmit = async (values: SQLSchema) => {
+    await createDatabase(values);
+    message.success('数据库创建成功');
+    databaseForm.resetFields();
+    setIsModalVisible(false);
+  };
+
+  const renderFormItemsByDatabaseType = () => {
+    switch (databaseCreateType) {
+      case 'mysql':
+        return (
+          <>
+            <Form.Item name="database_name" label="名称" rules={[{ required: true, message: '请输入数据库名称' }]}>
+              <Input placeholder="请输入数据库名称" />
+            </Form.Item>
+            <Form.Item name="charset" label="编码" rules={[{ required: true, message: '请选择字符编码！' }]}>
+              <Select>
+                <Select.Option value="utf8mb4">UTF-8 Unicode (utf8mb4)</Select.Option>
+                <Select.Option value="latin1">Latin1 (latin1)</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="collation" label="排序" rules={[{ required: true, message: '请选择排序规则！' }]}>
+              <Select>
+                <Select.Option value="utf8mb4_general_ci">utf8mb4_general_ci</Select.Option>
+                <Select.Option value="utf8mb4_unicode_ci">utf8mb4_unicode_ci</Select.Option>
+              </Select>
+            </Form.Item>
+          </>
+        );
+      case 'postgresql':
+        return (
+          <>
+            <Form.Item name="database_name" label="名称" rules={[{ required: true, message: '请输入数据库名称' }]}>
+              <Input placeholder="请输入数据库名称" />
+            </Form.Item>
+            <Form.Item name="template" label="模板">
+              <Input placeholder="请输入模板" />
+            </Form.Item>
+
+            <Form.Item
+              name="encoding"
+              label="编码"
+              rules={[{ required: false, message: '请选择字符编码！' }]} // 根据 SQLSchema 定义，非必填
+            >
+              <Select placeholder="请选择字符编码">
+                <Select.Option value="UTF8">UTF8</Select.Option>
+                <Select.Option value="LATIN1">LATIN1</Select.Option>
+              </Select>
+            </Form.Item>
+
+            {/* 排序规则 */}
+            <Form.Item
+              name="collation_order"
+              label="排序"
+              rules={[{ required: false, message: '请选择排序规则！' }]} // 根据 SQLSchema 定义，非必填
+            >
+              <Select placeholder="请选择排序规则">
+                <Select.Option value="utf8mb4_general_ci">utf8mb4_general_ci</Select.Option>
+                <Select.Option value="utf8mb4_unicode_ci">utf8mb4_unicode_ci</Select.Option>
+              </Select>
+            </Form.Item>
+
+            {/* 字符分类 */}
+            <Form.Item
+              name="character_classification"
+              label="分类"
+              rules={[{ required: false, message: '请选择字符分类！' }]} // 根据 SQLSchema 定义，非必填
+            >
+              <Select placeholder="请选择字符分类">
+                <Select.Option value="unicode">Unicode</Select.Option>
+                <Select.Option value="ascii">ASCII</Select.Option>
+              </Select>
+            </Form.Item>
+
+            {/* 表空间 */}
+            <Form.Item
+              name="tablespace"
+              label="表空间"
+              rules={[{ required: false, message: '请输入表空间名称！' }]} // 根据 SQLSchema 定义，非必填
+            >
+              <Input placeholder="请输入表空间名称" />
+            </Form.Item>
+
+            {/* 连接限制 */}
+            <Form.Item
+              name="connection_limit"
+              label="连接数"
+              rules={[{ required: false, message: '请输入连接限制！' }]} // 根据 SQLSchema 定义，非必填
+            >
+              <Input type="number" placeholder="请输入连接限制" />
+            </Form.Item>
+
+            <Form.Item name="allow_connection" label="可连接" valuePropName="checked">
+              <Select placeholder="请选择是否允许连接">
+                <Select.Option value={true}>是</Select.Option>
+                <Select.Option value={false}>否</Select.Option>
+              </Select>
+            </Form.Item>
+
+            {/* 是否为模板数据库 */}
+            <Form.Item
+              name="is_template"
+              label="可复用"
+              valuePropName="checked" // 对应布尔值字段
+            >
+              <Select placeholder="请选择是否为模板数据库">
+                <Select.Option value={true}>是</Select.Option>
+                <Select.Option value={false}>否</Select.Option>
+              </Select>
+            </Form.Item>
+          </>
+        );
+      default:
+        return (
+          <Form.Item name="database_name" label="名称" rules={[{ required: true, message: '请输入数据库名称' }]}>
+            <Input placeholder="请输入数据库名称" />
+          </Form.Item>
+        );
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -919,40 +1059,55 @@ const DatabaseExplorer: React.FC = () => {
         <Tabs defaultActiveKey="3" type="card">
           <TabPane tab="数据源" key="1">
             <Form {...formPropItemLayout} form={dataSourceForm} onFinish={handleDatasourceSubmit}>
-              <Form.Item name="databaseType" label="类型" rules={[{ required: true }]} initialValue={databaseType}>
+              <Form.Item name="database_type" label="类型" rules={[{ required: true }]} initialValue={databaseType}>
                 <Select onChange={handleDatabaseTypeChange}>
                   <Select.Option value="mysql">MySQL</Select.Option>
                   <Select.Option value="postgresql">PostgreSQL</Select.Option>
                   <Select.Option value="sqlite">Sqlite</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item name="connectionName" label="名称" rules={[{ required: true }]}>
+              <Form.Item name="connection_name" label="名称" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
               {databaseType === 'mysql' && (
-                <Form.Item name="port" wrapperCol={{ span: 4 }} label="端口号" rules={[{ required: true }]}>
-                  <Input defaultValue={'3306'} />
-                </Form.Item>
-              )}
-              {databaseType === 'postgresql' && (
-                <Form.Item name="port" wrapperCol={{ span: 4 }} label="端口号" rules={[{ required: true }]}>
-                  <Input defaultValue={'5432'} />
-                </Form.Item>
-              )}
-              {databaseType === 'sqlite' && (
-                <Form.Item name="dbName" label="库名" rules={[{ required: true }]}>
-                  <Input />
-                </Form.Item>
-              )}
-              {(databaseType === 'mysql' || databaseType === 'postgresql') && (
                 <>
+                  <Form.Item name="host" label="主机" rules={[{ required: true }]}>
+                    <Input defaultValue={'localhost'} />
+                  </Form.Item>
+                  <Form.Item name="port" wrapperCol={{ span: 4 }} label="端口号" rules={[{ required: true }]}>
+                    <Input defaultValue={'3306'} />
+                  </Form.Item>
                   <Form.Item name="username" label="用户" rules={[{ required: true }]}>
-                    <Input />
+                    <Input defaultValue={'root'} />
                   </Form.Item>
                   <Form.Item name="password" label="密码" rules={[{ required: true }]}>
                     <Input.Password />
                   </Form.Item>
                 </>
+              )}
+              {databaseType === 'postgresql' && (
+                <>
+                  <Form.Item name="host" label="主机" rules={[{ required: true }]}>
+                    <Input defaultValue={'localhost'} />
+                  </Form.Item>
+                  <Form.Item name="port" wrapperCol={{ span: 4 }} label="端口号" rules={[{ required: true }]}>
+                    <Input defaultValue={'5432'} />
+                  </Form.Item>
+                  <Form.Item name="connection_database" label="数据库" rules={[{ required: true }]}>
+                    <Input defaultValue={'postgres'} />
+                  </Form.Item>
+                  <Form.Item name="username" label="用户" rules={[{ required: true }]}>
+                    <Input defaultValue={'postgres'} />
+                  </Form.Item>
+                  <Form.Item name="password" label="密码" rules={[{ required: true }]}>
+                    <Input.Password />
+                  </Form.Item>
+                </>
+              )}
+              {databaseType === 'sqlite' && (
+                <Form.Item name="dbName" label="库名" rules={[{ required: true }]}>
+                  <Input />
+                </Form.Item>
               )}
               <Form.Item>
                 <Button type="primary" htmlType="submit">
@@ -962,27 +1117,19 @@ const DatabaseExplorer: React.FC = () => {
             </Form>
           </TabPane>
           <TabPane tab="数据库" key="2">
-            <Form {...formPropItemLayout} form={databaseForm} onFinish={handleDatasourceSubmit}>
-              <Form.Item name="databaseName" label="数据源" rules={[{ required: true }]}>
-                <Select>
-                  <Select.Option value="default">默认</Select.Option>
+            <Form {...databaseFormLayout} form={databaseForm} onFinish={handleDbFormSubmit}>
+              <Form.Item name="connection_id" label="数据源" rules={[{ required: true, message: '请选择数据源！' }]}>
+                <Select onChange={handleDataSourceChange} placeholder="请选择数据源">
+                  {connections.map((source) => (
+                    <Select.Option key={source.id} value={source.id}>
+                      {source.connection_name}
+                    </Select.Option>
+                  ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="databaseName" label="数据库" rules={[{ required: true }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item name="charset" label="字符集" rules={[{ required: true }]}>
-                <Select>
-                  <Select.Option value="utf8mb4">UTF-8 Unicode (utf8mb4)</Select.Option>
-                  <Select.Option value="latin1">Latin1 (latin1)</Select.Option>
-                </Select>
-              </Form.Item>
-              <Form.Item name="collation" label="排序" rules={[{ required: true }]}>
-                <Select>
-                  <Select.Option value="utf8mb4_general_ci">utf8mb4_general_ci</Select.Option>
-                  <Select.Option value="utf8mb4_unicode_ci">utf8mb4_unicode_ci</Select.Option>
-                </Select>
-              </Form.Item>
+
+              {renderFormItemsByDatabaseType()}
+
               <Form.Item>
                 <Button type="primary" htmlType="submit">
                   确定

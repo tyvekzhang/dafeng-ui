@@ -14,7 +14,7 @@ export default createStyles(({ token, css }) => ({
     flex: 1,
     display: 'grid',
     gap: 2,
-    gridTemplateColumns: '3fr 11fr',
+    gridTemplateColumns: '3fr 12fr',
   },
   leftContent: {
     display: 'flex',

@@ -100,6 +100,6 @@ const config = {
   withCredentials: import.meta.env.VITE_WITH_CREDENTIALS === 'true' || true,
 };
 
-const axiosInstance = new HttpRequest(config);
+const httpClient = new HttpRequest(config);
 
-export default axiosInstance;
+export default httpClient;
