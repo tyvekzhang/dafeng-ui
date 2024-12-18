@@ -4,6 +4,14 @@ export interface CodePreviewResponse {
   service: string;
   serviceImpl: string;
   controller: string;
+  create: string;
+  modify: string;
+  query: string;
+  detail: string;
+  page: string;
+  converter: string;
+  api: string;
+  type: string;
 }
 
 export interface GenTableQueryResponse {

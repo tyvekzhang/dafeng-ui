@@ -21,7 +21,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
   const [databases, setDatabases] = useState<Database[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
 
   // 获取数据库连接配置
   useEffect(() => {
@@ -48,7 +48,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
       const params = {
         ...values,
         page: currentPage,
-        pageSize,
+        size: pageSize,
       };
       const response = await listTables(params);
       setTableData(response.records);

@@ -42,7 +42,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
       if (!data) return [];
 
       return [
-        { key: 'domain', label: 'domain.java', children: processCodeString(data.entity), language: 'java' },
+        { key: 'entity', label: 'entity.java', children: processCodeString(data.entity), language: 'java' },
         { key: 'mapper', label: 'mapper.java', children: processCodeString(data.mapper), language: 'java' },
         { key: 'service', label: 'service.java', children: processCodeString(data.service), language: 'java' },
         {
@@ -52,6 +52,14 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
           language: 'java',
         },
         { key: 'controller', label: 'controller.java', children: processCodeString(data.controller), language: 'java' },
+        { key: 'converter', label: 'converter.java', children: processCodeString(data.converter), language: 'java' },
+        { key: 'create', label: 'create.java', children: processCodeString(data.create), language: 'java' },
+        { key: 'modify', label: 'modify.java', children: processCodeString(data.modify), language: 'java' },
+        { key: 'query', label: 'query.java', children: processCodeString(data.query), language: 'java' },
+        { key: 'detail', label: 'detail.java', children: processCodeString(data.detail), language: 'java' },
+        { key: 'page', label: 'page.java', children: processCodeString(data.page), language: 'java' },
+        { key: 'api', label: 'api.ts', children: processCodeString(data.api), language: 'js' },
+        { key: 'type', label: 'type.ts', children: processCodeString(data.type), language: 'js' },
       ];
     },
     [processCodeString],
