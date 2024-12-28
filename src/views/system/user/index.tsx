@@ -10,7 +10,7 @@ import {
   userRecover,
   userRemove,
   users,
-} from '@/services';
+} from '@/service/user';
 import { UserAdd, UserBatchModify, UserModify, UserQuery, UserQueryForm } from '@/types/user';
 import Add from '@/views/system/user/components/Add';
 import BatchModify from '@/views/system/user/components/BatchModify';
@@ -25,8 +25,7 @@ import {
   Pagination,
   Popconfirm,
   PopconfirmProps,
-  RadioChangeEvent,
-  Space,
+  RadioChangeEvent, Space,
   Switch,
   Table,
 } from 'antd';
@@ -245,7 +244,7 @@ const UserPage: React.FC = () => {
   const handleStatusChange = async (user: UserQuery) => {
     const updatedStatus = user.status === 1 ? 0 : 1;
     await userModify({ ...user, status: updatedStatus });
-    message.success('更新成功');
+    message.success('修改成功');
     await setUserTableData();
   };
   const handleUserEdit = async (data: UserQuery) => {
@@ -256,7 +255,7 @@ const UserPage: React.FC = () => {
       }
       await userModify({ ...editUser, ...data });
       handleUserEditCancel();
-      message.success('更新成功');
+      message.success('修改成功');
       await setUserTableData();
     } finally {
       setIsUserEditLoading(false);
@@ -281,17 +280,17 @@ const UserPage: React.FC = () => {
   const handleUserBatchModify = async (data: UserBatchModify) => {
     const ids = selectedRowKeys.map((key) => Number(key));
     if (ids.length === 0) {
-      message.warning('请先选择要更新的条目');
+      message.warning('请先选择要修改的条目');
       return;
     }
     if (JSON.stringify(data) === '{}') {
-      message.warning('请填写更新的信息');
+      message.warning('请填写修改的信息');
       return;
     }
     try {
       setIsUserBatchModifyLoading(true);
       await userBatchModify(ids, data);
-      message.success('更新成功');
+      message.success('修改成功');
       setSelectedRowKeys([]);
       batchEditForm.resetFields();
       setIsUserBatchEditModalVisible(false);

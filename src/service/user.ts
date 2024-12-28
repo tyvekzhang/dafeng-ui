@@ -1,6 +1,6 @@
 import type { AppMenu } from '@/router/types';
-import httpClient from '@/services/request';
-import { downloadBlob } from '@/services/util';
+import httpClient from '@/utils/http-client';
+import { downloadBlob } from '@/service/util';
 import { UserInfo } from '@/types';
 import { LoginForm, Token, UserAdd, UserBatchModify, UserQuery, UserQueryForm, UserTableData } from '@/types/user';
 import { AxiosResponse } from 'axios';

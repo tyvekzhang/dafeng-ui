@@ -6,7 +6,7 @@ import CodeEdit from './components/CodeEdit';
 import CodePreview from './components/CodePreview';
 import ImportTable from './components/ImportTable';
 
-import { codeList, downloadCode } from '@/services/code_gen';
+import { codeList, downloadCode } from '@/service/code_gen';
 import { GenTableQueryResponse } from '@/types/code_gen';
 
 export default function CodeGen() {

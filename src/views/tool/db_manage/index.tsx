@@ -11,7 +11,7 @@ import {
   fetchTableStructure,
   tableAdd,
   tableGenerate,
-} from '@/services/db_manage';
+} from '@/service/db_manage';
 import {
   ConnectionCreate,
   Database,

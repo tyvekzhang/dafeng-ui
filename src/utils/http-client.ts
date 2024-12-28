@@ -5,7 +5,7 @@ import qs from 'qs';
 
 import { message } from '@/components/GlobalToast';
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
-import { refreshToken } from '@/services/user';
+import { refreshToken } from '@/service/user';
 import NProgress from '@/settings/n_progress';
 
 class HttpRequest {

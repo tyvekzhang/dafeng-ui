@@ -17,10 +17,10 @@ const AppLogo: FC = () => {
   };
 
   return (
-    <div className={classNames('scicon', styles.appLogo)} onClick={handleClick}>
+    <div className="container mx-auto" onClick={handleClick}>
       <Space>
         {/* 图标 */}
-        <img className={styles.logoImg} src={logoImg} alt="logo" />
+        <img className="w-8 h-8 block" src={logoImg} alt="logo" />
         {/* 名称 */}
         <div className={classNames(styles.logoName, { hidden: getMenuFold })}>{appSetting.name}</div>
       </Space>

@@ -1,4 +1,4 @@
-import { userMenus } from '@/services';
+import { userMenus } from '@/service/user';
 import type { AppMenu } from '../types';
 
 export async function getAsyncMenus(): Promise<AppMenu[]> {

@@ -23,6 +23,15 @@ const SystemRoute: RouteObject = {
         key: 'userManage',
       },
     },
+    {
+      path: 'new-word',
+      name: 'WordNew',
+      element: LazyLoad(lazy(() => import('@/views/system/new-word'))),
+      meta: {
+        title: '生词管理',
+        key: 'wordNew',
+      },
+    },
   ],
 };
 

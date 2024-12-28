@@ -1,4 +1,4 @@
-import httpClient from '@/services/request';
+import httpClient from '@/utils/http-client';
 import { PageData } from '@/types/common';
 import {
   ConnectionCreate,

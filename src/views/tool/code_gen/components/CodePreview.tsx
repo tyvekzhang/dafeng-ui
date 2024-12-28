@@ -1,5 +1,5 @@
 import { message } from '@/components/GlobalToast';
-import { codePreview } from '@/services/code_gen';
+import { codePreview } from '@/service/code_gen';
 import { CodePreviewResponse } from '@/types/code_gen';
 import { CloseOutlined, CopyOutlined } from '@ant-design/icons';
 import { Modal, Tabs } from 'antd';
@@ -58,6 +58,8 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
         { key: 'query', label: 'query.java', children: processCodeString(data.query), language: 'java' },
         { key: 'detail', label: 'detail.java', children: processCodeString(data.detail), language: 'java' },
         { key: 'page', label: 'page.java', children: processCodeString(data.page), language: 'java' },
+        { key: 'index', label: 'index.tsx', children: processCodeString(data.index), language: 'js' },
+        { key: 'indexCreate', label: 'iCreate.tsx', children: processCodeString(data.indexCreate), language: 'js' },
         { key: 'api', label: 'api.ts', children: processCodeString(data.api), language: 'js' },
         { key: 'type', label: 'type.ts', children: processCodeString(data.type), language: 'js' },
       ];

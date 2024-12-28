@@ -1,5 +1,5 @@
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
-import { login, me } from '@/services';
+import { login, me } from '@/service/user';
 import { appSetting } from '@/settings/appBaseSetting';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { setRememberMe, setToken, setUserInfo } from '@/stores/modules/user';

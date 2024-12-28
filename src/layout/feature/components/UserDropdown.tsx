@@ -2,7 +2,7 @@ import headerImg from '@/assets/images/avatar.jpg';
 import { message } from '@/components/GlobalToast';
 import { REMEMBER_KEY, TOKEN_KEY } from '@/enums/cacheEnum';
 import { myMessage } from '@/hooks/web/myMessage';
-import { logout } from '@/services';
+import { logout } from '@/service/user';
 import { useAppDispatch, useAppSelector } from '@/stores';
 import { resetState } from '@/stores/modules/user';
 import { Token } from '@/types/user';

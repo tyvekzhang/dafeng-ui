@@ -1,5 +1,5 @@
-import httpClient from '@/services/request';
-import { downloadBlob } from '@/services/util';
+import httpClient from '@/utils/http-client';
+import { downloadBlob } from '@/service/util';
 import { CodePreviewResponse, TableDataResponse } from '@/types/code_gen';
 import { AxiosResponse } from 'axios';
 
@@ -22,7 +22,7 @@ export const importTables = (database_id: number, tableIds: number[]) => {
   return httpClient.post('/gen-table/import', data);
 };
 
-export const downloadCode = async (tableId: number, fileName: 'code.zip') => {
+export const downloadCode = async (tableId: number, fileName: string = 'code.zip') => {
   const response = await httpClient.get<AxiosResponse>(
     `/gen-table/download/${tableId}`,
     {},

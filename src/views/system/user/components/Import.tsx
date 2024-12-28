@@ -1,5 +1,5 @@
 import { message } from '@/components/GlobalToast';
-import { userExportTemplate } from '@/services';
+import { userExportTemplate } from '@/service/user';
 import { InboxOutlined } from '@ant-design/icons';
 import { Button, Modal, Upload, UploadFile } from 'antd';
 import { UploadRequestOption } from 'rc-upload/es/interface';

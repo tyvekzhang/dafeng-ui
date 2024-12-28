@@ -1,5 +1,5 @@
-import { importTables } from '@/services/code_gen';
-import { fetchConnections, fetchDatabases, listTables } from '@/services/db_manage';
+import { importTables } from '@/service/code_gen';
+import { fetchConnections, fetchDatabases, listTables } from '@/service/db_manage';
 import { Database, DatabaseConnection, TableInfo } from '@/types/db_manage';
 import type { TableProps } from 'antd';
 import { Button, Form, Input, message, Modal, Select, Space, Table } from 'antd';

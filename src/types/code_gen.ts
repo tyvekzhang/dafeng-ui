@@ -10,6 +10,8 @@ export interface CodePreviewResponse {
   detail: string;
   page: string;
   converter: string;
+  index: string;
+  indexCreate: string;
   api: string;
   type: string;
 }
