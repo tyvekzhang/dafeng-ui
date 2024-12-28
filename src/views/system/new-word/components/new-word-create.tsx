@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import { NewWordCreate } from '@/types/new-word';
 import { Button, Form, Input, Modal } from 'antd';
 import { FormInstance } from 'antd/es/form';
-import { NewWordCreate } from '@/types/new-word';
+import React, { useMemo } from 'react';
 
 const newWordCreateFormItemLayout = {
   labelCol: { span: 5 },
@@ -17,13 +17,12 @@ interface NewWordCreateProps {
 }
 
 const NewWordCreateComponent: React.FC<NewWordCreateProps> = ({
-                                                                isNewWordCreateModalVisible,
-                                                                onNewWordCreateCancel,
-                                                                onNewWordCreateFinish,
-                                                                isNewWordCreateLoading,
-                                                                newWordCreateForm,
-                                                              }) => {
-
+  isNewWordCreateModalVisible,
+  onNewWordCreateCancel,
+  onNewWordCreateFinish,
+  isNewWordCreateLoading,
+  newWordCreateForm,
+}) => {
   const footerButtons = useMemo(
     () => [
       <Button key="back" onClick={onNewWordCreateCancel}>
@@ -36,13 +35,18 @@ const NewWordCreateComponent: React.FC<NewWordCreateProps> = ({
     [isNewWordCreateLoading, newWordCreateForm, onNewWordCreateCancel],
   );
 
-
   return (
     <div>
-      <Modal title="阅读生词新增" open={isNewWordCreateModalVisible} onCancel={onNewWordCreateCancel} footer={footerButtons} width={"60%"}>
+      <Modal
+        title="阅读生词新增"
+        open={isNewWordCreateModalVisible}
+        onCancel={onNewWordCreateCancel}
+        footer={footerButtons}
+        width={'60%'}
+      >
         <Form
           {...newWordCreateFormItemLayout}
-          form={ newWordCreateForm}
+          form={newWordCreateForm}
           name="newWordCreate"
           onFinish={onNewWordCreateFinish}
           className="grid grid-cols-1 lg:grid-cols-2 gap-y-0 gap-x-2 pt-4"

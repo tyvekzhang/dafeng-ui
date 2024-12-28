@@ -1,11 +1,11 @@
 import { message } from '@/components/GlobalToast';
+import { NewWordCreate } from '@/types/new-word';
 import { InboxOutlined } from '@ant-design/icons';
 import { Button, Modal, Table, Upload, UploadFile } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
 import { UploadRequestOption } from 'rc-upload/es/interface';
 import type { RcFile } from 'rc-upload/lib/interface';
 import React, { useState } from 'react';
-import { NewWordCreate } from '@/types/new-word';
-import { ColumnsType } from 'antd/lib/table';
 
 interface NewWordImportProps {
   isNewWordImportModalVisible: boolean;
@@ -16,29 +16,21 @@ interface NewWordImportProps {
 }
 
 const NewWordImportComponent: React.FC<NewWordImportProps> = ({
-                                                                isNewWordImportModalVisible,
-                                                                onNewWordImportCancel,
-                                                                onNewWordImportFinish,
-                                                                isNewWordImportLoading,
-                                                                handleNewWordImport,
-                                                              }) => {
+  isNewWordImportModalVisible,
+  onNewWordImportCancel,
+  onNewWordImportFinish,
+  isNewWordImportLoading,
+  handleNewWordImport,
+}) => {
   const [newWordImportFileList, setNewWordImportFileList] = useState<RcFile[]>([]);
   const [newWordCreateList, setNewWordCreateList] = useState<NewWordCreate[]>([]);
   const [isUploadShow, setIsUploadShow] = useState<boolean>(true);
 
   const footerButtons = () => [
-    <Button
-      key="back"
-      onClick={handleNewWordImportCancel}
-    >
+    <Button key="back" onClick={handleNewWordImportCancel}>
       取消
     </Button>,
-    <Button
-      key="submit"
-      type="primary"
-      loading={isNewWordImportLoading}
-      onClick={handleNewWordImportConfirm}
-    >
+    <Button key="submit" type="primary" loading={isNewWordImportLoading} onClick={handleNewWordImportConfirm}>
       确定
     </Button>,
   ];
@@ -56,9 +48,8 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
         setNewWordImportFileList([]);
       }
     } else {
-      handleNewWordImport()
+      handleNewWordImport();
     }
-
   };
   // 表格列信息
   const newWordPageColumns: ColumnsType<NewWordCreate> = [
@@ -112,7 +103,7 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
   ];
 
   const handleNewWordExportTemplate = async () => {
-    message.warning('导出模板未实现')
+    message.warning('导出模板未实现');
   };
 
   const customUploadRequest = (options: UploadRequestOption): void | undefined => {
@@ -123,19 +114,19 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
       onError?.(new Error('仅支持xls、xlsx格式文件'));
       return;
     }
-    setNewWordImportFileList(prev => [...prev, rcFile]);
+    setNewWordImportFileList((prev) => [...prev, rcFile]);
     setTimeout(() => {
       onSuccess?.(rcFile);
     }, 200);
   };
 
   const handleRemove = (file: UploadFile) => {
-    setNewWordImportFileList(prev => prev.filter(f => f.uid !== file.uid));
+    setNewWordImportFileList((prev) => prev.filter((f) => f.uid !== file.uid));
   };
 
   const handleNewWordImportCancel = () => {
     onNewWordImportCancel();
-    setIsUploadShow(true)
+    setIsUploadShow(true);
   };
 
   return (

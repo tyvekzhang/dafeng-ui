@@ -1,5 +1,5 @@
-import React from 'react';
 import { Button, Popconfirm, Space } from 'antd';
+import React from 'react';
 
 interface ActionButtonsConfig {
   showCreate?: boolean;
@@ -25,19 +25,19 @@ interface ActionButtonsProps {
 }
 
 const ActionButtonComponent: React.FC<ActionButtonsProps> = ({
-                                                               onCreate,
-                                                               onImport,
-                                                               onExport,
-                                                               onBatchModify,
-                                                               onConfirmBatchRemove,
-                                                               onConfirmBatchRemoveCancel,
-                                                               isExportDisabled,
-                                                               isBatchModifyDisabled,
-                                                               isBatchRemoveDisabled,
-                                                               isBatchRemoveLoading,
-                                                               className = '',
-                                                               actionConfig = {},
-                                                             }) => {
+  onCreate,
+  onImport,
+  onExport,
+  onBatchModify,
+  onConfirmBatchRemove,
+  onConfirmBatchRemoveCancel,
+  isExportDisabled,
+  isBatchModifyDisabled,
+  isBatchRemoveDisabled,
+  isBatchRemoveLoading,
+  className = '',
+  actionConfig = {},
+}) => {
   const defaultConfig = {
     showCreate: true,
     showImport: false,
@@ -87,4 +87,3 @@ const ActionButtonComponent: React.FC<ActionButtonsProps> = ({
 };
 
 export default ActionButtonComponent;
-

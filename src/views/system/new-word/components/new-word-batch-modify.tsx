@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import { Button, Col, Form, Input, Modal, Row } from 'antd';
 import { NewWordBatchModify } from '@/types/new-word';
+import { Button, Col, Form, Input, Modal, Row } from 'antd';
 import { FormInstance } from 'antd/es/form';
+import React, { useMemo } from 'react';
 
 interface NewWordModifyProps {
   isNewWordBatchModifyModalVisible: boolean;
@@ -12,14 +12,12 @@ interface NewWordModifyProps {
 }
 
 const NewWordBatchModifyComponent: React.FC<NewWordModifyProps> = ({
-                                                                isNewWordBatchModifyModalVisible,
-                                                                onNewWordBatchModifyCancel,
-                                                                onNewWordBatchModifyFinish,
-                                                                isNewWordBatchModifyLoading,
-                                                                newWordBatchModifyForm,
-                                                              }) => {
-
-
+  isNewWordBatchModifyModalVisible,
+  onNewWordBatchModifyCancel,
+  onNewWordBatchModifyFinish,
+  isNewWordBatchModifyLoading,
+  newWordBatchModifyForm,
+}) => {
   const footerButtons = useMemo(
     () => [
       <Button key="cancel" onClick={onNewWordBatchModifyCancel}>
@@ -40,11 +38,7 @@ const NewWordBatchModifyComponent: React.FC<NewWordModifyProps> = ({
       footer={footerButtons}
       destroyOnClose
     >
-      <Form
-        form={newWordBatchModifyForm}
-        name="newWordBatchModify"
-        layout="vertical"
-      >
+      <Form form={newWordBatchModifyForm} name="newWordBatchModify" layout="vertical">
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item name="userId" label="用户ID" rules={[{ required: true, message: '请输入用户ID' }]}>
@@ -76,8 +70,7 @@ const NewWordBatchModifyComponent: React.FC<NewWordModifyProps> = ({
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="nextReviewDate" label="复习时间"
-                       rules={[{ required: true, message: '请输入复习时间' }]}>
+            <Form.Item name="nextReviewDate" label="复习时间" rules={[{ required: true, message: '请输入复习时间' }]}>
               <Input placeholder="请输入复习时间" />
             </Form.Item>
           </Col>
@@ -91,4 +84,3 @@ const NewWordBatchModifyComponent: React.FC<NewWordModifyProps> = ({
 };
 
 export default NewWordBatchModifyComponent;
-

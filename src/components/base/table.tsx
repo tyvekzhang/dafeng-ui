@@ -1,45 +1,45 @@
-import React, { useState } from 'react'
-import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import React, { useState } from 'react';
 
 interface Column {
-  key: string
-  title: string
+  key: string;
+  title: string;
 }
 
 interface ExpandableRow {
-  key: string
-  data: { [key: string]: any }
-  children?: ExpandableRow[]
+  key: string;
+  data: { [key: string]: any };
+  children?: ExpandableRow[];
 }
 
 interface TailwindTableProps {
-  columns: Column[]
-  data: ExpandableRow[]
+  columns: Column[];
+  data: ExpandableRow[];
 }
 
 const TailwindTable: React.FC<TailwindTableProps> = ({ columns, data }) => {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const toggleSelection = (key: string) => {
-    const newSelection = new Set(selectedRows)
+    const newSelection = new Set(selectedRows);
     if (newSelection.has(key)) {
-      newSelection.delete(key)
+      newSelection.delete(key);
     } else {
-      newSelection.add(key)
+      newSelection.add(key);
     }
-    setSelectedRows(newSelection)
-  }
+    setSelectedRows(newSelection);
+  };
 
   const toggleExpand = (key: string) => {
-    const newExpanded = new Set(expandedRows)
+    const newExpanded = new Set(expandedRows);
     if (newExpanded.has(key)) {
-      newExpanded.delete(key)
+      newExpanded.delete(key);
     } else {
-      newExpanded.add(key)
+      newExpanded.add(key);
     }
-    setExpandedRows(newExpanded)
-  }
+    setExpandedRows(newExpanded);
+  };
 
   const renderRow = (row: ExpandableRow, level: number = 0) => {
     return (
@@ -64,18 +64,16 @@ const TailwindTable: React.FC<TailwindTableProps> = ({ columns, data }) => {
               </button>
             </td>
           )}
-          {columns.map(column => (
+          {columns.map((column) => (
             <td key={column.key} className="px-6 py-4 whitespace-nowrap">
               {row.data[column.key]}
             </td>
           ))}
         </tr>
-        {row.children &&
-          expandedRows.has(row.key) &&
-          row.children.map(child => renderRow(child, level + 1))}
+        {row.children && expandedRows.has(row.key) && row.children.map((child) => renderRow(child, level + 1))}
       </React.Fragment>
-    )
-  }
+    );
+  };
 
   return (
     <div className="flex flex-col">
@@ -84,34 +82,37 @@ const TailwindTable: React.FC<TailwindTableProps> = ({ columns, data }) => {
           <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Select
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Expand
-                </th>
-                {columns.map(column => (
+                <tr>
                   <th
-                    key={column.key}
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    {column.title}
+                    Select
                   </th>
-                ))}
-              </tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Expand
+                  </th>
+                  {columns.map((column) => (
+                    <th
+                      key={column.key}
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {column.title}
+                    </th>
+                  ))}
+                </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-              {data.map(row => renderRow(row))}
-              </tbody>
+              <tbody className="bg-white divide-y divide-gray-200">{data.map((row) => renderRow(row))}</tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TailwindTable
-
+export default TailwindTable;

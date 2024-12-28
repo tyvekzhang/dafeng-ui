@@ -1,4 +1,3 @@
-import httpClient from '@/utils/http-client';
 import { PageData } from '@/types/common';
 import {
   ConnectionCreate,
@@ -12,6 +11,7 @@ import {
   TableInfo,
   TableMetadata,
 } from '@/types/db_manage';
+import httpClient from '@/utils/http-client';
 
 export const fetchConnections = async (): Promise<DatabaseConnection[]> => {
   const params = {

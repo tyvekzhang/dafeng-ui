@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import ActionButtonComponent from '@/components/base/action-button';
+import { PaginatedTable } from '@/components/base/paginated-table';
+import { message } from '@/components/GlobalToast';
 import {
   batchCreateNewWord,
   batchModifyNewWord,
@@ -8,19 +10,17 @@ import {
   importNewWord,
   modifyNewWord,
 } from '@/service/new-word';
-import { NewWordBatchModify, NewWordCreate, NewWordModify, NewWordPage } from '@/types/new-word';
-import { PaginatedTable } from '@/components/base/paginated-table';
-import { ColumnsType } from 'antd/lib/table';
 import { BaseQueryImpl } from '@/types';
-import ActionButtonComponent from '@/components/base/action-button';
-import { message } from '@/components/GlobalToast';
-import NewWordCreateComponent from '@/views/system/new-word/components/new-word-create';
-import { Form } from 'antd';
-import NewWordQueryComponent from '@/views/system/new-word/components/new-word-query';
-import NewWordModifyComponent from '@/views/system/new-word/components/new-word-modify';
+import { NewWordBatchModify, NewWordCreate, NewWordModify, NewWordPage } from '@/types/new-word';
 import NewWordBatchModifyComponent from '@/views/system/new-word/components/new-word-batch-modify';
+import NewWordCreateComponent from '@/views/system/new-word/components/new-word-create';
 import NewWordImportComponent from '@/views/system/new-word/components/new-word-import';
+import NewWordModifyComponent from '@/views/system/new-word/components/new-word-modify';
+import NewWordQueryComponent from '@/views/system/new-word/components/new-word-query';
+import { Form } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
 import type { RcFile } from 'rc-upload/lib/interface';
+import React, { useEffect, useState } from 'react';
 
 const NewWord: React.FC = () => {
   // 查询模块
@@ -30,7 +30,7 @@ const NewWord: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   useEffect(() => {
     const fetchData = async () => {
-      const newWordPage = await newWordQueryForm.validateFields() as NewWordPage;
+      const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
       const pageData = BaseQueryImpl.create(current, pageSize).buildPage();
       const resp = await fetchNewWordByPage(pageData, newWordPage);
       setNewWordPageDataSource(resp.records);
@@ -44,9 +44,9 @@ const NewWord: React.FC = () => {
     setPageSize(newPageSize);
   };
   const resetPagination = () => {
-    setCurrent(1)
-    setPageSize(10)
-  }
+    setCurrent(1);
+    setPageSize(10);
+  };
   // 表格列信息
   const newWordPageColumns: ColumnsType<NewWordPage> = [
     {
@@ -94,15 +94,15 @@ const NewWord: React.FC = () => {
   ];
   const [newWordQueryForm] = Form.useForm();
   const handleNewWordQueryReset = () => {
-    resetPagination()
+    resetPagination();
     newWordQueryForm.resetFields();
   };
   const onNewWordQueryFinish = async () => {
-    const newWordPage = await newWordQueryForm.validateFields() as NewWordPage;
+    const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
     await handleNewWordQueryFinish(newWordPage);
   };
   const handleNewWordQueryFinish = async (newWordPage: NewWordPage) => {
-    await fetchNewWordByPage(BaseQueryImpl.create(current, pageSize).buildPage(), newWordPage).then(resp => {
+    await fetchNewWordByPage(BaseQueryImpl.create(current, pageSize).buildPage(), newWordPage).then((resp) => {
       setNewWordPageDataSource(resp.records);
       setNewWordPageTotalCount(resp.total);
     });
@@ -116,7 +116,7 @@ const NewWord: React.FC = () => {
     setIsNewWordCreateModalVisible(true);
   };
   const handleNewWordCreateCancel = () => {
-    newWordCreateForm.resetFields()
+    newWordCreateForm.resetFields();
     setIsNewWordCreateModalVisible(false);
   };
   const handleNewWordCreateFinish = async (newWordCreate: NewWordCreate) => {
@@ -125,7 +125,7 @@ const NewWord: React.FC = () => {
       await createNewWord(newWordCreate);
       message.success('新增成功');
       newWordCreateForm.resetFields();
-      await onNewWordQueryFinish()
+      await onNewWordQueryFinish();
     } finally {
       setIsNewWordCreateLoading(false);
       setIsNewWordCreateModalVisible(false);
@@ -146,11 +146,11 @@ const NewWord: React.FC = () => {
       return;
     }
     try {
-      setIsBatchRemoveLoading(true)
+      setIsBatchRemoveLoading(true);
       await batchRemoveNewWord(selectedRowKeys.map((key) => Number(key)));
-      await onNewWordQueryFinish()
+      await onNewWordQueryFinish();
     } finally {
-      setIsBatchRemoveLoading(false)
+      setIsBatchRemoveLoading(false);
     }
   };
   const handleNewWordBatchRemoveCancel = async () => {
@@ -168,14 +168,14 @@ const NewWord: React.FC = () => {
     setIsNewWordModifyModalVisible(false);
   };
   const handleNewWordModifyFinish = async () => {
-    const newWordModify = await newWordModifyForm.validateFields() as NewWordModify;
+    const newWordModify = (await newWordModifyForm.validateFields()) as NewWordModify;
     setIsNewWordModifyLoading(true);
     try {
       await modifyNewWord(newWordModify);
       newWordModifyForm.resetFields();
       message.success('修改成功');
     } finally {
-      setIsNewWordModifyLoading(false)
+      setIsNewWordModifyLoading(false);
       setIsNewWordModifyModalVisible(false);
     }
   };
@@ -183,13 +183,12 @@ const NewWord: React.FC = () => {
   // 批量修改模块
   const onNewWordBatchModify = () => {
     if (selectedRowKeys.length === 1) {
-      setIsNewWordModifyModalVisible(true)
-      newWordModifyForm.setFieldsValue({...selectedRows[0]})
+      setIsNewWordModifyModalVisible(true);
+      newWordModifyForm.setFieldsValue({ ...selectedRows[0] });
     } else {
-      setIsNewWordBatchModifyModalVisible(true)
-      newWordBatchModifyForm.resetFields()
+      setIsNewWordBatchModifyModalVisible(true);
+      newWordBatchModifyForm.resetFields();
     }
-
   };
   const [isNewWordBatchModifyModalVisible, setIsNewWordBatchModifyModalVisible] = useState<boolean>(false);
   const [isNewWordBatchModifyLoading, setIsNewWordBatchModifyLoading] = useState<boolean>(false);
@@ -199,18 +198,20 @@ const NewWord: React.FC = () => {
     setIsNewWordBatchModifyModalVisible(false);
   };
   const handleNewWordBatchModifyFinish = async () => {
-    const newWordBatchModify = await newWordBatchModifyForm.validateFields() as NewWordBatchModify;
+    const newWordBatchModify = (await newWordBatchModifyForm.validateFields()) as NewWordBatchModify;
     setIsNewWordBatchModifyLoading(true);
     try {
-      await batchModifyNewWord(newWordBatchModify, selectedRowKeys.map((key) => Number(key)));
+      await batchModifyNewWord(
+        newWordBatchModify,
+        selectedRowKeys.map((key) => Number(key)),
+      );
       newWordBatchModifyForm.resetFields();
       message.success('修改成功');
     } finally {
-      setIsNewWordBatchModifyLoading(false)
+      setIsNewWordBatchModifyLoading(false);
       setIsNewWordBatchModifyModalVisible(false);
     }
   };
-
 
   // 导入模块
   const [isNewWordImportModalVisible, setIsNewWordImportModalVisible] = useState<boolean>(false);
@@ -218,33 +219,31 @@ const NewWord: React.FC = () => {
   const [newWordCreateList, setNewWordCreateList] = useState<NewWordCreate[]>([]);
 
   const onNewWordImport = () => {
-    setIsNewWordImportModalVisible(true)
+    setIsNewWordImportModalVisible(true);
   };
   const handleNewWordImportCancel = () => {
-    setIsNewWordImportModalVisible(false)
-  }
+    setIsNewWordImportModalVisible(false);
+  };
   const onNewWordImportFinish = async (fileList: RcFile[]) => {
     try {
-      setIsNewWordImportLoading(true)
-      const newWordCreateList = await importNewWord(fileList)
-      setNewWordCreateList(newWordCreateList)
-      return newWordCreateList
+      setIsNewWordImportLoading(true);
+      const newWordCreateList = await importNewWord(fileList);
+      setNewWordCreateList(newWordCreateList);
+      return newWordCreateList;
     } finally {
-      setIsNewWordImportLoading(false)
+      setIsNewWordImportLoading(false);
     }
-  }
+  };
 
   const handleNewWordImport = async () => {
-    setIsNewWordImportLoading(true)
+    setIsNewWordImportLoading(true);
     try {
-      await batchCreateNewWord(newWordCreateList)
+      await batchCreateNewWord(newWordCreateList);
     } finally {
-      setIsNewWordImportLoading(false)
-      setNewWordCreateList([])
+      setIsNewWordImportLoading(false);
+      setNewWordCreateList([]);
     }
-  }
-
-
+  };
 
   // 导出模块
   const onNewWordExport = async () => {
@@ -258,7 +257,7 @@ const NewWord: React.FC = () => {
     showExport: false,
     showModify: false,
     showRemove: true,
-  }
+  };
   return (
     <div className="container mx-auto px-4 bg-white">
       <div className="shadow-sm">

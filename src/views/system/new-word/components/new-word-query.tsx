@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button, Form, Input, DatePicker, Space } from 'antd';
+import { Button, DatePicker, Form, Input, Space } from 'antd';
 import { FormInstance } from 'antd/es/form';
+import React from 'react';
 
 interface NewWordQueryProps {
   onNewWordQueryFinish: () => void;
@@ -14,10 +14,10 @@ const newWordQueryFormItemLayout = {
 };
 
 const NewWordQueryComponent: React.FC<NewWordQueryProps> = ({
-                                                              onNewWordQueryFinish,
-                                                              onNewWordQueryReset,
-                                                              newWordQueryForm,
-                                                            }) => {
+  onNewWordQueryFinish,
+  onNewWordQueryReset,
+  newWordQueryForm,
+}) => {
   const handleNewWordQueryReset = () => {
     onNewWordQueryReset();
     onNewWordQueryFinish();
@@ -55,9 +55,7 @@ const NewWordQueryComponent: React.FC<NewWordQueryProps> = ({
       </Form.Item>
       <Form.Item className="flex justify-end">
         <Space className="inline-flex">
-          <Button onClick={handleNewWordQueryReset}>
-            重置
-          </Button>
+          <Button onClick={handleNewWordQueryReset}>重置</Button>
           <Button type="primary" htmlType="submit">
             查询
           </Button>

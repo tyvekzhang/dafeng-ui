@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import { Button, Col, Form, Input, Modal, Row } from 'antd';
 import { NewWordModify } from '@/types/new-word';
+import { Button, Col, Form, Input, Modal, Row } from 'antd';
 import { FormInstance } from 'antd/es/form';
+import React, { useMemo } from 'react';
 
 interface NewWordModifyProps {
   isNewWordModifyModalVisible: boolean;
@@ -12,14 +12,12 @@ interface NewWordModifyProps {
 }
 
 const NewWordModifyComponent: React.FC<NewWordModifyProps> = ({
-                                                                isNewWordModifyModalVisible,
-                                                                onNewWordModifyCancel,
-                                                                onNewWordModifyFinish,
-                                                                isNewWordModifyLoading,
-                                                                newWordModifyForm,
-                                                              }) => {
-
-
+  isNewWordModifyModalVisible,
+  onNewWordModifyCancel,
+  onNewWordModifyFinish,
+  isNewWordModifyLoading,
+  newWordModifyForm,
+}) => {
   const footerButtons = useMemo(
     () => [
       <Button key="cancel" onClick={onNewWordModifyCancel}>
@@ -40,11 +38,7 @@ const NewWordModifyComponent: React.FC<NewWordModifyProps> = ({
       footer={footerButtons}
       destroyOnClose
     >
-      <Form
-        form={newWordModifyForm}
-        name="newWordModify"
-        layout="vertical"
-      >
+      <Form form={newWordModifyForm} name="newWordModify" layout="vertical">
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item name="userId" label="用户ID" rules={[{ required: true, message: '请输入用户ID' }]}>
@@ -76,8 +70,7 @@ const NewWordModifyComponent: React.FC<NewWordModifyProps> = ({
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="nextReviewDate" label="复习时间"
-                       rules={[{ required: true, message: '请输入复习时间' }]}>
+            <Form.Item name="nextReviewDate" label="复习时间" rules={[{ required: true, message: '请输入复习时间' }]}>
               <Input placeholder="请输入复习时间" />
             </Form.Item>
           </Col>
@@ -91,4 +84,3 @@ const NewWordModifyComponent: React.FC<NewWordModifyProps> = ({
 };
 
 export default NewWordModifyComponent;
-

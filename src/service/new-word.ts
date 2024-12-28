@@ -1,13 +1,13 @@
-import httpClient from '@/utils/http-client';
 import { PageQuery, PageResult } from '@/types';
 import {
-  NewWordQuery,
-  NewWordCreate,
-  NewWordModify,
-  NewWordDetail,
-  NewWordPage,
   NewWordBatchModify,
+  NewWordCreate,
+  NewWordDetail,
+  NewWordModify,
+  NewWordPage,
+  NewWordQuery,
 } from '@/types/new-word';
+import httpClient from '@/utils/http-client';
 
 /**
  * 分页查询NewWord
@@ -62,7 +62,7 @@ export function modifyNewWord(newWordModify: NewWordModify) {
  * @returns 无返回值
  */
 export function batchModifyNewWord(newWordBatchModify: NewWordBatchModify, ids: number[]) {
-  return httpClient.put<void>(`/new-word/modify`, { ...ids, ...newWordBatchModify});
+  return httpClient.put<void>(`/new-word/modify`, { ...ids, ...newWordBatchModify });
 }
 
 /**

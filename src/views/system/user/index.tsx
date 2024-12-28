@@ -25,7 +25,8 @@ import {
   Pagination,
   Popconfirm,
   PopconfirmProps,
-  RadioChangeEvent, Space,
+  RadioChangeEvent,
+  Space,
   Switch,
   Table,
 } from 'antd';

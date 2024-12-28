@@ -1,6 +1,6 @@
-import httpClient from '@/utils/http-client';
 import { downloadBlob } from '@/service/util';
 import { CodePreviewResponse, TableDataResponse } from '@/types/code_gen';
+import httpClient from '@/utils/http-client';
 import { AxiosResponse } from 'axios';
 
 export const codePreview = (tableId: number) => {

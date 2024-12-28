@@ -75,7 +75,7 @@ export class BaseQueryImpl implements BaseQuery {
   constructor(
     current: number = BaseQueryImpl.DEFAULT_CURRENT,
     pageSize: number = BaseQueryImpl.DEFAULT_PAGE_SIZE,
-    sorter?: string
+    sorter?: string,
   ) {
     this._current = Math.max(1, current);
     this._pageSize = Math.max(1, Math.min(pageSize, BaseQueryImpl.MAX_PAGE_SIZE));
@@ -111,12 +111,12 @@ export class BaseQueryImpl implements BaseQuery {
       current: number;
       pageSize: number;
       sorter: string;
-    }>
+    }>,
   ): BaseQueryImpl {
     return new BaseQueryImpl(
       updates?.current ?? this._current,
       updates?.pageSize ?? this._pageSize,
-      updates?.sorter ?? this._sorter
+      updates?.sorter ?? this._sorter,
     );
   }
 
@@ -175,7 +175,7 @@ export class BaseQueryImpl implements BaseQuery {
    */
   private validateSorterJson(sorterJson: Record<string, string>): boolean {
     return Object.values(sorterJson).every(
-      (order) => order === BaseQueryImpl.SORT_ASC || order === BaseQueryImpl.SORT_DESC
+      (order) => order === BaseQueryImpl.SORT_ASC || order === BaseQueryImpl.SORT_DESC,
     );
   }
 }
@@ -189,7 +189,7 @@ function exampleUsage() {
     JSON.stringify({
       userName: 'ascend',
       createTime: 'descend',
-    })
+    }),
   );
 
   // 构建分页对象
@@ -206,9 +206,7 @@ function exampleUsage() {
   console.log(page2);
 }
 
-
 export interface PageResult<T> {
-
   /**
    * 总记录数
    */
@@ -218,6 +216,4 @@ export interface PageResult<T> {
    * 当前页的数据列表
    */
   records: T[];
-
 }
-

@@ -1,8 +1,8 @@
 import type { AppMenu } from '@/router/types';
-import httpClient from '@/utils/http-client';
 import { downloadBlob } from '@/service/util';
 import { UserInfo } from '@/types';
 import { LoginForm, Token, UserAdd, UserBatchModify, UserQuery, UserQueryForm, UserTableData } from '@/types/user';
+import httpClient from '@/utils/http-client';
 import { AxiosResponse } from 'axios';
 import { RcFile } from 'rc-upload/lib/interface';
 

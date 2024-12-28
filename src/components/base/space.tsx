@@ -11,14 +11,14 @@ interface SpaceProps {
 }
 
 const Space: React.FC<SpaceProps> = ({
-                                       children,
-                                       direction = 'horizontal',
-                                       size = 'small',
-                                       wrap = false,
-                                       align = 'center',
-                                       justify = 'start',
-                                       className = '',
-                                     }) => {
+  children,
+  direction = 'horizontal',
+  size = 'small',
+  wrap = false,
+  align = 'center',
+  justify = 'start',
+  className = '',
+}) => {
   const getSpaceClasses = () => {
     const baseClasses = ['flex'];
 
@@ -98,5 +98,4 @@ const Space: React.FC<SpaceProps> = ({
   );
 };
 
-export {Space};
-
+export { Space };
