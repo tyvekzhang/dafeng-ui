@@ -55,6 +55,12 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
         { key: 'converter', label: 'converter.java', children: processCodeString(data.converter), language: 'java' },
         { key: 'create', label: 'create.java', children: processCodeString(data.create), language: 'java' },
         { key: 'modify', label: 'modify.java', children: processCodeString(data.modify), language: 'java' },
+        {
+          key: 'batchModify',
+          label: 'batchModify.java',
+          children: processCodeString(data.batchModify),
+          language: 'java',
+        },
         { key: 'query', label: 'query.java', children: processCodeString(data.query), language: 'java' },
         { key: 'detail', label: 'detail.java', children: processCodeString(data.detail), language: 'java' },
         { key: 'page', label: 'page.java', children: processCodeString(data.page), language: 'java' },

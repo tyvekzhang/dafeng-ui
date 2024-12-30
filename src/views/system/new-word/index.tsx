@@ -254,8 +254,8 @@ const NewWord: React.FC = () => {
   const actionConfig = {
     showCreate: true,
     showImport: true,
-    showExport: false,
-    showModify: false,
+    showExport: true,
+    showModify: true,
     showRemove: true,
   };
   return (
@@ -294,7 +294,7 @@ const NewWord: React.FC = () => {
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}
           onSelectionChange={handleSelectionChange}
-          rowKey="userId"
+          rowKey="word"
         />
       </div>
       <div>

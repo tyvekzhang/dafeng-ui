@@ -6,6 +6,7 @@ export interface CodePreviewResponse {
   controller: string;
   create: string;
   modify: string;
+  batchModify: string;
   query: string;
   detail: string;
   page: string;

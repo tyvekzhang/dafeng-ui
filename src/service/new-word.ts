@@ -11,81 +11,107 @@ import httpClient from '@/utils/http-client';
 
 /**
  * 分页查询NewWord
- * @param page 分页参数
+ *
+ * @param pageQuery 分页参数
  * @param newWordQuery 查询条件
- * @returns 返回分页结果，包含NewWord详情列表
+ * @returns 含NewWord详情列表的分页结果
  */
-export function fetchNewWordByPage(page: PageQuery, newWordQuery?: Partial<NewWordQuery>) {
-  return httpClient.post<PageResult<NewWordPage>>('/new-word/page', { ...page, ...newWordQuery });
-}
-
-/**
- * 创建NewWord
- * @param newWordCreate 创建NewWord的数据
- * @returns 返回创建的NewWord的ID
- */
-export function createNewWord(newWordCreate: NewWordCreate) {
-  return httpClient.post<number>('/new-word/create', newWordCreate);
-}
-
-/**
- * 批量创建NewWord
- * @param newWordCreateList 批量创建NewWord的数据
- * @returns 返回创建NewWord的ID
- */
-export function batchCreateNewWord(newWordCreateList: NewWordCreate[]) {
-  return httpClient.post<number[]>('/new-word/batch-create', newWordCreateList);
+export function fetchNewWordByPage(pageQuery: PageQuery, newWordQuery?: Partial<NewWordQuery>) {
+  return httpClient.get<PageResult<NewWordPage>>('/new-word/page', { params: { ...pageQuery, ...newWordQuery } });
 }
 
 /**
  * 获取NewWord详情
+ *
  * @param id NewWord的ID
- * @returns 返回NewWord的详细信息
+ * @returns NewWord详细信息
  */
 export function fetchNewWordDetail(id: number) {
   return httpClient.get<NewWordDetail>(`/new-word/detail/${id}`);
 }
 
 /**
- * 修改NewWord信息
- * @param newWordModify 修改的NewWord数据
- * @returns 无返回值
+ * 导出NewWord数据导入模板
+ *
+ * @returns 触发导出模板操作
  */
-export function modifyNewWord(newWordModify: NewWordModify) {
-  return httpClient.put<void>(`/new-word/modify`, newWordModify);
+export function exportNewWordTemplate() {
+  return httpClient.get<void>('/new-word/export-template');
 }
 
 /**
- * 批量修改NewWord信息
- * @param newWordBatchModify 修改的NewWord数据
- * @param ids 批量修改NewWord的ID列表
- * @returns 无返回值
+ * 导出NewWord数据
+ *
+ * @param ids 要导出的NewWord的ID列表
  */
-export function batchModifyNewWord(newWordBatchModify: NewWordBatchModify, ids: number[]) {
-  return httpClient.put<void>(`/new-word/modify`, { ...ids, ...newWordBatchModify });
+export function exportNewWordPage(ids: number[]) {
+  return httpClient.get<void>('/new-word/export', { params: { ids } });
 }
 
 /**
- * 批量删除NewWord
- * @param ids 要删除的NewWordID数组
- * @returns 无返回值
+ * 创建NewWord
+ *
+ * @param newWordCreate 创建数据
+ * @returns 创建的NewWord的ID
+ */
+export function createNewWord(newWordCreate: NewWordCreate) {
+  return httpClient.post<number>('/new-word/create', newWordCreate);
+}
+
+/**
+ * 导入NewWord数据并进行校验
+ *
+ * @param file 上传的Excel文件
+ * @returns 校验结果列表
+ */
+export function importNewWord(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return httpClient.post<NewWordCreate[]>('/new-word/import', formData);
+}
+
+/**
+ * 批量创建NewWord
+ *
+ * @param newWordCreateList 创建数据列表
+ * @returns 创建的NewWord的ID列表
+ */
+export function batchCreateNewWord(newWordCreateList: NewWordCreate[]) {
+  return httpClient.post<number[]>('/new-word/batch-create', newWordCreateList);
+}
+
+/**
+ * 移除NewWord
+ *
+ * @param id 要移除的NewWord的Id
+ */
+export function removeNewWord(id: number) {
+  return httpClient.delete<void>(`/new-word/remove/${id}`);
+}
+
+/**
+ * 批量移除NewWord
+ *
+ * @param ids 要移除的NewWord的ID数组
  */
 export function batchRemoveNewWord(ids: number[]) {
   return httpClient.delete<void>('/new-word/batch-remove', { data: ids });
 }
 
 /**
- * 导入NewWord
- * @param fileList 要导入的NewWord文件列表
+ * 更新NewWord信息
+ *
+ * @param newWordModify 包含ID数组和修改的数据
  */
-export function importNewWord(fileList: File[]) {
-  const formData = new FormData();
-  fileList.forEach((file) => {
-    formData.append('file', file);
-  });
-  return httpClient.post<NewWordCreate[]>('/new-word/import', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+export function modifyNewWord(newWordModify: NewWordModify) {
+  return httpClient.put<void>('/new-word/modify', newWordModify);
+}
+
+/**
+ * 批量更新NewWord信息
+ *
+ * @param newWordBatchModify 包含ID数组和修改的数据
+ */
+export function batchModifyNewWord(newWordBatchModify: NewWordBatchModify) {
+  return httpClient.put<void>('/new-word/batch-modify', newWordBatchModify);
 }

@@ -12,12 +12,12 @@ export default createStyles(({ token, css }) => {
     },
     logoImg: {
       display: 'block',
-      width: '40px',
-      height: '38px',
+      width: '32px',
+      height: '32px',
     },
     logoName: css`
       display: block;
-      width: 160px;
+      width: auto;
       height: 40px;
       text-align: left;
       line-height: 40px;

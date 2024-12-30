@@ -4,7 +4,7 @@ import { MenuFoldBtnEnum, MenuModeEnum, MenuTypeEnum } from '@/enums/menuEnum';
 import type { AppConfig } from '@/types/config';
 
 export const appSetting: AppConfig = {
-  name: '单细胞测序平台',
+  name: '奇点智阅',
   // Theme color
   themeColor: '#1890ff',
   // Permission-related cache is stored in sessionStorage or localStorage

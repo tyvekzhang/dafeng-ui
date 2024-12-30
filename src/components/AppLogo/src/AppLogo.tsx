@@ -18,9 +18,9 @@ const AppLogo: FC = () => {
 
   return (
     <div className="container mx-auto" onClick={handleClick}>
-      <Space>
+      <Space className="mx-auto flex justify-center items-center">
         {/* 图标 */}
-        <img className="w-8 h-8 block" src={logoImg} alt="logo" />
+        <img className={styles.logoImg} src={logoImg} alt="logo" />
         {/* 名称 */}
         <div className={classNames(styles.logoName, { hidden: getMenuFold })}>{appSetting.name}</div>
       </Space>
