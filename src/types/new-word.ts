@@ -1,7 +1,4 @@
 export interface NewWordCreate {
-  /** 主键 */
-  id: number;
-
   /** 用户ID */
   userId: number;
 
@@ -17,20 +14,16 @@ export interface NewWordCreate {
   /** 复习次数 */
   reviewCount: number;
 
-  /** 复习时间 */
+  /** 下次复习时间 */
   nextReviewDate: string;
 
   /** 租户ID */
   tenantId: number;
-
-  /** 创建时间 */
-  createTime: string;
-
-  /** 修改时间 */
-  updateTime: string;
 }
 
 export interface NewWordModify {
+  /** 主键 */
+  id: number;
   /** 用户ID */
   userId: number;
 
@@ -46,17 +39,19 @@ export interface NewWordModify {
   /** 复习次数 */
   reviewCount: number;
 
-  /** 复习时间 */
+  /** 下次复习时间 */
   nextReviewDate: string;
 
   /** 租户ID */
   tenantId: number;
 
-  /** 修改时间 */
+  /** 更新时间 */
   updateTime: string;
 }
 
 export interface NewWordBatchModify {
+  /** 主键列表 */
+  ids: number[];
   /** 用户ID */
   userId: number;
 
@@ -72,13 +67,13 @@ export interface NewWordBatchModify {
   /** 复习次数 */
   reviewCount: number;
 
-  /** 复习时间 */
+  /** 下次复习时间 */
   nextReviewDate: string;
 
   /** 租户ID */
   tenantId: number;
 
-  /** 修改时间 */
+  /** 更新时间 */
   updateTime: string;
 }
 
@@ -98,7 +93,7 @@ export interface NewWordQuery {
   /** 复习次数 */
   reviewCount: number;
 
-  /** 复习时间 */
+  /** 下次复习时间 */
   nextReviewDate: string;
 
   /** 租户ID */
@@ -121,7 +116,7 @@ export interface NewWordDetail {
   /** 复习次数 */
   reviewCount: number;
 
-  /** 复习时间 */
+  /** 下次复习时间 */
   nextReviewDate: string;
 
   /** 租户ID */
@@ -129,6 +124,9 @@ export interface NewWordDetail {
 }
 
 export interface NewWordPage {
+  /** 主键 */
+  id: number;
+
   /** 用户ID */
   userId: number;
 
@@ -144,7 +142,7 @@ export interface NewWordPage {
   /** 复习次数 */
   reviewCount: number;
 
-  /** 复习时间 */
+  /** 下次复习时间 */
   nextReviewDate: string;
 
   /** 租户ID */

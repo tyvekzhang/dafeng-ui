@@ -1,6 +1,6 @@
 import type { PaginationProps, TableProps } from 'antd';
 import { Pagination, Table } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface PaginatedTableProps<T> extends Omit<TableProps<T>, 'pagination'> {
   total: number;
@@ -9,6 +9,7 @@ interface PaginatedTableProps<T> extends Omit<TableProps<T>, 'pagination'> {
   onPaginationChange: (current: number, pageSize: number) => void;
   onSelectionChange?: (selectedRowKeys: React.Key[], selectedRows: T[]) => void;
   rowSelectionType?: 'checkbox' | 'radio';
+  selectedRowKeys?: React.Key[];
 }
 
 export function PaginatedTable<T extends object>({
@@ -19,24 +20,17 @@ export function PaginatedTable<T extends object>({
   onSelectionChange,
   rowSelectionType = 'checkbox',
   rowSelection: propRowSelection,
+  selectedRowKeys,
   ...tableProps
 }: PaginatedTableProps<T>) {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-
   const rowSelection: TableProps<T>['rowSelection'] = {
     type: rowSelectionType,
     selectedRowKeys,
-    onChange: (selectedRowKeys: React.Key[], selectedRows: T[]) => {
-      setSelectedRowKeys(selectedRowKeys);
-      onSelectionChange?.(selectedRowKeys, selectedRows);
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: T[]) => {
+      onSelectionChange?.(newSelectedRowKeys, selectedRows);
     },
     ...(propRowSelection as TableProps<T>['rowSelection']),
   };
-
-  useEffect(() => {
-    // Reset selection when page or pageSize changes
-    setSelectedRowKeys([]);
-  }, [current, pageSize]);
 
   const handlePaginationChange: PaginationProps['onChange'] = (newCurrent, newPageSize) => {
     onPaginationChange(newCurrent, newPageSize);

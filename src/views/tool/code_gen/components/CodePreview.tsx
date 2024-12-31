@@ -42,8 +42,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
       if (!data) return [];
 
       return [
-        { key: 'entity', label: 'entity.java', children: processCodeString(data.entity), language: 'java' },
-        { key: 'mapper', label: 'mapper.java', children: processCodeString(data.mapper), language: 'java' },
+        { key: 'controller', label: 'controller.java', children: processCodeString(data.controller), language: 'java' },
         { key: 'service', label: 'service.java', children: processCodeString(data.service), language: 'java' },
         {
           key: 'serviceImpl',
@@ -51,7 +50,8 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
           children: processCodeString(data.serviceImpl),
           language: 'java',
         },
-        { key: 'controller', label: 'controller.java', children: processCodeString(data.controller), language: 'java' },
+        { key: 'mapper', label: 'mapper.java', children: processCodeString(data.mapper), language: 'java' },
+        { key: 'entity', label: 'entity.java', children: processCodeString(data.entity), language: 'java' },
         { key: 'converter', label: 'converter.java', children: processCodeString(data.converter), language: 'java' },
         { key: 'create', label: 'create.java', children: processCodeString(data.create), language: 'java' },
         { key: 'modify', label: 'modify.java', children: processCodeString(data.modify), language: 'java' },

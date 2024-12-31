@@ -6,6 +6,7 @@ import {
   batchModifyNewWord,
   batchRemoveNewWord,
   createNewWord,
+  exportNewWordPage,
   fetchNewWordByPage,
   importNewWord,
   modifyNewWord,
@@ -31,7 +32,7 @@ const NewWord: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
-      const pageData = BaseQueryImpl.create(current, pageSize).buildPage();
+      const pageData = BaseQueryImpl.create(current, pageSize);
       const resp = await fetchNewWordByPage(pageData, newWordPage);
       setNewWordPageDataSource(resp.records);
       setNewWordPageTotalCount(resp.total);
@@ -49,6 +50,12 @@ const NewWord: React.FC = () => {
   };
   // 表格列信息
   const newWordPageColumns: ColumnsType<NewWordPage> = [
+    {
+      title: 'Id',
+      dataIndex: 'id',
+      key: 'id',
+      hidden: true,
+    },
     {
       title: '序号',
       dataIndex: 'No',
@@ -75,6 +82,7 @@ const NewWord: React.FC = () => {
       title: '单词',
       dataIndex: 'word',
       key: 'word',
+      render: (text) => (text ? text : '--'),
     },
     {
       title: '复习次数',
@@ -99,10 +107,14 @@ const NewWord: React.FC = () => {
   };
   const onNewWordQueryFinish = async () => {
     const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
-    await handleNewWordQueryFinish(newWordPage);
+    const filteredNewWordPage = Object.fromEntries(
+      Object.entries(newWordPage).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+    );
+    resetPagination();
+    await handleNewWordQueryFinish(filteredNewWordPage as NewWordPage);
   };
   const handleNewWordQueryFinish = async (newWordPage: NewWordPage) => {
-    await fetchNewWordByPage(BaseQueryImpl.create(current, pageSize).buildPage(), newWordPage).then((resp) => {
+    await fetchNewWordByPage(BaseQueryImpl.create(current, pageSize), newWordPage).then((resp) => {
       setNewWordPageDataSource(resp.records);
       setNewWordPageTotalCount(resp.total);
     });
@@ -136,6 +148,10 @@ const NewWord: React.FC = () => {
   const [isBatchRemoveLoading, setIsBatchRemoveLoading] = useState<boolean>(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<NewWordPage[]>([]);
+  const resetSelectedRows = () => {
+    setSelectedRowKeys([]);
+    setSelectedRows([]);
+  };
   const handleSelectionChange = (selectedRowKeys: React.Key[], selectedRows: NewWordPage[]) => {
     setSelectedRows(selectedRows);
     setSelectedRowKeys(selectedRowKeys);
@@ -149,17 +165,17 @@ const NewWord: React.FC = () => {
       setIsBatchRemoveLoading(true);
       await batchRemoveNewWord(selectedRowKeys.map((key) => Number(key)));
       await onNewWordQueryFinish();
+      resetSelectedRows();
     } finally {
       setIsBatchRemoveLoading(false);
     }
   };
   const handleNewWordBatchRemoveCancel = async () => {
-    setSelectedRowKeys([]);
-    setSelectedRows([]);
+    resetSelectedRows();
     message.info('操作已取消');
   };
 
-  // 单个修改模块
+  // 单个更新模块
   const [isNewWordModifyModalVisible, setIsNewWordModifyModalVisible] = useState<boolean>(false);
   const [isNewWordModifyLoading, setIsNewWordModifyLoading] = useState<boolean>(false);
   const [newWordModifyForm] = Form.useForm();
@@ -169,18 +185,21 @@ const NewWord: React.FC = () => {
   };
   const handleNewWordModifyFinish = async () => {
     const newWordModify = (await newWordModifyForm.validateFields()) as NewWordModify;
+    newWordModify.id = selectedRows[0].id;
     setIsNewWordModifyLoading(true);
     try {
       await modifyNewWord(newWordModify);
       newWordModifyForm.resetFields();
-      message.success('修改成功');
+      message.success('更新成功');
+      await onNewWordQueryFinish();
+      resetSelectedRows();
     } finally {
       setIsNewWordModifyLoading(false);
       setIsNewWordModifyModalVisible(false);
     }
   };
 
-  // 批量修改模块
+  // 批量更新模块
   const onNewWordBatchModify = () => {
     if (selectedRowKeys.length === 1) {
       setIsNewWordModifyModalVisible(true);
@@ -193,20 +212,22 @@ const NewWord: React.FC = () => {
   const [isNewWordBatchModifyModalVisible, setIsNewWordBatchModifyModalVisible] = useState<boolean>(false);
   const [isNewWordBatchModifyLoading, setIsNewWordBatchModifyLoading] = useState<boolean>(false);
   const [newWordBatchModifyForm] = Form.useForm();
-  const handleNewWordBatchModifyCancel = () => {
+  const handleNewWordBatchModifyCancel = async () => {
     newWordBatchModifyForm.resetFields();
     setIsNewWordBatchModifyModalVisible(false);
+    resetSelectedRows();
+    message.info('操作已取消');
   };
   const handleNewWordBatchModifyFinish = async () => {
     const newWordBatchModify = (await newWordBatchModifyForm.validateFields()) as NewWordBatchModify;
     setIsNewWordBatchModifyLoading(true);
     try {
-      await batchModifyNewWord(
-        newWordBatchModify,
-        selectedRowKeys.map((key) => Number(key)),
-      );
+      newWordBatchModify.ids = selectedRowKeys.map((key) => Number(key));
+      await batchModifyNewWord(newWordBatchModify);
       newWordBatchModifyForm.resetFields();
-      message.success('修改成功');
+      message.success('更新成功');
+      await onNewWordQueryFinish();
+      resetSelectedRows();
     } finally {
       setIsNewWordBatchModifyLoading(false);
       setIsNewWordBatchModifyModalVisible(false);
@@ -227,7 +248,7 @@ const NewWord: React.FC = () => {
   const onNewWordImportFinish = async (fileList: RcFile[]) => {
     try {
       setIsNewWordImportLoading(true);
-      const newWordCreateList = await importNewWord(fileList);
+      const newWordCreateList = await importNewWord(fileList[0]);
       setNewWordCreateList(newWordCreateList);
       return newWordCreateList;
     } finally {
@@ -239,6 +260,9 @@ const NewWord: React.FC = () => {
     setIsNewWordImportLoading(true);
     try {
       await batchCreateNewWord(newWordCreateList);
+      message.success('导入成功');
+      setIsNewWordImportModalVisible(false);
+      await onNewWordQueryFinish();
     } finally {
       setIsNewWordImportLoading(false);
       setNewWordCreateList([]);
@@ -246,8 +270,19 @@ const NewWord: React.FC = () => {
   };
 
   // 导出模块
+  const [isExportLoading, setIsExportLoading] = useState<boolean>(false);
   const onNewWordExport = async () => {
-    message.error('Export functionality not implemented');
+    if (selectedRowKeys === null || selectedRowKeys.length === 0) {
+      message.warning('请选择要导出的项目');
+      return;
+    }
+    try {
+      setIsExportLoading(true);
+      await exportNewWordPage(selectedRowKeys.map((key) => Number(key)));
+      resetSelectedRows();
+    } finally {
+      setIsExportLoading(false);
+    }
   };
 
   // 操作配置模块
@@ -278,8 +313,9 @@ const NewWord: React.FC = () => {
           onConfirmBatchRemoveCancel={handleNewWordBatchRemoveCancel}
           isExportDisabled={selectedRowKeys.length === 0}
           isBatchModifyDisabled={selectedRowKeys.length === 0}
-          isBatchRemoveLoading={isBatchRemoveLoading}
           isBatchRemoveDisabled={selectedRowKeys.length === 0}
+          isBatchRemoveLoading={isBatchRemoveLoading}
+          isExportLoading={isExportLoading}
           actionConfig={actionConfig}
           className="mb-2 mt-4"
         />
@@ -294,7 +330,8 @@ const NewWord: React.FC = () => {
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}
           onSelectionChange={handleSelectionChange}
-          rowKey="word"
+          selectedRowKeys={selectedRowKeys}
+          rowKey="id"
         />
       </div>
       <div>
@@ -309,7 +346,7 @@ const NewWord: React.FC = () => {
           />
         </div>
         <div>
-          {/*单个修改模块*/}
+          {/*单个更新模块*/}
           <NewWordModifyComponent
             isNewWordModifyModalVisible={isNewWordModifyModalVisible}
             onNewWordModifyCancel={handleNewWordModifyCancel}
@@ -319,7 +356,7 @@ const NewWord: React.FC = () => {
           />
         </div>
         <div>
-          {/*批量修改模块*/}
+          {/*批量更新模块*/}
           <NewWordBatchModifyComponent
             isNewWordBatchModifyModalVisible={isNewWordBatchModifyModalVisible}
             onNewWordBatchModifyCancel={handleNewWordBatchModifyCancel}

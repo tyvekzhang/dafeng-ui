@@ -1,4 +1,5 @@
 import { message } from '@/components/GlobalToast';
+import { exportNewWordTemplate } from '@/service/new-word';
 import { NewWordCreate } from '@/types/new-word';
 import { InboxOutlined } from '@ant-design/icons';
 import { Button, Modal, Table, Upload, UploadFile } from 'antd';
@@ -43,12 +44,14 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
       }
       try {
         const newWordPageList = await onNewWordImportFinish(newWordImportFileList);
-        setNewWordCreateList(newWordPageList);
+        setIsUploadShow(false);
+        setNewWordCreateList(newWordPageList as NewWordCreate[]);
       } finally {
         setNewWordImportFileList([]);
       }
     } else {
       handleNewWordImport();
+      setIsUploadShow(true);
     }
   };
   // 表格列信息
@@ -103,10 +106,10 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
   ];
 
   const handleNewWordExportTemplate = async () => {
-    message.warning('导出模板未实现');
+    await exportNewWordTemplate();
   };
 
-  const customUploadRequest = (options: UploadRequestOption): void | undefined => {
+  const customUploadRequest = async (options: UploadRequestOption): Promise<void | undefined> => {
     const { onSuccess, onError, file } = options;
     const rcFile = file as RcFile;
     if (!rcFile.name.endsWith('.xls') && !rcFile.name.endsWith('.xlsx')) {

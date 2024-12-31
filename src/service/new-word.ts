@@ -1,4 +1,5 @@
-import { PageQuery, PageResult } from '@/types';
+import { downloadBlob } from '@/service/util';
+import { BaseQueryImpl, PageQuery, PageResult } from '@/types';
 import {
   NewWordBatchModify,
   NewWordCreate,
@@ -8,6 +9,7 @@ import {
   NewWordQuery,
 } from '@/types/new-word';
 import httpClient from '@/utils/http-client';
+import { AxiosResponse } from 'axios';
 
 /**
  * 分页查询NewWord
@@ -16,8 +18,18 @@ import httpClient from '@/utils/http-client';
  * @param newWordQuery 查询条件
  * @returns 含NewWord详情列表的分页结果
  */
-export function fetchNewWordByPage(pageQuery: PageQuery, newWordQuery?: Partial<NewWordQuery>) {
-  return httpClient.get<PageResult<NewWordPage>>('/new-word/page', { params: { ...pageQuery, ...newWordQuery } });
+export function fetchNewWordByPage(pageQuery?: PageQuery, newWordQuery?: Partial<NewWordQuery>) {
+  let pageQueryParams: PageQuery;
+  if (pageQuery === null || pageQuery === undefined) {
+    pageQueryParams = BaseQueryImpl.create(1, 200);
+  } else {
+    pageQueryParams = pageQuery;
+  }
+  const params = {
+    ...pageQueryParams,
+    ...newWordQuery,
+  };
+  return httpClient.get<PageResult<NewWordPage>>('/new-word/page', params);
 }
 
 /**
@@ -31,12 +43,18 @@ export function fetchNewWordDetail(id: number) {
 }
 
 /**
- * 导出NewWord数据导入模板
+ * NewWord数据导入模板
  *
- * @returns 触发导出模板操作
  */
-export function exportNewWordTemplate() {
-  return httpClient.get<void>('/new-word/export-template');
+export async function exportNewWordTemplate() {
+  const response = await httpClient.get<AxiosResponse>(
+    `/new-word/export-template`,
+    {},
+    {
+      responseType: 'blob',
+    },
+  );
+  downloadBlob(response, 'new_word_template.xlsx');
 }
 
 /**
@@ -44,8 +62,14 @@ export function exportNewWordTemplate() {
  *
  * @param ids 要导出的NewWord的ID列表
  */
-export function exportNewWordPage(ids: number[]) {
-  return httpClient.get<void>('/new-word/export', { params: { ids } });
+export async function exportNewWordPage(ids: number[]) {
+  const params = {
+    ids: ids,
+  };
+  const response = await httpClient.get<AxiosResponse>(`/new-word/export`, params, {
+    responseType: 'blob',
+  });
+  downloadBlob(response, 'new_word_export.xlsx');
 }
 
 /**
@@ -95,7 +119,7 @@ export function removeNewWord(id: number) {
  * @param ids 要移除的NewWord的ID数组
  */
 export function batchRemoveNewWord(ids: number[]) {
-  return httpClient.delete<void>('/new-word/batch-remove', { data: ids });
+  return httpClient.delete<void>('/new-word/batch-remove', { ids: ids });
 }
 
 /**

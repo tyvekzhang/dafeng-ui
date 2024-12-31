@@ -20,6 +20,7 @@ interface ActionButtonsProps {
   isBatchModifyDisabled: boolean;
   isBatchRemoveDisabled: boolean;
   isBatchRemoveLoading: boolean;
+  isExportLoading: boolean;
   className?: string;
   actionConfig?: ActionButtonsConfig;
 }
@@ -35,6 +36,7 @@ const ActionButtonComponent: React.FC<ActionButtonsProps> = ({
   isBatchModifyDisabled,
   isBatchRemoveDisabled,
   isBatchRemoveLoading,
+  isExportLoading,
   className = '',
   actionConfig = {},
 }) => {
@@ -59,7 +61,7 @@ const ActionButtonComponent: React.FC<ActionButtonsProps> = ({
         </Button>
       )}
       {config.showExport && (
-        <Button disabled={isExportDisabled} onClick={onExport} className="btn-export">
+        <Button loading={isExportLoading} disabled={isExportDisabled} onClick={onExport} className="btn-export">
           导出
         </Button>
       )}

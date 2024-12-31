@@ -61,149 +61,77 @@ export class BaseQueryImpl implements BaseQuery {
   private static readonly DEFAULT_PAGE_SIZE = 10;
   private static readonly MAX_PAGE_SIZE = 200;
 
-  // 私有只读属性
-  private readonly _current: number;
-  private readonly _pageSize: number;
-  private readonly _sorter?: string;
+  current: number;
+  pageSize: number;
+  sorter?: string;
+
+  constructor(current?: number, pageSize?: number, sorter?: string) {
+    this.current = current || BaseQueryImpl.DEFAULT_CURRENT;
+    this.pageSize = pageSize || BaseQueryImpl.DEFAULT_PAGE_SIZE;
+    this.sorter = sorter;
+  }
 
   /**
-   * 构造函数
+   * 静态工厂方法，用于创建分页查询并返回 PageQuery 对象
    * @param current 当前页码
    * @param pageSize 每页大小
-   * @param sorter 排序参数
+   * @param sorter 排序字符串，如 "field1_ascend,field2_descend"
+   * @returns PageQuery 分页查询对象
    */
-  constructor(
-    current: number = BaseQueryImpl.DEFAULT_CURRENT,
-    pageSize: number = BaseQueryImpl.DEFAULT_PAGE_SIZE,
-    sorter?: string,
-  ) {
-    this._current = Math.max(1, current);
-    this._pageSize = Math.max(1, Math.min(pageSize, BaseQueryImpl.MAX_PAGE_SIZE));
-    this._sorter = sorter;
-  }
-
-  // Getter 方法
-  get current(): number {
-    return this._current;
-  }
-
-  get pageSize(): number {
-    return this._pageSize;
-  }
-
-  get sorter(): string | undefined {
-    return this._sorter;
+  static create(current?: number, pageSize?: number, sorter?: string): PageQuery {
+    const query = new BaseQueryImpl(current, pageSize, sorter);
+    return query.buildPage();
   }
 
   /**
-   * 静态工厂方法
+   * 构建分页查询参数
+   * @returns PageQuery 分页查询对象
    */
-  static create(current?: number, pageSize?: number, sorter?: string): BaseQueryImpl {
-    return new BaseQueryImpl(current, pageSize, sorter);
-  }
+  buildPage(): PageQuery {
+    // 确保 current 和 pageSize 在合理的范围内
+    const validCurrent = this.current > 0 ? this.current : BaseQueryImpl.DEFAULT_CURRENT;
+    const validPageSize = Math.min(this.pageSize, BaseQueryImpl.MAX_PAGE_SIZE);
 
-  /**
-   * 克隆方法
-   * @param updates 修改参数
-   */
-  clone(
-    updates?: Partial<{
-      current: number;
-      pageSize: number;
-      sorter: string;
-    }>,
-  ): BaseQueryImpl {
-    return new BaseQueryImpl(
-      updates?.current ?? this._current,
-      updates?.pageSize ?? this._pageSize,
-      updates?.sorter ?? this._sorter,
-    );
-  }
+    let orders: OrderItem[] | undefined = undefined;
 
-  /**
-   * 解析排序参数
-   * @returns 排序配置数组
-   */
-  private parseSorter(): OrderItem[] {
-    if (!this._sorter || this._sorter.trim() === '') {
-      return [];
+    // 处理排序字段
+    if (this.sorter) {
+      orders = this.parseSorter(this.sorter);
     }
 
-    try {
-      const sorterJson = JSON.parse(this._sorter);
-      return Object.entries(sorterJson)
-        .filter(([_, order]) => order === BaseQueryImpl.SORT_ASC || order === BaseQueryImpl.SORT_DESC)
-        .map(([key, order]) => ({
-          field: this.toUnderlineCase(key),
-          order: order === BaseQueryImpl.SORT_ASC ? 'asc' : 'desc',
-        }));
-    } catch (error) {
-      console.warn('Invalid sorter format', error);
-      return [];
-    }
-  }
-
-  /**
-   * 构建分页对象
-   * @returns 分页对象
-   */
-  public buildPage(): PageQuery {
-    return {
-      current: this._current,
-      pageSize: this._pageSize,
-      orders: this.parseSorter(),
+    return <PageQuery>{
+      current: validCurrent,
+      pageSize: validPageSize,
+      orders,
     };
   }
 
   /**
-   * 驼峰转下划线
-   * @param key 驼峰命名的字符串
-   *
-   * @returns 下划线命名的字符串
+   * 解析排序字符串
+   * 示例 sorter 格式为： "field1_ascend,field2_descend"
+   * @param sorter 排序字符串
+   * @returns OrderItem[] 排序项数组
    */
-  private toUnderlineCase(key: string): string {
-    return key
-      .split(/(?=[A-Z])/)
-      .join('_')
-      .toLowerCase();
+  private parseSorter(sorter: string): OrderItem[] {
+    return sorter.split(',').map((sort) => {
+      const [field, order] = sort.split('_');
+      if (!field || !order) {
+        throw new Error(`Invalid sorter format: ${sort}`);
+      }
+
+      // 将字符串转换为 OrderItem 中的 'asc' 或 'desc'
+      let normalizedOrder: 'asc' | 'desc';
+      if (order === BaseQueryImpl.SORT_ASC) {
+        normalizedOrder = 'asc';
+      } else if (order === BaseQueryImpl.SORT_DESC) {
+        normalizedOrder = 'desc';
+      } else {
+        throw new Error(`Invalid order direction: ${order}`);
+      }
+
+      return { field, order: normalizedOrder };
+    });
   }
-
-  /**
-   * 验证排序参数
-   * @param sorterJson 排序参数对象
-   * @returns 是否有效
-   */
-  private validateSorterJson(sorterJson: Record<string, string>): boolean {
-    return Object.values(sorterJson).every(
-      (order) => order === BaseQueryImpl.SORT_ASC || order === BaseQueryImpl.SORT_DESC,
-    );
-  }
-}
-
-// 使用示例
-function exampleUsage() {
-  // 创建基本查询对象
-  const query1 = BaseQueryImpl.create(
-    1,
-    20,
-    JSON.stringify({
-      userName: 'ascend',
-      createTime: 'descend',
-    }),
-  );
-
-  // 构建分页对象
-  const page1 = query1.buildPage();
-  console.log(page1);
-
-  // 克隆并修改查询对象
-  const query2 = query1.clone({
-    current: 2,
-    pageSize: 15,
-  });
-
-  const page2 = query2.buildPage();
-  console.log(page2);
 }
 
 export interface PageResult<T> {
