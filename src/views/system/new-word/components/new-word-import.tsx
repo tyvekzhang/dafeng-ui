@@ -23,8 +23,8 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
   isNewWordImportLoading,
   handleNewWordImport,
 }) => {
-  const [newWordImportFileList, setNewWordImportFileList] = useState<RcFile[]>([]);
-  const [newWordCreateList, setNewWordCreateList] = useState<NewWordCreate[]>([]);
+  const [NewWordImportFileList, setNewWordImportFileList] = useState<RcFile[]>([]);
+  const [NewWordCreateList, setNewWordCreateList] = useState<NewWordCreate[]>([]);
   const [isUploadShow, setIsUploadShow] = useState<boolean>(true);
 
   const footerButtons = () => [
@@ -38,14 +38,14 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
 
   const handleNewWordImportConfirm = async () => {
     if (isUploadShow) {
-      if (newWordImportFileList.length === 0) {
+      if (NewWordImportFileList.length === 0) {
         message.warning('请先选择文件');
         return;
       }
       try {
-        const newWordPageList = await onNewWordImportFinish(newWordImportFileList);
+        const NewWordPageList = await onNewWordImportFinish(NewWordImportFileList);
         setIsUploadShow(false);
-        setNewWordCreateList(newWordPageList as NewWordCreate[]);
+        setNewWordCreateList(NewWordPageList as NewWordCreate[]);
       } finally {
         setNewWordImportFileList([]);
       }
@@ -55,7 +55,7 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
     }
   };
   // 表格列信息
-  const newWordPageColumns: ColumnsType<NewWordCreate> = [
+  const NewWordPageColumns: ColumnsType<NewWordCreate> = [
     {
       title: '序号',
       dataIndex: 'No',
@@ -148,7 +148,7 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
               multiple
               accept=".xlsx,.xls"
               onRemove={handleRemove}
-              fileList={newWordImportFileList}
+              fileList={NewWordImportFileList}
               customRequest={customUploadRequest as any}
             >
               <p className="sc-upload-drag-icon">
@@ -165,8 +165,8 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
       ) : (
         <div>
           <Table
-            columns={newWordPageColumns}
-            dataSource={newWordCreateList}
+            columns={NewWordPageColumns}
+            dataSource={NewWordCreateList}
             pagination={false}
             bordered={false}
             rowKey={'id'}

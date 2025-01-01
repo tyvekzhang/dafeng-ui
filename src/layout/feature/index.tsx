@@ -1,5 +1,5 @@
 import { Divider } from 'antd';
-import { FullScreen, GithubLink, UserDropdown } from './components';
+import { FullScreen, UserDropdown } from './components';
 import moduleStyle from './index.module.less';
 
 export default function LayoutFeature() {
@@ -11,7 +11,7 @@ export default function LayoutFeature() {
         {/* <AppSearch /> */}
         <FullScreen />
         {/* <AppLocalePicker /> */}
-        <GithubLink />
+        {/*<GithubLink />*/}
       </div>
       <Divider type="vertical" className={moduleStyle[`${prefixCls}-divider`]} />
       <UserDropdown />

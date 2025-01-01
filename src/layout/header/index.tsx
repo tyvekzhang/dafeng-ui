@@ -17,7 +17,7 @@ const LayoutHeader = () => {
     >
       <div
         className="flex-between-h"
-        style={{ padding: '0 12px', marginBottom: '2px', boxShadow: '0 3px 6px -4px rgba(0, 0, 0, 0.12)' }}
+        style={{ padding: '0px 24px 0px 12px', marginBottom: '2px', boxShadow: '0 3px 6px -4px rgba(0, 0, 0, 0.12)' }}
       >
         <div className="flex-center-v">
           <FoldTrigger />

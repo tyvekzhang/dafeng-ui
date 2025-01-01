@@ -1,5 +1,6 @@
 import ActionButtonComponent from '@/components/base/action-button';
 import { PaginatedTable } from '@/components/base/paginated-table';
+import TransitionWrapper from '@/components/base/transition-wrapper';
 import { message } from '@/components/GlobalToast';
 import {
   batchCreateNewWord,
@@ -22,7 +23,7 @@ import NewWordImportComponent from '@/views/system/new-word/components/new-word-
 import NewWordModifyComponent from '@/views/system/new-word/components/new-word-modify';
 import NewWordQueryComponent from '@/views/system/new-word/components/new-word-query';
 import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import { Dropdown, Form } from 'antd';
+import { Form } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import type { RcFile } from 'rc-upload/lib/interface';
 import React, { useEffect, useState } from 'react';
@@ -39,10 +40,14 @@ const NewWord: React.FC = () => {
   const showMore = false;
 
   // 查询模块
+  const [isNewWordQueryShow, setIsNewWordQueryShow] = useState<boolean>(true);
   const [newWordPageDataSource, setNewWordPageDataSource] = useState<NewWordPage[]>([]);
   const [newWordPageTotalCount, setNewWordPageTotalCount] = useState(0);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const onNewWordQueryShow = () => {
+    setIsNewWordQueryShow((prevState) => !prevState);
+  };
   useEffect(() => {
     const fetchData = async () => {
       const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
@@ -111,7 +116,6 @@ const NewWord: React.FC = () => {
       title: '单词',
       dataIndex: 'word',
       key: 'word',
-      render: (text) => (text ? text : '--'),
     },
     {
       title: '复习次数',
@@ -119,7 +123,7 @@ const NewWord: React.FC = () => {
       key: 'reviewCount',
     },
     {
-      title: '复习时间',
+      title: '下次复习时间',
       dataIndex: 'nextReviewDate',
       key: 'nextReviewDate',
     },
@@ -159,17 +163,28 @@ const NewWord: React.FC = () => {
           </button>
 
           {showMore && (
-            <Dropdown menu={{ items: [], onClick: () => message.info('功能开发中') }} trigger={['click']}>
-              <button type="button" className="flex items-center gap-1 text-blue-500 text-[10px] btn-operation">
-                <span>更多</span>
-                <MoreOutlined className="w-3 h-3" />
-              </button>
-            </Dropdown>
+            <button type="button" className="flex items-center gap-1 text-blue-500 text-[10px] btn-operation">
+              <span>更多</span>
+              <MoreOutlined className="w-3 h-3" />
+            </button>
           )}
         </div>
       ),
     },
   ];
+
+  const [visibleColumns, setVisibleColumns] = useState(newWordPageColumns.map((col) => col.key));
+  const onToggleColumnVisibility = (columnKey: number) => {
+    setVisibleColumns((prevVisibleColumns) => {
+      if (prevVisibleColumns.includes(columnKey)) {
+        return prevVisibleColumns.filter((key) => key !== columnKey);
+      } else {
+        return [...prevVisibleColumns, columnKey];
+      }
+    });
+  };
+  const filteredNewWordColumns = newWordPageColumns.filter((col) => visibleColumns.includes(col.key));
+
   const [newWordQueryForm] = Form.useForm();
   const handleNewWordQueryReset = () => {
     resetPagination();
@@ -234,7 +249,7 @@ const NewWord: React.FC = () => {
   };
   const handleNewWordBatchRemove = async () => {
     if (selectedRowKeys.length === 0) {
-      message.warning('请选择要删除的项目');
+      message.warning('请先选择要删除的项目');
       return;
     }
     try {
@@ -353,7 +368,7 @@ const NewWord: React.FC = () => {
   const [isExportLoading, setIsExportLoading] = useState<boolean>(false);
   const onNewWordExport = async () => {
     if (selectedRowKeys === null || selectedRowKeys.length === 0) {
-      message.warning('请选择要导出的项目');
+      message.warning('请先选择导出的项目');
       return;
     }
     try {
@@ -367,14 +382,15 @@ const NewWord: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 bg-white">
-      <div className="shadow-sm">
-        {/*查询模块*/}
-        <NewWordQueryComponent
-          onNewWordQueryFinish={onNewWordQueryFinish}
-          onNewWordQueryReset={handleNewWordQueryReset}
-          newWordQueryForm={newWordQueryForm}
-        />
-      </div>
+      <TransitionWrapper show={isNewWordQueryShow}>
+        <div className="shadow-sm">
+          <NewWordQueryComponent
+            onNewWordQueryFinish={onNewWordQueryFinish}
+            onNewWordQueryReset={handleNewWordQueryReset}
+            newWordQueryForm={newWordQueryForm}
+          />
+        </div>
+      </TransitionWrapper>
       <div>
         <ActionButtonComponent
           onCreate={onNewWordCreate}
@@ -383,19 +399,23 @@ const NewWord: React.FC = () => {
           onBatchModify={onNewWordBatchModify}
           onConfirmBatchRemove={handleNewWordBatchRemove}
           onConfirmBatchRemoveCancel={handleNewWordBatchRemoveCancel}
+          isQueryShow={isNewWordQueryShow}
+          onQueryShow={onNewWordQueryShow}
           isExportDisabled={selectedRowKeys.length === 0}
           isBatchModifyDisabled={selectedRowKeys.length === 0}
           isBatchRemoveDisabled={selectedRowKeys.length === 0}
           isBatchRemoveLoading={isBatchRemoveLoading}
           isExportLoading={isExportLoading}
+          rawColumns={newWordPageColumns as any[]}
+          visibleColumns={visibleColumns as any[]}
+          onToggleColumnVisibility={onToggleColumnVisibility}
           actionConfig={actionConfig}
           className="mb-2 mt-4"
         />
       </div>
       <div>
-        {/*分页展示模块*/}
         <PaginatedTable<NewWordPage>
-          columns={newWordPageColumns}
+          columns={filteredNewWordColumns}
           dataSource={newWordPageDataSource}
           total={newWordPageTotalCount}
           current={current}
@@ -408,7 +428,6 @@ const NewWord: React.FC = () => {
       </div>
       <div>
         <div>
-          {/*新增模块*/}
           <NewWordCreateComponent
             isNewWordCreateModalVisible={isNewWordCreateModalVisible}
             onNewWordCreateCancel={handleNewWordCreateCancel}
@@ -418,7 +437,6 @@ const NewWord: React.FC = () => {
           />
         </div>
         <div>
-          {/*详情模块*/}
           <NewWordDetailComponent
             isNewWordDetailDrawerVisible={isNewWordDetailDrawerVisible}
             onNewWordDetailClose={onNewWordDetailClose}
@@ -426,7 +444,6 @@ const NewWord: React.FC = () => {
           />
         </div>
         <div>
-          {/*单个更新模块*/}
           <NewWordModifyComponent
             isNewWordModifyModalVisible={isNewWordModifyModalVisible}
             onNewWordModifyCancel={handleNewWordModifyCancel}
@@ -436,7 +453,6 @@ const NewWord: React.FC = () => {
           />
         </div>
         <div>
-          {/*批量更新模块*/}
           <NewWordBatchModifyComponent
             isNewWordBatchModifyModalVisible={isNewWordBatchModifyModalVisible}
             onNewWordBatchModifyCancel={handleNewWordBatchModifyCancel}
@@ -446,7 +462,6 @@ const NewWord: React.FC = () => {
           />
         </div>
         <div>
-          {/*导入模块*/}
           <NewWordImportComponent
             isNewWordImportModalVisible={isNewWordImportModalVisible}
             isNewWordImportLoading={isNewWordImportLoading}

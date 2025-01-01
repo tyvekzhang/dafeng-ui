@@ -152,7 +152,7 @@ const TagsLayout: FC = () => {
         size="small"
         onClick={() => handleReload()}
       />
-      <Dropdown menu={{ items, onClick }} placement="bottomLeft">
+      <Dropdown menu={{ items, onClick }} placement="bottomLeft" className="mr-4">
         <Button
           className={classNames(styles['layout_tags__btn'], styles['layout_tags__btn-space'])}
           icon={<CloseOutlined />}
