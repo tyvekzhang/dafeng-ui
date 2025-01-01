@@ -12,7 +12,12 @@ export interface CodePreviewResponse {
   page: string;
   converter: string;
   index: string;
-  indexCreate: string;
+  iQuery: string;
+  iCreate: string;
+  iDetail: string;
+  iModify: string;
+  iBatchModify: string;
+  iImport: string;
   api: string;
   type: string;
 }

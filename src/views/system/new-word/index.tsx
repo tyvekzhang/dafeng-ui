@@ -8,22 +8,36 @@ import {
   createNewWord,
   exportNewWordPage,
   fetchNewWordByPage,
+  fetchNewWordDetail,
   importNewWord,
   modifyNewWord,
+  removeNewWord,
 } from '@/service/new-word';
 import { BaseQueryImpl } from '@/types';
-import { NewWordBatchModify, NewWordCreate, NewWordModify, NewWordPage } from '@/types/new-word';
+import { NewWordBatchModify, NewWordCreate, NewWordDetail, NewWordModify, NewWordPage } from '@/types/new-word';
 import NewWordBatchModifyComponent from '@/views/system/new-word/components/new-word-batch-modify';
 import NewWordCreateComponent from '@/views/system/new-word/components/new-word-create';
+import NewWordDetailComponent from '@/views/system/new-word/components/new-word-detail';
 import NewWordImportComponent from '@/views/system/new-word/components/new-word-import';
 import NewWordModifyComponent from '@/views/system/new-word/components/new-word-modify';
 import NewWordQueryComponent from '@/views/system/new-word/components/new-word-query';
-import { Form } from 'antd';
+import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
+import { Dropdown, Form } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import type { RcFile } from 'rc-upload/lib/interface';
 import React, { useEffect, useState } from 'react';
 
 const NewWord: React.FC = () => {
+  // 配置模块
+  const actionConfig = {
+    showCreate: true,
+    showImport: true,
+    showExport: true,
+    showModify: true,
+    showRemove: true,
+  };
+  const showMore = false;
+
   // 查询模块
   const [newWordPageDataSource, setNewWordPageDataSource] = useState<NewWordPage[]>([]);
   const [newWordPageTotalCount, setNewWordPageTotalCount] = useState(0);
@@ -48,6 +62,21 @@ const NewWord: React.FC = () => {
     setCurrent(1);
     setPageSize(10);
   };
+
+  // 详情模块
+  const [isNewWordDetailDrawerVisible, setIsNewWordDetailDrawerVisible] = useState<boolean>(false);
+  const [newWordDetail, setNewWordDetail] = useState<NewWordDetail | null>(null);
+  const onNewWordDetail = async (newWordPage: NewWordPage) => {
+    setIsNewWordDetailDrawerVisible(true);
+    const id = newWordPage.id;
+    await fetchNewWordDetail(id).then(setNewWordDetail);
+  };
+
+  const onNewWordDetailClose = async () => {
+    setNewWordDetail(null);
+    setIsNewWordDetailDrawerVisible(false);
+  };
+
   // 表格列信息
   const newWordPageColumns: ColumnsType<NewWordPage> = [
     {
@@ -99,6 +128,47 @@ const NewWord: React.FC = () => {
       dataIndex: 'tenantId',
       key: 'tenantId',
     },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="flex items-center gap-1 text-red-500 text-[12px] btn-operation"
+            onClick={() => onNewWordDetail(record)}
+          >
+            <EyeOutlined className="w-3 h-3" />
+            详情
+          </button>
+          <button
+            type="button"
+            className="flex items-center gap-1 text-blue-500 text-[12px] btn-operation"
+            onClick={() => onNewWordModify(record)}
+          >
+            <EditOutlined className="w-3 h-3" />
+            编辑
+          </button>
+          <button
+            type="button"
+            className="flex items-center gap-1 text-red-500 text-[12px] btn-remove"
+            onClick={() => handleNewWordDelete(record)}
+          >
+            <DeleteOutlined className="w-3 h-3" />
+            删除
+          </button>
+
+          {showMore && (
+            <Dropdown menu={{ items: [], onClick: () => message.info('功能开发中') }} trigger={['click']}>
+              <button type="button" className="flex items-center gap-1 text-blue-500 text-[10px] btn-operation">
+                <span>更多</span>
+                <MoreOutlined className="w-3 h-3" />
+              </button>
+            </Dropdown>
+          )}
+        </div>
+      ),
+    },
   ];
   const [newWordQueryForm] = Form.useForm();
   const handleNewWordQueryReset = () => {
@@ -144,7 +214,13 @@ const NewWord: React.FC = () => {
     }
   };
 
-  // 删除模块
+  // 单个删除模块
+  const handleNewWordDelete = async (newWordPage: NewWordPage) => {
+    await removeNewWord(newWordPage.id);
+    await onNewWordQueryFinish();
+  };
+
+  // 批量删除模块
   const [isBatchRemoveLoading, setIsBatchRemoveLoading] = useState<boolean>(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<NewWordPage[]>([]);
@@ -179,13 +255,17 @@ const NewWord: React.FC = () => {
   const [isNewWordModifyModalVisible, setIsNewWordModifyModalVisible] = useState<boolean>(false);
   const [isNewWordModifyLoading, setIsNewWordModifyLoading] = useState<boolean>(false);
   const [newWordModifyForm] = Form.useForm();
+  const onNewWordModify = (record: NewWordPage) => {
+    setIsNewWordModifyModalVisible(true);
+    newWordModifyForm.setFieldsValue({ ...record });
+  };
+
   const handleNewWordModifyCancel = () => {
     newWordModifyForm.resetFields();
     setIsNewWordModifyModalVisible(false);
   };
   const handleNewWordModifyFinish = async () => {
     const newWordModify = (await newWordModifyForm.validateFields()) as NewWordModify;
-    newWordModify.id = selectedRows[0].id;
     setIsNewWordModifyLoading(true);
     try {
       await modifyNewWord(newWordModify);
@@ -285,14 +365,6 @@ const NewWord: React.FC = () => {
     }
   };
 
-  // 操作配置模块
-  const actionConfig = {
-    showCreate: true,
-    showImport: true,
-    showExport: true,
-    showModify: true,
-    showRemove: true,
-  };
   return (
     <div className="container mx-auto px-4 bg-white">
       <div className="shadow-sm">
@@ -343,6 +415,14 @@ const NewWord: React.FC = () => {
             onNewWordCreateFinish={handleNewWordCreateFinish}
             isNewWordCreateLoading={isNewWordCreateLoading}
             newWordCreateForm={newWordCreateForm}
+          />
+        </div>
+        <div>
+          {/*详情模块*/}
+          <NewWordDetailComponent
+            isNewWordDetailDrawerVisible={isNewWordDetailDrawerVisible}
+            onNewWordDetailClose={onNewWordDetailClose}
+            newWordDetail={newWordDetail}
           />
         </div>
         <div>

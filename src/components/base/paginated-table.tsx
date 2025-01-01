@@ -50,6 +50,8 @@ export function PaginatedTable<T extends object>({
           current={current}
           pageSize={pageSize}
           total={total}
+          showTotal={(total) => `共${total}条`}
+          pageSizeOptions={[5, 10, 20, 50, 100]}
           showSizeChanger
           showQuickJumper
           onChange={handlePaginationChange}

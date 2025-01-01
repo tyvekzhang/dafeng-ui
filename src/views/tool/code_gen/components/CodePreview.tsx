@@ -65,7 +65,17 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
         { key: 'detail', label: 'detail.java', children: processCodeString(data.detail), language: 'java' },
         { key: 'page', label: 'page.java', children: processCodeString(data.page), language: 'java' },
         { key: 'index', label: 'index.tsx', children: processCodeString(data.index), language: 'js' },
-        { key: 'indexCreate', label: 'iCreate.tsx', children: processCodeString(data.indexCreate), language: 'js' },
+        { key: 'iQuery', label: 'iQuery.tsx', children: processCodeString(data.iQuery), language: 'js' },
+        { key: 'iCreate', label: 'iCreate.tsx', children: processCodeString(data.iCreate), language: 'js' },
+        { key: 'iDetail', label: 'iDetail.tsx', children: processCodeString(data.iDetail), language: 'js' },
+        { key: 'iModify', label: 'iModify.tsx', children: processCodeString(data.iModify), language: 'js' },
+        {
+          key: 'iBatchModify',
+          label: 'iBatchModify.tsx',
+          children: processCodeString(data.iBatchModify),
+          language: 'js',
+        },
+        { key: 'iImport', label: 'iImport.tsx', children: processCodeString(data.iImport), language: 'js' },
         { key: 'api', label: 'api.ts', children: processCodeString(data.api), language: 'js' },
         { key: 'type', label: 'type.ts', children: processCodeString(data.type), language: 'js' },
       ];
