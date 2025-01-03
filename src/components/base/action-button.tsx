@@ -102,7 +102,7 @@ const ActionButtonComponent: React.FC<ActionButtonsProps> = ({
         <Tooltip title={isQueryShow ? '隐藏搜索框' : '显示搜索框'}>
           <Button
             className="border-none"
-            icon={isQueryShow ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+            icon={isQueryShow ? <EyeInvisibleOutlined /> : <EyeOutlined />}
             onClick={onQueryShow}
           />
         </Tooltip>
@@ -117,7 +117,7 @@ const ActionButtonComponent: React.FC<ActionButtonsProps> = ({
           trigger="click"
           placement="bottomRight"
         >
-          <Tooltip title="隐藏列">
+          <Tooltip title="设置列">
             <Button className="border-none" icon={<SettingOutlined />} />
           </Tooltip>
         </Popover>

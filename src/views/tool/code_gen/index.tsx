@@ -6,7 +6,8 @@ import CodeEdit from './components/CodeEdit';
 import CodePreview from './components/CodePreview';
 import ImportTable from './components/ImportTable';
 
-import { codeList, downloadCode } from '@/service/code_gen';
+import { message } from '@/components/GlobalToast';
+import { codeList, deleteTable, downloadCode } from '@/service/code_gen';
 import { GenTableQueryResponse } from '@/types/code_gen';
 
 export default function CodeGen() {
@@ -22,16 +23,26 @@ export default function CodeGen() {
     setCurrentTableId(record.id);
   };
 
+  const handleDelete = async (record: GenTableQueryResponse) => {
+    await deleteTable(record.id);
+    message.success('删除成功');
+    fetchCodeList();
+  };
+
   const handleCodeGenerate = async (record: GenTableQueryResponse) => {
     setCurrentTableId(record.id);
     await downloadCode(record.id);
   };
 
   const [tableData, setTableData] = useState<GenTableQueryResponse[]>([]);
-  useEffect(() => {
+
+  const fetchCodeList = () => {
     codeList().then((res) => {
       setTableData(res.records);
     });
+  };
+  useEffect(() => {
+    fetchCodeList();
   }, [importOpen]);
 
   const columns: TableProps<GenTableQueryResponse>['columns'] = [
@@ -90,7 +101,7 @@ export default function CodeGen() {
             <Button type="link" size={'small'} icon={<EditOutlined />} onClick={() => setEditOpen(true)}></Button>
           </Tooltip>
           <Tooltip title="删除">
-            <Button size={'small'} type="link" icon={<DeleteOutlined />}></Button>
+            <Button size={'small'} type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record)}></Button>
           </Tooltip>
           <Tooltip title="同步">
             <Button size={'small'} type="link" icon={<SyncOutlined />}></Button>

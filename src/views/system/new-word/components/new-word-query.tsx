@@ -32,27 +32,25 @@ const NewWordQueryComponent: React.FC<NewWordQueryProps> = ({
       layout="horizontal"
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-0 gap-x-4 pt-4 px-2"
     >
-      <Form.Item name="userId" label="用户ID">
-        <Input placeholder="请输入用户ID" />
+      <Form.Item name="articleId" label="文章ID" rules={[{ required: false, message: '请输入' }]}>
+        <Input type="number" placeholder="请输入" />
       </Form.Item>
-      <Form.Item name="articleId" label="文章ID">
-        <Input placeholder="请输入文章ID" />
+      <Form.Item name="wordId" label="词库表ID" rules={[{ required: false, message: '请输入' }]}>
+        <Input type="number" placeholder="请输入" />
       </Form.Item>
-      <Form.Item name="wordId" label="词库表ID">
-        <Input placeholder="请输入词库表ID" />
+      <Form.Item name="word" label="单词" rules={[{ required: false, message: '请输入' }]}>
+        <Input placeholder="请输入" />
       </Form.Item>
-      <Form.Item name="word" label="单词">
-        <Input placeholder="请输入单词" />
+      <Form.Item name="reviewCount" label="复习次数" rules={[{ required: false, message: '请输入' }]}>
+        <Input type="number" placeholder="请输入" />
       </Form.Item>
-      <Form.Item name="reviewCount" label="复习次数">
-        <Input placeholder="请输入复习次数" />
+      <Form.Item name="nextReviewDate" label="复习时间" rules={[{ required: false, message: '请输入' }]}>
+        <DatePicker.RangePicker />
       </Form.Item>
-      <Form.Item name="nextReviewDate" label="复习时间">
-        <DatePicker className="w-full" />
+      <Form.Item name="createTime" label="创建时间" rules={[{ required: false, message: '请输入' }]}>
+        <DatePicker.RangePicker />
       </Form.Item>
-      <Form.Item name="tenantId" label="租户ID">
-        <Input placeholder="请输入租户ID" />
-      </Form.Item>
+      <div></div>
       <Form.Item className="flex justify-end">
         <Space className="inline-flex">
           <Button onClick={handleNewWordQueryReset}>重置</Button>

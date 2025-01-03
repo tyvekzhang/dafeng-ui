@@ -4,9 +4,6 @@ import httpClient from '@/utils/http-client';
 import { AxiosResponse } from 'axios';
 
 export const codePreview = (tableId: number) => {
-  if (tableId === null || tableId === undefined) {
-    tableId = 13076635717632;
-  }
   return httpClient.get<CodePreviewResponse>(`/gen-table/preview/${tableId}`);
 };
 
@@ -31,4 +28,8 @@ export const downloadCode = async (tableId: number, fileName: string = 'code.zip
     },
   );
   downloadBlob(response, fileName);
+};
+
+export const deleteTable = (tableId: number) => {
+  return httpClient.delete(`/gen-table/remove/${tableId}`);
 };

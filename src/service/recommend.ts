@@ -13,10 +13,10 @@ import httpClient from '@/utils/http-client';
  * 分页查询NewWord
  *
  * @param pageQuery 分页参数
- * @param newWordQuery 查询条件
+ * @param recommendQuery 查询条件
  * @returns 含NewWord详情列表的分页结果
  */
-export function fetchNewWordByPage(pageQuery?: PageQuery, newWordQuery?: Partial<NewWordQuery>) {
+export function fetchNewWordByPage(pageQuery?: PageQuery, recommendQuery?: Partial<NewWordQuery>) {
   let pageQueryParams: PageQuery;
   if (pageQuery === null || pageQuery === undefined) {
     pageQueryParams = BaseQueryImpl.create(1, 200);
@@ -25,7 +25,7 @@ export function fetchNewWordByPage(pageQuery?: PageQuery, newWordQuery?: Partial
   }
   const params = {
     ...pageQueryParams,
-    ...newWordQuery,
+    ...recommendQuery,
   };
   return httpClient.get<PageResult<NewWordPage>>('/new-word/page', params);
 }
@@ -60,11 +60,11 @@ export function exportNewWordPage(ids: number[]) {
 /**
  * 创建NewWord
  *
- * @param newWordCreate 创建数据
+ * @param recommendCreate 创建数据
  * @returns 创建的NewWord的ID
  */
-export function createNewWord(newWordCreate: NewWordCreate) {
-  return httpClient.post<number>('/new-word/create', newWordCreate);
+export function createNewWord(recommendCreate: NewWordCreate) {
+  return httpClient.post<number>('/new-word/create', recommendCreate);
 }
 
 /**
@@ -82,11 +82,11 @@ export function importNewWord(file: File) {
 /**
  * 批量创建NewWord
  *
- * @param newWordCreateList 创建数据列表
+ * @param recommendCreateList 创建数据列表
  * @returns 创建的NewWord的ID列表
  */
-export function batchCreateNewWord(newWordCreateList: NewWordCreate[]) {
-  return httpClient.post<number[]>('/new-word/batch-create', newWordCreateList);
+export function batchCreateNewWord(recommendCreateList: NewWordCreate[]) {
+  return httpClient.post<number[]>('/new-word/batch-create', recommendCreateList);
 }
 
 /**
@@ -110,17 +110,17 @@ export function batchRemoveNewWord(ids: number[]) {
 /**
  * 更新NewWord信息
  *
- * @param newWordModify 包含ID数组和修改的数据
+ * @param recommendModify 包含ID数组和修改的数据
  */
-export function modifyNewWord(newWordModify: NewWordModify) {
-  return httpClient.put<void>('/new-word/modify', newWordModify);
+export function modifyNewWord(recommendModify: NewWordModify) {
+  return httpClient.put<void>('/new-word/modify', recommendModify);
 }
 
 /**
  * 批量更新NewWord信息
  *
- * @param newWordBatchModify 包含ID数组和修改的数据
+ * @param recommendBatchModify 包含ID数组和修改的数据
  */
-export function batchModifyNewWord(newWordBatchModify: NewWordBatchModify) {
-  return httpClient.put<void>('/new-word/batch-modify', newWordBatchModify);
+export function batchModifyNewWord(recommendBatchModify: NewWordBatchModify) {
+  return httpClient.put<void>('/new-word/batch-modify', recommendBatchModify);
 }

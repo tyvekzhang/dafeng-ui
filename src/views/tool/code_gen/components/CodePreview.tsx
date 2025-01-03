@@ -27,13 +27,12 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
   }, []);
 
   useEffect(() => {
-    const fetchCodePreview = async () => {
+    const fetchCodePreview = () => {
       if (!tableId || !open) return;
-
-      const data = await codePreview(tableId);
-      setCodePreviewData(data);
+      codePreview(tableId).then((resp) => {
+        setCodePreviewData(resp);
+      });
     };
-
     fetchCodePreview();
   }, [tableId, open]);
 
@@ -84,7 +83,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
   );
   const items = useMemo(() => buildItems(codePreviewData), [buildItems, codePreviewData]);
 
-  const copyToClipboard = useCallback((text: string) => {
+  const copyToClipboard = useCallback(async (text: string) => {
     navigator.clipboard
       .writeText(text)
       .then(() => {
@@ -129,8 +128,9 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
       title="代码预览"
       open={open}
       onCancel={onClose}
-      width={1200}
+      width={'79%'}
       footer={null}
+      loading={!codePreviewData}
       closeIcon={<CloseOutlined />}
       destroyOnClose
     >

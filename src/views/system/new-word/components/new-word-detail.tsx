@@ -33,13 +33,11 @@ const NewWordDetailComponent: React.FC<NewWordDetailDrawerProps> = ({
     >
       {newWordDetail && (
         <Descriptions column={1} bordered>
-          <Descriptions.Item label="用户ID">{newWordDetail.userId}</Descriptions.Item>
           <Descriptions.Item label="文章ID">{newWordDetail.articleId}</Descriptions.Item>
           <Descriptions.Item label="词库表ID">{newWordDetail.wordId}</Descriptions.Item>
           <Descriptions.Item label="单词">{newWordDetail.word}</Descriptions.Item>
           <Descriptions.Item label="复习次数">{newWordDetail.reviewCount}</Descriptions.Item>
           <Descriptions.Item label="复习时间">{newWordDetail.nextReviewDate}</Descriptions.Item>
-          <Descriptions.Item label="租户ID">{newWordDetail.tenantId}</Descriptions.Item>
         </Descriptions>
       )}
     </Drawer>
