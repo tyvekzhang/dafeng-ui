@@ -1,7 +1,15 @@
 import { downloadBlob } from '@/service/util';
-import { CodePreviewResponse, TableDataResponse } from '@/types/code_gen';
+import { CodePreviewResponse, GenTableDetail, TableDataResponse } from '@/types/code_gen';
 import httpClient from '@/utils/http-client';
 import { AxiosResponse } from 'axios';
+
+export const codeModify = (genTableDetail: GenTableDetail) => {
+  return httpClient.put<void>(`/gen-table/modify`, genTableDetail);
+};
+
+export const getTableDetail = (tableId: number) => {
+  return httpClient.get<GenTableDetail>(`/gen-table/detail/${tableId}`);
+};
 
 export const codePreview = (tableId: number) => {
   return httpClient.get<CodePreviewResponse>(`/gen-table/preview/${tableId}`);
@@ -28,6 +36,10 @@ export const downloadCode = async (tableId: number, fileName: string = 'code.zip
     },
   );
   downloadBlob(response, fileName);
+};
+
+export const syncTable = (tableId: number) => {
+  return httpClient.post(`/gen-table/sync/${tableId}`);
 };
 
 export const deleteTable = (tableId: number) => {

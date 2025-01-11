@@ -78,3 +78,9 @@ export interface SQLSchema {
   allow_connection?: boolean; // 是否允许连接
   is_template?: boolean; // 是否为模板数据库
 }
+
+export interface GenTableExecute {
+  database_id: number;
+  sql_statement: string
+}
+

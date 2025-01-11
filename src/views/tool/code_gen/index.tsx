@@ -2,12 +2,12 @@ import { CodeOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SyncOutlined }
 import type { TableProps } from 'antd';
 import { Button, Card, Form, Input, Popconfirm, Space, Table, Tooltip } from 'antd';
 import { useEffect, useState } from 'react';
-import CodeEdit from './components/CodeEdit';
+import CodeModify from './components/CodeModify';
 import CodePreview from './components/CodePreview';
 import ImportTable from './components/ImportTable';
 
 import { message } from '@/components/GlobalToast';
-import { codeList, deleteTable, downloadCode } from '@/service/code_gen';
+import { codeList, deleteTable, downloadCode, syncTable } from '@/service/code_gen';
 import { GenTableQueryResponse } from '@/types/code_gen';
 
 export default function CodeGen() {
@@ -23,10 +23,20 @@ export default function CodeGen() {
     setCurrentTableId(record.id);
   };
 
+  const onCodeModify = (record: GenTableQueryResponse) => {
+    setEditOpen(true)
+    setCurrentTableId(record.id);
+  };
+
   const handleDelete = async (record: GenTableQueryResponse) => {
     await deleteTable(record.id);
     message.success('删除成功');
     fetchCodeList();
+  };
+
+  const handleSync = async (record: GenTableQueryResponse) => {
+    await syncTable(record.id);
+    message.success('同步成功');
   };
 
   const handleCodeGenerate = async (record: GenTableQueryResponse) => {
@@ -98,13 +108,13 @@ export default function CodeGen() {
             <Button type="link" size={'small'} icon={<EyeOutlined />} onClick={() => handlePreview(record)}></Button>
           </Tooltip>
           <Tooltip title="编辑">
-            <Button type="link" size={'small'} icon={<EditOutlined />} onClick={() => setEditOpen(true)}></Button>
+            <Button type="link" size={'small'} icon={<EditOutlined />} onClick={() => onCodeModify(record)}></Button>
           </Tooltip>
           <Tooltip title="删除">
             <Button size={'small'} type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record)}></Button>
           </Tooltip>
           <Tooltip title="同步">
-            <Button size={'small'} type="link" icon={<SyncOutlined />}></Button>
+            <Button size={'small'} type="link" icon={<SyncOutlined />} onClick={() => handleSync(record)}></Button>
           </Tooltip>
           <Tooltip title="生成代码">
             <Button
@@ -188,7 +198,7 @@ export default function CodeGen() {
       </Card>
 
       <CodePreview open={previewOpen} onClose={() => setPreviewOpen(false)} tableId={currentTableId} />
-      <CodeEdit open={editOpen} onClose={() => setEditOpen(false)} />
+      <CodeModify open={editOpen} onClose={() => setEditOpen(false)} tableId={currentTableId}/>
       <ImportTable open={importOpen} onClose={() => setImportOpen(false)} />
     </>
   );

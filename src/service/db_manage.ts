@@ -3,7 +3,7 @@ import {
   ConnectionCreate,
   ConnectionQueryResponse,
   Database,
-  DatabaseConnection,
+  DatabaseConnection, GenTableExecute,
   SQLSchema,
   TableAdd,
   TableColumn,
@@ -13,6 +13,13 @@ import {
 } from '@/types/db_manage';
 import httpClient from '@/utils/http-client';
 
+export const executeSQL = (genTableExecute: GenTableExecute) => {
+  return httpClient.post<any>('/gen-table/execute', genTableExecute);
+};
+
+export const fetchDynamicColumns = (id: number) => {
+  return httpClient.get(`/field/antd/${id}`);
+}
 export const fetchConnections = async (): Promise<DatabaseConnection[]> => {
   const params = {
     page: 1,
@@ -30,7 +37,7 @@ export const fetchConnection = async (connectionId: number) => {
 export const fetchDatabases = async (connectionId: number): Promise<Database[]> => {
   const params = {
     page: 1,
-    size: 1000,
+    size: 200,
     connection_id: connectionId,
   };
   return httpClient.get<PageData<Database>>('/database/databases', params).then((res) => {
@@ -51,6 +58,16 @@ export const fetchTables = async (databaseId: number): Promise<TableInfo[]> => {
 
 export const listTables = async (params: Record<string, string>) => {
   return httpClient.get<PageData<TableInfo>>('/table/tables', params);
+};
+
+export const fetchDynamicTableData = async (tableId: number) => {
+  const params = {
+    page: 1,
+    size: 10,
+    table_id: tableId,
+  };
+
+  return httpClient.get<PageData<any>>(`/gen-table/data/${params.table_id}/${params.page}/${params.size}`)
 };
 
 export const fetchTableStructure = async (tableId: number): Promise<TableColumn[]> => {

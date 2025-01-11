@@ -2,10 +2,12 @@ import EditableCell from '@/components/EditableCell';
 import { message } from '@/components/GlobalToast';
 import {
   createConnection,
-  createDatabase,
+  createDatabase, executeSQL,
   fetchConnection,
   fetchConnections,
   fetchDatabases,
+  fetchDynamicColumns,
+  fetchDynamicTableData,
   fetchIndexStructure,
   fetchTables,
   fetchTableStructure,
@@ -15,7 +17,7 @@ import {
 import {
   ConnectionCreate,
   Database,
-  DatabaseConnection,
+  DatabaseConnection, GenTableExecute,
   SQLSchema,
   TableAdd,
   TableColumn,
@@ -46,6 +48,7 @@ import {
   Popconfirm,
   Select,
   Space,
+  Splitter,
   Switch,
   Table,
   type TableProps,
@@ -54,6 +57,7 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import useStates from './style';
+import TextArea from 'antd/es/input/TextArea';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
@@ -73,13 +77,29 @@ const databaseFormLayout = {
   wrapperCol: { span: 12 },
 };
 
+const executeSQLFormLayout = {
+  labelCol: { span: 2 },
+  wrapperCol: { span: 12 },
+};
+
 const DatabaseExplorer: React.FC = () => {
   const { styles } = useStates();
   const [databaseType, setDatabaseType] = useState<string | null>('');
+  const [executeSQLConnections, setExecuteSQLConnections] = useState<DatabaseConnection[]>([]);
   const [connections, setConnections] = useState<DatabaseConnection[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [fieldType, setFieldType] = useState<string>('varchar');
   const [activateKey, setActivateKey] = useState<string>('1');
+  const [outerActiveKey, setOuterActiveKey] = useState('1');
+  const [innerActiveKey, setInnerActiveKey] = useState('1');
+  const [isEditable, setIsEditable] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const handleOuterTabChange = (key: string) => {
+    setOuterActiveKey(key);
+  };
+
+  const handleInnerTabChange = (key: string) => {
+    setInnerActiveKey(key);
+  };
 
   const handleTabChange = (key: string) => {
     setActivateKey(key);
@@ -96,13 +116,13 @@ const DatabaseExplorer: React.FC = () => {
       prevState.map((item, i) => (i === index ? { ...item, [field]: newValue } : item)),
     );
   };
+  const [executeSQLDatabases, setExecuteSQLDatabases] = useState<Database[]>([]);
   const [databases, setDatabases] = useState<Database[]>([]);
   const [selectedDatabase, setSelectedDatabase] = useState<Database | null>(null);
   const [tables, setTables] = useState<TableInfo[]>([]);
   const [selectedTable, setSelectedTable] = useState<TableInfo | null>(null);
   const [fieldDataSource, setFieldDataSource] = useState<TableColumn[]>([]);
   const [indexDataSource, setIndexDataSource] = useState<TableIndex[]>([]);
-  const [isEditable, setIsEditable] = useState(false);
   const [isClearAble, setIsClearAble] = useState(false);
   const [tableDatabases, setTableDatabases] = useState<Database[]>([]);
 
@@ -248,7 +268,11 @@ const DatabaseExplorer: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchConnections().then(setConnections);
+    fetchConnections().then(resp => {
+      setConnections(resp);
+      setExecuteSQLConnections(resp)
+      setDynamicDatasource(resp as any);
+    });
   }, []);
 
   useEffect(() => {
@@ -303,8 +327,15 @@ const DatabaseExplorer: React.FC = () => {
   const handleTableClick = async (tableInfo: TableInfo) => {
     setIsEditable(false);
     setSelectedTable(tableInfo);
-    fetchTableStructure(tableInfo.id).then(setFieldDataSource);
-    fetchIndexStructure(tableInfo.id).then(setIndexDataSource);
+    if (outerActiveKey === '1') {
+      await fetchDynamicColumns(tableInfo.id).then(setDynamicColumns);
+      fetchDynamicTableData(tableInfo.id).then(resp => {
+        setDynamicDatasource(resp.records as any);
+      });
+    } else {
+      fetchTableStructure(tableInfo.id).then(setFieldDataSource);
+      fetchIndexStructure(tableInfo.id).then(setIndexDataSource);
+    }
   };
 
   const handleAddField = () => {
@@ -758,12 +789,20 @@ const DatabaseExplorer: React.FC = () => {
   );
 
   const [databaseForm] = Form.useForm();
+  const [executeSQLForm] = Form.useForm();
   const [databaseCreateType, setDatabaseCreateType] = useState('');
+
+  const handleExecuteSQLDataSourceChange = async () => {
+    const connection_id =executeSQLForm.getFieldValue('connection_id');
+    const response = await fetchDatabases(connection_id);
+    setExecuteSQLDatabases(response)
+  };
 
   const handleDataSourceChange = async (value: number) => {
     const response = await fetchConnection(value);
     setDatabaseCreateType(response?.database_type);
   };
+
 
   const handleDbFormSubmit = async (values: SQLSchema) => {
     await createDatabase(values);
@@ -886,174 +925,323 @@ const DatabaseExplorer: React.FC = () => {
     }
   };
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        <div className={styles.leftContent}>
-          <div style={{ padding: '16px 24px 0' }}>
-            <Input prefix={<SearchOutlined />} placeholder="Search..." />
-          </div>
-          <Button
-            className={`btn-add`}
-            style={{ width: '25%', marginLeft: '24px', marginTop: '8px' }}
-            onClick={showModal}
-          >
-            新增
-          </Button>
-          <Menu
-            mode="inline"
-            triggerSubMenuAction="click"
-            style={{ height: 'calc(100vh - 196px)', borderRight: 0, overflow: 'scroll' }}
-          >
-            {connections.map((connection) => (
-              <SubMenu
-                key={connection.id}
-                icon={<LinkOutlined />}
-                title={connection.connection_name}
-                onTitleClick={() => handleConnectionClick(connection)}
-              >
-                {databases?.map((database) => (
-                  <SubMenu
-                    key={database.id}
-                    icon={<DatabaseOutlined />}
-                    title={database.database_name}
-                    onTitleClick={() => handleDatabaseClick(database)}
-                  >
-                    {tables?.map((table) => (
-                      <Menu.Item key={table.id} icon={<TableOutlined />} onClick={() => handleTableClick(table)}>
-                        {table.name}
-                      </Menu.Item>
-                    ))}
-                  </SubMenu>
-                ))}
-              </SubMenu>
-            ))}
-          </Menu>
-        </div>
-        <div className={styles.rightContent}>
-          <Tabs activeKey={activateKey} onChange={handleTabChange} type="card">
-            <TabPane tab="表结构" key="1">
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 12 }}>
-                <Space style={{ padding: '8px 0', marginBottom: '16px' }}>
-                  <Button className={`btn-add`} onClick={handleAddField} disabled={!isEditable}>
-                    新增
-                  </Button>
-                  <Button type="primary" onClick={handleSaveField} disabled={!isEditable}>
-                    保存
-                  </Button>
-                  <Popconfirm title="确定要清空所有字段吗？" onConfirm={handleClearFields} okText="是" cancelText="否">
-                    <Button icon={<ClearOutlined />} disabled={!isClearAble}>
-                      清空
-                    </Button>
-                  </Popconfirm>
-                </Space>
-                <Space>
-                  <Input
-                    allowClear
-                    prefix={<SearchOutlined />}
-                    placeholder="搜索字段或备注..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ width: 200 }}
-                  />
-                  <Switch
-                    checkedChildren="编辑"
-                    unCheckedChildren="预览"
-                    checked={isEditable}
-                    onChange={handleEditableChange}
-                  />
-                </Space>
-              </div>
-              <Form form={fieldForm} component={false}>
-                <Table<TableColumn>
-                  components={{
-                    body: { cell: EditableCell },
-                  }}
-                  columns={mergedColumns}
-                  dataSource={filteredFieldDataSource}
-                  rowKey="name"
-                  pagination={false}
-                />
-              </Form>
-            </TabPane>
+  const [dynamicColumns, setDynamicColumns] = useState([
+    {
+      'title': '主键',
+      'dataIndex': 'id',
+      'key': 'id',
+      'width': '10%',
+      'ellipsis': false,
+      'sorter': false,
+      'hidden': true,
+    },
+    {
+      'title': '连接名称',
+      'dataIndex': 'connection_name',
+      'key': 'connection_name',
+      'width': '10%',
+      'ellipsis': true,
+      'sorter': false,
+      'hidden': false,
+    },
+    {
+      'title': '数据库',
+      'dataIndex': 'database_type',
+      'key': 'database_type',
+      'width': '10%',
+      render: (text: any) => (text ? text : '-'),
+      'ellipsis': true,
+      'sorter': false,
+      'hidden': false,
+    },
+    {
+      'title': '连接库',
+      'dataIndex': 'connection_database',
+      'key': 'connection_database',
+      'width': '10%',
+      render: (text: any) => (text ? text : '-'),
+      'ellipsis': true,
+      'sorter': false,
+      'hidden': false,
+    },
+    {
+      'title': 'host',
+      'dataIndex': 'host',
+      'key': 'host',
+      'width': '10%',
+      render: (text: any) => (text ? text : '-'),
+      'ellipsis': true,
+      'sorter': false,
+      'hidden': false,
+    },
+    {
+      'title': '创建时间',
+      'dataIndex': 'create_time',
+      'key': 'create_time',
+      'width': '10%',
+      render: (text: any) => (text ? text : '-'),
+      'ellipsis': false,
+      'sorter': false,
+      'hidden': false,
+    },
+  ]);
+  const [dynamicDatasource, setDynamicDatasource] = useState();
 
-            <TabPane tab="索引" key="2">
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 12 }}>
-                <Space style={{ padding: '8px 0', marginBottom: '16px' }}>
-                  <Button className={`btn-add`} onClick={handleAddIndex} disabled={!isEditable}>
-                    新增
-                  </Button>
-                  <Button type="primary" onClick={handleSaveIndex} disabled={!isEditable}>
-                    保存
-                  </Button>
-                  <Popconfirm title="确定要清空所有索引吗？" onConfirm={handleClearIndexes} okText="是" cancelText="否">
-                    <Button icon={<ClearOutlined />} disabled={!isClearAble}>
-                      清空
-                    </Button>
-                  </Popconfirm>
-                </Space>
-                <Switch
-                  checkedChildren="编辑"
-                  unCheckedChildren="预览"
-                  checked={isEditable}
-                  onChange={handleEditableChange}
-                  style={{ marginTop: '16px' }}
+  const [isExecuteSQLModalVisible, setIsExecuteSQLModalVisible] = useState(false);
+  const [isExecuteSQLModalLoading, setIsExecuteSQLModalLoading] = useState(false);
+
+  const showExecuteSQLModal = async () => {
+    setIsExecuteSQLModalVisible(true)
+  }
+  const handleExecuteSQLCancel = async () => {
+    setIsExecuteSQLModalVisible(false)
+  }
+  const handleExecuteSQLOk = async () => {
+    const genTableExecute = await executeSQLForm.validateFields() as GenTableExecute
+    try {
+      setIsExecuteSQLModalLoading(true)
+      const resp = await executeSQL(genTableExecute);
+      message.success('SQL执行成功');
+      setDynamicColumns(resp["fields"])
+      setDynamicDatasource(resp["records"])
+      setIsExecuteSQLModalVisible(false)
+    } finally {
+      setIsExecuteSQLModalLoading(false)
+    }
+  }
+  const [sqlQuery, setSqlQuery] = useState('');
+  const handleSqlQueryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setSqlQuery(e.target.value);
+  };
+  return (
+    <div className="container">
+      <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        <Splitter.Panel defaultSize="20%" min="15%" max="30%">
+          <div className={styles.leftContent}>
+            <div style={{ padding: '16px 24px 0' }}>
+              <Input prefix={<SearchOutlined />} placeholder="Search..." />
+            </div>
+            <Button
+              className={`btn-add`}
+              style={{ width: '25%', marginLeft: '24px', marginTop: '8px' }}
+              onClick={showModal}
+            >
+              新增
+            </Button>
+            <Menu
+              mode="inline"
+              triggerSubMenuAction="click"
+              style={{ height: 'calc(100vh - 196px)', borderRight: 0, overflow: 'scroll' }}
+            >
+              {connections.map((connection) => (
+                <SubMenu
+                  key={connection.id}
+                  icon={<LinkOutlined />}
+                  title={connection.connection_name}
+                  onTitleClick={() => handleConnectionClick(connection)}
+                >
+                  {databases?.map((database) => (
+                    <SubMenu
+                      key={database.id}
+                      icon={<DatabaseOutlined />}
+                      title={database.database_name}
+                      onTitleClick={() => handleDatabaseClick(database)}
+                    >
+                      {tables?.map((table) => (
+                        <Menu.Item key={table.id} icon={<TableOutlined />} onClick={() => handleTableClick(table)}>
+                          {table.name}
+                        </Menu.Item>
+                      ))}
+                    </SubMenu>
+                  ))}
+                </SubMenu>
+              ))}
+            </Menu>
+          </div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div className={styles.rightContent}>
+            <Tabs activeKey={outerActiveKey} onChange={handleOuterTabChange} type="card">
+              <TabPane tab="查看表" key="1">
+                <Button onClick={showExecuteSQLModal}>执行SQL</Button>
+                <Modal
+                  title="执行SQL"
+                  open={isExecuteSQLModalVisible}
+                  loading={isExecuteSQLModalLoading}
+                  width={'60%'}
+                  footer={[
+                    <Button key="back" onClick={handleExecuteSQLCancel}>
+                      取消
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleExecuteSQLOk}>
+                      执行
+                    </Button>,
+                  ]}
+                >
+                  <Form {...executeSQLFormLayout} form={executeSQLForm} onFinish={handleExecuteSQLOk}>
+                    <Form.Item name="connection_id" label="数据源" rules={[{ required: true, message: '请选择数据源！' }]}>
+                      <Select onChange={handleExecuteSQLDataSourceChange} placeholder="请选择数据源">
+                        {executeSQLConnections.map((source) => (
+                          <Select.Option key={source.id} value={source.id}>
+                            {source.connection_name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item name="database_id" label="数据库" rules={[{ required: true, message: '请选择数据源！' }]}>
+                      <Select placeholder="请选择数据源">
+                        {executeSQLDatabases.map((source) => (
+                          <Select.Option key={source.id} value={source.id}>
+                            {source.database_name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item name="sql_statement" label="SQL语句" rules={[{ required: true, message: '请输入SQL语句' }]}>
+                      <TextArea
+                        rows={4}
+                        placeholder="输入SQL查询"
+                        value={sqlQuery}
+                        onChange={handleSqlQueryChange}
+                      />
+                    </Form.Item>
+                  </Form>
+                </Modal>
+                <Table
+                  columns={dynamicColumns}
+                  dataSource={dynamicDatasource}
+                  scroll={{ x: true }}
                 />
-              </div>
-              <Form form={indexForm} component={false}>
-                <Table<TableIndex>
-                  components={{
-                    body: { cell: EditableCell },
-                  }}
-                  columns={mergedIndexColumns}
-                  dataSource={indexDataSource}
-                  rowKey="name"
-                  pagination={false}
-                />
-              </Form>
-            </TabPane>
-            <TabPane tab="表信息" key="3">
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 12 }}>
-                <Space style={{ padding: '8px 0', marginBottom: '16px' }}>
-                  <Button type="primary" onClick={handleSave} disabled={!isEditable}>
-                    完成
-                  </Button>
-                  <Popconfirm
-                    title="确定要清空所有表数据吗？"
-                    onConfirm={handleClearTableMetadata}
-                    okText="是"
-                    cancelText="否"
-                  >
-                    <Button icon={<ClearOutlined />} disabled={!isClearAble}>
-                      清空
-                    </Button>
-                  </Popconfirm>
-                </Space>
-                <Switch
-                  checkedChildren="编辑"
-                  unCheckedChildren="预览"
-                  checked={isEditable}
-                  onChange={handleEditableChange}
-                  style={{ marginTop: '16px' }}
-                />
-              </div>
-              <Form {...tableFormPropItemLayout}>
-                <Form.Item label="数据库">
-                  <Input placeholder={'请选择数据库'} value={selectedDatabase?.database_name} disabled={true} />
-                </Form.Item>
-              </Form>
-              <Form form={tableMetadataForm} {...tableFormPropItemLayout}>
-                <Form.Item name="table_name" label="名称" rules={[{ required: true, message: '必填项' }]}>
-                  <Input disabled={!isEditable} />
-                </Form.Item>
-                <Form.Item name="comment" label="备注">
-                  <Input disabled={!isEditable} />
-                </Form.Item>
-              </Form>
-            </TabPane>
-          </Tabs>
-        </div>
-      </div>
+              </TabPane>
+              <TabPane tab="设计表" key="2">
+                <Tabs activeKey={innerActiveKey} onChange={handleInnerTabChange} type="card">
+                  <TabPane tab="表结构" key="1">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 12 }}>
+                      <Space style={{ padding: '8px 0', marginBottom: '16px' }}>
+                        <Button className={`btn-add`} onClick={handleAddField} disabled={!isEditable}>
+                          新增
+                        </Button>
+                        <Button type="primary" onClick={handleSaveField} disabled={!isEditable}>
+                          保存
+                        </Button>
+                        <Popconfirm title="确定要清空所有字段吗？" onConfirm={handleClearFields} okText="是"
+                                    cancelText="否">
+                          <Button icon={<ClearOutlined />} disabled={!isClearAble}>
+                            清空
+                          </Button>
+                        </Popconfirm>
+                      </Space>
+                      <Space>
+                        <Input
+                          allowClear
+                          prefix={<SearchOutlined />}
+                          placeholder="搜索字段或备注..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          style={{ width: 200 }}
+                        />
+                        <Switch
+                          checkedChildren="编辑"
+                          unCheckedChildren="预览"
+                          checked={isEditable}
+                          onChange={handleEditableChange}
+                        />
+                      </Space>
+                    </div>
+                    <Form form={fieldForm} component={false}>
+                      <Table<TableColumn>
+                        components={{
+                          body: { cell: EditableCell },
+                        }}
+                        columns={mergedColumns}
+                        dataSource={filteredFieldDataSource}
+                        rowKey="name"
+                        pagination={false}
+                      />
+                    </Form>
+                  </TabPane>
+
+                  <TabPane tab="索引" key="2">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 12 }}>
+                      <Space style={{ padding: '8px 0', marginBottom: '16px' }}>
+                        <Button className={`btn-add`} onClick={handleAddIndex} disabled={!isEditable}>
+                          新增
+                        </Button>
+                        <Button type="primary" onClick={handleSaveIndex} disabled={!isEditable}>
+                          保存
+                        </Button>
+                        <Popconfirm title="确定要清空所有索引吗？" onConfirm={handleClearIndexes} okText="是"
+                                    cancelText="否">
+                          <Button icon={<ClearOutlined />} disabled={!isClearAble}>
+                            清空
+                          </Button>
+                        </Popconfirm>
+                      </Space>
+                      <Switch
+                        checkedChildren="编辑"
+                        unCheckedChildren="预览"
+                        checked={isEditable}
+                        onChange={handleEditableChange}
+                        style={{ marginTop: '16px' }}
+                      />
+                    </div>
+                    <Form form={indexForm} component={false}>
+                      <Table<TableIndex>
+                        components={{
+                          body: { cell: EditableCell },
+                        }}
+                        columns={mergedIndexColumns}
+                        dataSource={indexDataSource}
+                        rowKey="name"
+                        pagination={false}
+                      />
+                    </Form>
+                  </TabPane>
+                  <TabPane tab="表信息" key="3">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 12 }}>
+                      <Space style={{ padding: '8px 0', marginBottom: '16px' }}>
+                        <Button type="primary" onClick={handleSave} disabled={!isEditable}>
+                          完成
+                        </Button>
+                        <Popconfirm
+                          title="确定要清空所有表数据吗？"
+                          onConfirm={handleClearTableMetadata}
+                          okText="是"
+                          cancelText="否"
+                        >
+                          <Button icon={<ClearOutlined />} disabled={!isClearAble}>
+                            清空
+                          </Button>
+                        </Popconfirm>
+                      </Space>
+                      <Switch
+                        checkedChildren="编辑"
+                        unCheckedChildren="预览"
+                        checked={isEditable}
+                        onChange={handleEditableChange}
+                        style={{ marginTop: '16px' }}
+                      />
+                    </div>
+                    <Form {...tableFormPropItemLayout}>
+                      <Form.Item label="数据库">
+                        <Input placeholder={'请选择数据库'} value={selectedDatabase?.database_name} disabled={true} />
+                      </Form.Item>
+                    </Form>
+                    <Form form={tableMetadataForm} {...tableFormPropItemLayout}>
+                      <Form.Item name="table_name" label="名称" rules={[{ required: true, message: '必填项' }]}>
+                        <Input disabled={!isEditable} />
+                      </Form.Item>
+                      <Form.Item name="comment" label="备注">
+                        <Input disabled={!isEditable} />
+                      </Form.Item>
+                    </Form>
+                  </TabPane>
+                </Tabs>
+              </TabPane>
+            </Tabs>
+          </div>
+        </Splitter.Panel>
+      </Splitter>
 
       <Modal title="新增" open={isModalVisible} onCancel={handleCancel} footer={null} width={760}>
         <Tabs defaultActiveKey="3" type="card">
