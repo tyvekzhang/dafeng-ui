@@ -198,7 +198,7 @@ export default function CodeGen() {
       </Card>
 
       <CodePreview open={previewOpen} onClose={() => setPreviewOpen(false)} tableId={currentTableId} />
-      <CodeModify open={editOpen} onClose={() => setEditOpen(false)} tableId={currentTableId}/>
+      {editOpen && <CodeModify open={editOpen} onClose={() => setEditOpen(false)} tableId={currentTableId}/>}
       <ImportTable open={importOpen} onClose={() => setImportOpen(false)} />
     </>
   );

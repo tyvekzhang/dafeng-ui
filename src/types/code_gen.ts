@@ -1,4 +1,5 @@
 export interface CodePreviewResponse {
+  backend: string;
   entity: string;
   mapper: string;
   service: string;
@@ -20,6 +21,7 @@ export interface CodePreviewResponse {
   iImport: string;
   api: string;
   type: string;
+  entityPy: string;
 }
 
 export interface GenTableQueryResponse {

@@ -58,9 +58,11 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
     }
   };
 
-  const handleSearch = (values: any) => {
+  const [backend, setBackend] = useState<string>("java")
+  const handleSearch = async (values: any) => {
     setCurrentPage(1);
-    fetchTables(values);
+    setBackend(values.backend)
+    await fetchTables(form.getFieldsValue());
   };
 
   const handleImport = async () => {
@@ -68,13 +70,12 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
       message.warning('请选择要导入的表');
       return;
     }
-
     try {
       setLoading(true);
       const selectedTables = tableData.filter((item) => selectedRowKeys.includes(item.id));
       const tableIds = selectedTables.map((item) => item.id);
       const database_id = selectedTables[0].database_id;
-      await importTables(database_id, tableIds);
+      await importTables(database_id, tableIds, backend);
       handleReset();
     } finally {
       setLoading(false);
@@ -110,6 +111,11 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
     },
   ];
 
+  const importFormLayout = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 18 },
+  };
+
   return (
     <Modal
       title="导入表"
@@ -126,9 +132,9 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
         </Button>,
       ]}
     >
-      <Form form={form} layout="inline" onFinish={handleSearch} style={{ marginBottom: 16 }}>
+      <Form {...importFormLayout} form={form} layout="inline" initialValues={{ backend: "java" }} onFinish={handleSearch} className={"grid grid-cols-3 gap-y-4"}>
         <Form.Item name="dataSource" label="数据源" rules={[{ required: true }]}>
-          <Select style={{ width: 128 }} placeholder="请选择数据源" onChange={handleConnectionChange}>
+          <Select  placeholder="请选择数据源" onChange={handleConnectionChange}>
             {databaseConnections.map((config) => (
               <Option key={config.id} value={config.id}>
                 {config.connection_name}
@@ -137,12 +143,18 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
           </Select>
         </Form.Item>
         <Form.Item name="database_id" label="数据库" rules={[{ required: true }]}>
-          <Select style={{ width: 156 }} placeholder="请选择数据库" onChange={() => fetchTables(form.getFieldsValue())}>
+          <Select  placeholder="请选择数据库" >
             {databases.map((db) => (
               <Option key={db.id} value={db.id}>
                 {db.database_name}
               </Option>
             ))}
+          </Select>
+        </Form.Item>
+        <Form.Item name="backend" label="后端">
+          <Select placeholder="请选择后端" onClick={() => setBackend}>
+            <Option key="java" value="java">Java</Option>
+            <Option key="python" value="python">Python</Option>
           </Select>
         </Form.Item>
         <Form.Item name="tableName" label="表名称">
@@ -151,7 +163,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
         <Form.Item name="description" label="表描述">
           <Input placeholder="请输入表描述" style={{ width: 128 }} />
         </Form.Item>
-        <Form.Item>
+        <Form.Item className={"flex justify-end"}>
           <Space>
             <Button type="primary" htmlType="submit" loading={loading}>
               搜索
@@ -162,6 +174,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
       </Form>
 
       <Table
+        className={"mt-4"}
         loading={loading}
         columns={columns}
         dataSource={tableData}

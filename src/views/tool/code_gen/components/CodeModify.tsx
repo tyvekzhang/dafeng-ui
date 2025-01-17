@@ -23,14 +23,13 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
     if (tableInfo) {
       tableForm.setFieldsValue(tableInfo);
     }
-  }, [tableInfo, tableForm]);
+  }, [tableForm]);
 
 
   useEffect(() => {
     const fetchTableDetail = async () => {
       const res = await getTableDetail(tableId);
       const { gen_table, gen_field } = res;
-      console.log('gen_table', gen_table)
       setTableInfo(gen_table);
       setFieldInfo(gen_field);
     };

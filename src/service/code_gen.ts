@@ -19,10 +19,11 @@ export const codeList = () => {
   return httpClient.get<TableDataResponse>(`/gen-table/list`);
 };
 
-export const importTables = (database_id: number, tableIds: number[]) => {
+export const importTables = (database_id: number, tableIds: number[], backend: string) => {
   const data = {
     database_id: database_id,
     table_ids: tableIds,
+    backend: backend
   };
   return httpClient.post('/gen-table/import', data);
 };

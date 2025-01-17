@@ -1014,9 +1014,9 @@ const DatabaseExplorer: React.FC = () => {
     setSqlQuery(e.target.value);
   };
   return (
-    <div className="container">
+    <div className="w-full">
       <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-        <Splitter.Panel defaultSize="20%" min="15%" max="30%">
+        <Splitter.Panel defaultSize="20%" min="1%" max="30%">
           <div className={styles.leftContent}>
             <div style={{ padding: '16px 24px 0' }}>
               <Input prefix={<SearchOutlined />} placeholder="Search..." />
