@@ -1,7 +1,6 @@
-import ActionButtonComponent from '@/components/base/action-button';
-import { PaginatedTable } from '@/components/base/paginated-table';
-import TransitionWrapper from '@/components/base/transition-wrapper';
-import { message } from '@/components/GlobalToast';
+import ActionButtonComponent from "@/components/base/action-button";
+import { PaginatedTable } from "@/components/base/paginated-table";
+import { message } from "@/components/GlobalToast";
 import {
   batchCreateNewWord,
   batchModifyNewWord,
@@ -13,20 +12,21 @@ import {
   importNewWord,
   modifyNewWord,
   removeNewWord,
-} from '@/service/new-word';
-import { BaseQueryImpl } from '@/types';
-import { NewWordBatchModify, NewWordCreate, NewWordDetail, NewWordModify, NewWordPage } from '@/types/new-word';
-import NewWordBatchModifyComponent from '@/views/system/new-word/components/new-word-batch-modify';
-import NewWordCreateComponent from '@/views/system/new-word/components/new-word-create';
-import NewWordDetailComponent from '@/views/system/new-word/components/new-word-detail';
-import NewWordImportComponent from '@/views/system/new-word/components/new-word-import';
-import NewWordModifyComponent from '@/views/system/new-word/components/new-word-modify';
-import NewWordQueryComponent from '@/views/system/new-word/components/new-word-query';
+} from "@/service/new-word";
+import { BaseQueryImpl } from "@/types";
+import { NewWordBatchModify, NewWordCreate, NewWordDetail, NewWordModify, NewWordPage } from "@/types/new-word";
+import NewWordBatchModifyComponent from "@/views/system/new-word/components/new-word-batch-modify";
+import NewWordCreateComponent from "@/views/system/new-word/components/new-word-create";
+import NewWordImportComponent from "@/views/system/new-word/components/new-word-import";
+import NewWordModifyComponent from "@/views/system/new-word/components/new-word-modify";
+import NewWordQueryComponent from "@/views/system/new-word/components/new-word-query";
+import { Form } from "antd";
+import { ColumnsType } from "antd/lib/table";
+import type { RcFile } from "rc-upload/lib/interface";
+import React, { useEffect, useState } from "react";
 import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import { Form } from 'antd';
-import { ColumnsType } from 'antd/lib/table';
-import type { RcFile } from 'rc-upload/lib/interface';
-import React, { useEffect, useState } from 'react';
+import NewWordDetailComponent from "@/views/system/new-word/components/new-word-detail";
+import TransitionWrapper from '@/components/base/transition-wrapper';
 
 const NewWord: React.FC = () => {
   // 配置模块
@@ -40,14 +40,14 @@ const NewWord: React.FC = () => {
   const showMore = false;
 
   // 查询模块
-  const [isNewWordQueryShow, setIsNewWordQueryShow] = useState<boolean>(true);
+  const [isNewWordQueryShow, setIsNewWordQueryShow] = useState<boolean>(true)
   const [newWordPageDataSource, setNewWordPageDataSource] = useState<NewWordPage[]>([]);
   const [newWordPageTotalCount, setNewWordPageTotalCount] = useState(0);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const onNewWordQueryShow = () => {
-    setIsNewWordQueryShow((prevState) => !prevState);
-  };
+    setIsNewWordQueryShow(prevState => !prevState)
+  }
   useEffect(() => {
     const fetchData = async () => {
       const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
@@ -56,7 +56,8 @@ const NewWord: React.FC = () => {
       setNewWordPageDataSource(resp.records);
       setNewWordPageTotalCount(resp.total);
     };
-    fetchData().then(() => {});
+    fetchData().then(() => {
+    });
   }, [current, pageSize]);
 
   const handlePaginationChange = (newPage: number, newPageSize: number) => {
@@ -85,63 +86,69 @@ const NewWord: React.FC = () => {
   // 表格列信息
   const newWordPageColumns: ColumnsType<NewWordPage> = [
     {
-      title: 'Id',
-      dataIndex: 'id',
-      key: 'id',
+      title: "Id",
+      dataIndex: "id",
+      key: "id",
       hidden: true,
     },
     {
-      title: '序号',
-      dataIndex: 'No',
-      key: 'No',
+      title: "序号",
+      dataIndex: "No",
+      key: "No",
       render: (_: number, _record: NewWordPage, rowIndex: number) => rowIndex + 1,
-      width: '8%',
+      width: "8%",
     },
     {
-      title: '文章ID',
-      dataIndex: 'articleId',
-      key: 'articleId',
-      render: (text) => (text ? text : '-'),
+      title: "文章ID",
+      dataIndex: "article_id",
+      key: "article_id",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '词库表ID',
-      dataIndex: 'wordId',
-      key: 'wordId',
-      render: (text) => (text ? text : '-'),
+      title: "词库表ID",
+      dataIndex: "word_id",
+      key: "word_id",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '单词',
-      dataIndex: 'word',
-      key: 'word',
-      render: (text) => (text ? text : '-'),
+      title: "单词",
+      dataIndex: "word",
+      key: "word",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '复习次数',
-      dataIndex: 'reviewCount',
-      key: 'reviewCount',
-      render: (text) => (text ? text : '-'),
+      title: "翻译",
+      dataIndex: "translation",
+      key: "translation",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '复习时间',
-      dataIndex: 'nextReviewDate',
-      key: 'nextReviewDate',
-      render: (text) => (text ? text : '-'),
+      title: "复习次数",
+      dataIndex: "review_count",
+      key: "review_count",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
-      render: (text) => (text ? text : '-'),
+      title: "复习时间",
+      dataIndex: "next_review_date",
+      key: "next_review_date",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '操作',
-      key: 'action',
+      title: "创建时间",
+      dataIndex: "create_time",
+      key: "create_time",
+      render: (text) => (text ? text : "-"),
+    },
+    {
+      title: "操作",
+      key: "action",
       render: (_, record) => (
         <div className="flex gap-2">
           <button
             type="button"
             className="flex items-center gap-1 text-red-500 text-[12px] btn-operation"
-            onClick={() => onNewWordDetail(record)}
+            onClick={ () => onNewWordDetail(record)}
           >
             <EyeOutlined className="w-3 h-3" />
             详情
@@ -149,7 +156,7 @@ const NewWord: React.FC = () => {
           <button
             type="button"
             className="flex items-center gap-1 text-blue-500 text-[12px] btn-operation"
-            onClick={() => onNewWordModify(record)}
+            onClick={ () => onNewWordModify(record)}
           >
             <EditOutlined className="w-3 h-3" />
             编辑
@@ -157,7 +164,7 @@ const NewWord: React.FC = () => {
           <button
             type="button"
             className="flex items-center gap-1 text-red-500 text-[12px] btn-remove"
-            onClick={() => handleNewWordDelete(record)}
+            onClick={ () => handleNewWordDelete(record)}
           >
             <DeleteOutlined className="w-3 h-3" />
             删除
@@ -165,26 +172,26 @@ const NewWord: React.FC = () => {
 
           {showMore && (
             <button type="button" className="flex items-center gap-1 text-blue-500 text-[10px] btn-operation">
-              <span>更多</span>
-              <MoreOutlined className="w-3 h-3" />
-            </button>
+               <span>更多</span>
+               <MoreOutlined className="w-3 h-3" />
+             </button>
           )}
         </div>
       ),
     },
-  ];
+  ]
 
-  const [visibleColumns, setVisibleColumns] = useState(newWordPageColumns.map((col) => col.key));
+  const [visibleColumns, setVisibleColumns] = useState(newWordPageColumns.map(col => col.key));
   const onToggleColumnVisibility = (columnKey: number) => {
-    setVisibleColumns((prevVisibleColumns) => {
+    setVisibleColumns(prevVisibleColumns => {
       if (prevVisibleColumns.includes(columnKey)) {
-        return prevVisibleColumns.filter((key) => key !== columnKey);
+        return prevVisibleColumns.filter(key => key !== columnKey);
       } else {
         return [...prevVisibleColumns, columnKey];
       }
     });
   };
-  const filteredNewWordColumns = newWordPageColumns.filter((col) => visibleColumns.includes(col.key));
+  const filteredNewWordColumns = newWordPageColumns.filter(col => visibleColumns.includes(col.key));
 
   const [newWordQueryForm] = Form.useForm();
   const handleNewWordQueryReset = () => {
@@ -194,7 +201,7 @@ const NewWord: React.FC = () => {
   const onNewWordQueryFinish = async () => {
     const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
     const filteredNewWordPage = Object.fromEntries(
-      Object.entries(newWordPage).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+      Object.entries(newWordPage).filter(([, value]) => value !== undefined && value !== null && value !== ""),
     );
     resetPagination();
     await handleNewWordQueryFinish(filteredNewWordPage as NewWordPage);
@@ -221,7 +228,7 @@ const NewWord: React.FC = () => {
     setIsNewWordCreateLoading(true);
     try {
       await createNewWord(newWordCreate);
-      message.success('新增成功');
+      message.success("新增成功");
       newWordCreateForm.resetFields();
       await onNewWordQueryFinish();
     } finally {
@@ -250,12 +257,12 @@ const NewWord: React.FC = () => {
   };
   const handleNewWordBatchRemove = async () => {
     if (selectedRowKeys.length === 0) {
-      message.warning('请先选择要删除的项目');
+      message.warning("请先选择要删除的项目");
       return;
     }
     try {
       setIsBatchRemoveLoading(true);
-      await batchRemoveNewWord(selectedRowKeys.map((key) => Number(key)));
+      await batchRemoveNewWord(selectedRows.map((row) => row.id));
       await onNewWordQueryFinish();
       resetSelectedRows();
     } finally {
@@ -264,29 +271,33 @@ const NewWord: React.FC = () => {
   };
   const handleNewWordBatchRemoveCancel = async () => {
     resetSelectedRows();
-    message.info('操作已取消');
+    message.info("操作已取消");
   };
 
   // 单个更新模块
   const [isNewWordModifyModalVisible, setIsNewWordModifyModalVisible] = useState<boolean>(false);
   const [isNewWordModifyLoading, setIsNewWordModifyLoading] = useState<boolean>(false);
   const [newWordModifyForm] = Form.useForm();
-  const onNewWordModify = (record: NewWordPage) => {
+  const onNewWordModify = (newWordPage: NewWordPage) => {
     setIsNewWordModifyModalVisible(true);
-    newWordModifyForm.setFieldsValue({ ...record });
+    setSelectedRowKeys([newWordPage.id])
+    setSelectedRows([newWordPage])
+    newWordModifyForm.setFieldsValue({ ...newWordPage });
   };
 
   const handleNewWordModifyCancel = () => {
+    resetSelectedRows();
     newWordModifyForm.resetFields();
     setIsNewWordModifyModalVisible(false);
   };
   const handleNewWordModifyFinish = async () => {
-    const newWordModify = (await newWordModifyForm.validateFields()) as NewWordModify;
+    const newWordModifyData = (await newWordModifyForm.validateFields()) as NewWordModify;
+    const newWordModify = {...newWordModifyData, id: selectedRows[0].id};
     setIsNewWordModifyLoading(true);
     try {
       await modifyNewWord(newWordModify);
       newWordModifyForm.resetFields();
-      message.success('更新成功');
+      message.success("更新成功");
       await onNewWordQueryFinish();
       resetSelectedRows();
     } finally {
@@ -312,16 +323,20 @@ const NewWord: React.FC = () => {
     newWordBatchModifyForm.resetFields();
     setIsNewWordBatchModifyModalVisible(false);
     resetSelectedRows();
-    message.info('操作已取消');
+    message.info("操作已取消");
   };
   const handleNewWordBatchModifyFinish = async () => {
     const newWordBatchModify = (await newWordBatchModifyForm.validateFields()) as NewWordBatchModify;
     setIsNewWordBatchModifyLoading(true);
+    if (selectedRows === null || selectedRows.length === 0) {
+      message.warning("请选择要更新的项目")
+      return;
+    }
     try {
-      newWordBatchModify.ids = selectedRowKeys.map((key) => Number(key));
+      newWordBatchModify.ids = selectedRows.map((row) => row.id);
       await batchModifyNewWord(newWordBatchModify);
       newWordBatchModifyForm.resetFields();
-      message.success('更新成功');
+      message.success("更新成功");
       await onNewWordQueryFinish();
       resetSelectedRows();
     } finally {
@@ -356,7 +371,7 @@ const NewWord: React.FC = () => {
     setIsNewWordImportLoading(true);
     try {
       await batchCreateNewWord(newWordCreateList);
-      message.success('导入成功');
+      message.success("导入成功");
       setIsNewWordImportModalVisible(false);
       await onNewWordQueryFinish();
     } finally {
@@ -369,12 +384,12 @@ const NewWord: React.FC = () => {
   const [isExportLoading, setIsExportLoading] = useState<boolean>(false);
   const onNewWordExport = async () => {
     if (selectedRowKeys === null || selectedRowKeys.length === 0) {
-      message.warning('请先选择导出的项目');
+      message.warning("请先选择导出的项目");
       return;
     }
     try {
       setIsExportLoading(true);
-      await exportNewWordPage(selectedRowKeys.map((key) => Number(key)));
+      await exportNewWordPage(selectedRows.map((row) => row.id));
       resetSelectedRows();
     } finally {
       setIsExportLoading(false);
@@ -388,7 +403,7 @@ const NewWord: React.FC = () => {
           <NewWordQueryComponent
             onNewWordQueryFinish={onNewWordQueryFinish}
             onNewWordQueryReset={handleNewWordQueryReset}
-            newWordQueryForm={newWordQueryForm}
+            newWordQueryForm={ newWordQueryForm}
           />
         </div>
       </TransitionWrapper>
@@ -407,7 +422,7 @@ const NewWord: React.FC = () => {
           isBatchRemoveDisabled={selectedRowKeys.length === 0}
           isBatchRemoveLoading={isBatchRemoveLoading}
           isExportLoading={isExportLoading}
-          rawColumns={newWordPageColumns as any[]}
+          rawColumns={ newWordPageColumns as any[]}
           visibleColumns={visibleColumns as any[]}
           onToggleColumnVisibility={onToggleColumnVisibility}
           actionConfig={actionConfig}
@@ -416,9 +431,9 @@ const NewWord: React.FC = () => {
       </div>
       <div>
         <PaginatedTable<NewWordPage>
-          columns={filteredNewWordColumns}
-          dataSource={newWordPageDataSource}
-          total={newWordPageTotalCount}
+          columns={ filteredNewWordColumns}
+          dataSource={ newWordPageDataSource}
+          total={ newWordPageTotalCount}
           current={current}
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}
@@ -434,14 +449,14 @@ const NewWord: React.FC = () => {
             onNewWordCreateCancel={handleNewWordCreateCancel}
             onNewWordCreateFinish={handleNewWordCreateFinish}
             isNewWordCreateLoading={isNewWordCreateLoading}
-            newWordCreateForm={newWordCreateForm}
+            newWordCreateForm={ newWordCreateForm}
           />
         </div>
         <div>
           <NewWordDetailComponent
             isNewWordDetailDrawerVisible={isNewWordDetailDrawerVisible}
             onNewWordDetailClose={onNewWordDetailClose}
-            newWordDetail={newWordDetail}
+            newWordDetail={ newWordDetail}
           />
         </div>
         <div>
@@ -450,7 +465,7 @@ const NewWord: React.FC = () => {
             onNewWordModifyCancel={handleNewWordModifyCancel}
             onNewWordModifyFinish={handleNewWordModifyFinish}
             isNewWordModifyLoading={isNewWordModifyLoading}
-            newWordModifyForm={newWordModifyForm}
+            newWordModifyForm={ newWordModifyForm}
           />
         </div>
         <div>
@@ -459,7 +474,7 @@ const NewWord: React.FC = () => {
             onNewWordBatchModifyCancel={handleNewWordBatchModifyCancel}
             onNewWordBatchModifyFinish={handleNewWordBatchModifyFinish}
             isNewWordBatchModifyLoading={isNewWordBatchModifyLoading}
-            newWordBatchModifyForm={newWordBatchModifyForm}
+            newWordBatchModifyForm={ newWordBatchModifyForm}
           />
         </div>
         <div>

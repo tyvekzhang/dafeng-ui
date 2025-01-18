@@ -9,14 +9,16 @@ interface NewWordDetailDrawerProps {
 }
 
 const NewWordDetailComponent: React.FC<NewWordDetailDrawerProps> = ({
-  isNewWordDetailDrawerVisible,
-  onNewWordDetailClose,
-  newWordDetail,
-}) => {
+                                                                     isNewWordDetailDrawerVisible,
+                                                                     onNewWordDetailClose,
+                                                                     newWordDetail,
+                                                                   }) => {
   const footerButtons = useMemo(
     () => (
       <Space>
-        <Button onClick={onNewWordDetailClose}>关闭</Button>
+        <Button onClick={onNewWordDetailClose}>
+          关闭
+        </Button>
       </Space>
     ),
     [onNewWordDetailClose],
@@ -31,13 +33,14 @@ const NewWordDetailComponent: React.FC<NewWordDetailDrawerProps> = ({
       destroyOnClose
       width={600}
     >
-      {newWordDetail && (
+      { newWordDetail && (
         <Descriptions column={1} bordered>
-          <Descriptions.Item label="文章ID">{newWordDetail.articleId}</Descriptions.Item>
-          <Descriptions.Item label="词库表ID">{newWordDetail.wordId}</Descriptions.Item>
-          <Descriptions.Item label="单词">{newWordDetail.word}</Descriptions.Item>
-          <Descriptions.Item label="复习次数">{newWordDetail.reviewCount}</Descriptions.Item>
-          <Descriptions.Item label="复习时间">{newWordDetail.nextReviewDate}</Descriptions.Item>
+          <Descriptions.Item label="文章ID">{ newWordDetail.article_id}</Descriptions.Item>
+          <Descriptions.Item label="词库表ID">{ newWordDetail.word_id}</Descriptions.Item>
+          <Descriptions.Item label="单词">{ newWordDetail.word}</Descriptions.Item>
+          <Descriptions.Item label="翻译">{ newWordDetail.translation}</Descriptions.Item>
+          <Descriptions.Item label="复习次数">{ newWordDetail.review_count}</Descriptions.Item>
+          <Descriptions.Item label="复习时间">{ newWordDetail.next_review_date}</Descriptions.Item>
         </Descriptions>
       )}
     </Drawer>

@@ -17,12 +17,12 @@ interface NewWordImportProps {
 }
 
 const NewWordImportComponent: React.FC<NewWordImportProps> = ({
-  isNewWordImportModalVisible,
-  onNewWordImportCancel,
-  onNewWordImportFinish,
-  isNewWordImportLoading,
-  handleNewWordImport,
-}) => {
+                                                                isNewWordImportModalVisible,
+                                                                onNewWordImportCancel,
+                                                                onNewWordImportFinish,
+                                                                isNewWordImportLoading,
+                                                                handleNewWordImport,
+                                                              }) => {
   const [NewWordImportFileList, setNewWordImportFileList] = useState<RcFile[]>([]);
   const [NewWordCreateList, setNewWordCreateList] = useState<NewWordCreate[]>([]);
   const [isUploadShow, setIsUploadShow] = useState<boolean>(true);
@@ -57,51 +57,59 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
   // 表格列信息
   const NewWordPageColumns: ColumnsType<NewWordCreate> = [
     {
-      title: '序号',
-      dataIndex: 'No',
-      key: 'No',
+      title: "序号",
+      dataIndex: "No",
+      key: "No",
       render: (_: number, _record: NewWordCreate, rowIndex: number) => rowIndex + 1,
-      width: '8%',
+      width: "8%",
     },
     {
-      title: '用户ID',
-      dataIndex: 'userId',
-      key: 'userId',
+      title: "文章ID",
+      dataIndex: "article_id",
+      key: "article_id",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '文章ID',
-      dataIndex: 'articleId',
-      key: 'articleId',
+      title: "词库表ID",
+      dataIndex: "word_id",
+      key: "word_id",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '词库表ID',
-      dataIndex: 'wordId',
-      key: 'wordId',
+      title: "单词",
+      dataIndex: "word",
+      key: "word",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '单词',
-      dataIndex: 'word',
-      key: 'word',
+      title: "翻译",
+      dataIndex: "translation",
+      key: "translation",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '复习次数',
-      dataIndex: 'reviewCount',
-      key: 'reviewCount',
+      title: "复习次数",
+      dataIndex: "review_count",
+      key: "review_count",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '复习时间',
-      dataIndex: 'nextReviewDate',
-      key: 'nextReviewDate',
+      title: "复习时间",
+      dataIndex: "next_review_date",
+      key: "next_review_date",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '租户ID',
-      dataIndex: 'tenantId',
-      key: 'tenantId',
+      title: "创建时间",
+      dataIndex: "create_time",
+      key: "create_time",
+      render: (text) => (text ? text : "-"),
     },
     {
-      title: '校验信息',
-      dataIndex: 'errMsg',
-      key: 'errMsg',
+      title: "错误信息",
+      dataIndex: "errMsg",
+      key: "errMsg",
+      render: (text) => (text ? text : "-"),
     },
   ];
 
@@ -148,7 +156,7 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
               multiple
               accept=".xlsx,.xls"
               onRemove={handleRemove}
-              fileList={NewWordImportFileList}
+              fileList={ NewWordImportFileList}
               customRequest={customUploadRequest as any}
             >
               <p className="sc-upload-drag-icon">
@@ -165,8 +173,8 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
       ) : (
         <div>
           <Table
-            columns={NewWordPageColumns}
-            dataSource={NewWordCreateList}
+            columns={ NewWordPageColumns}
+            dataSource={ NewWordCreateList}
             pagination={false}
             bordered={false}
             rowKey={'id'}

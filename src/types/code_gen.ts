@@ -22,6 +22,11 @@ export interface CodePreviewResponse {
   api: string;
   type: string;
   entityPy: string;
+  schemaPy: string;
+  mapperPy: string;
+  servicePy: string;
+  serviceImplPy: string;
+  controllerPy: string;
 }
 
 export interface GenTableQueryResponse {

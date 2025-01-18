@@ -34,7 +34,9 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
         setCodePreviewData(resp);
       });
     };
-    fetchCodePreview();
+    if (open) {
+      fetchCodePreview();
+    }
   }, [tableId, open]);
 
   const buildItems = (data: CodePreviewResponse | null): TabItem[] => {
@@ -42,6 +44,11 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
 
     const python_tabs = [
       { key: 'entityPy', label: 'entity.py', children: processCodeString(data.entityPy), language: 'python' },
+      { key: 'schemaPy', label: 'schema.py', children: processCodeString(data.schemaPy), language: 'python' },
+      { key: 'mapperPy', label: 'mapper.py', children: processCodeString(data.mapperPy), language: 'python' },
+      { key: 'servicePy', label: 'service.py', children: processCodeString(data.servicePy), language: 'python' },
+      { key: 'serviceImplPy', label: 'serviceImpl.py', children: processCodeString(data.serviceImplPy), language: 'python' },
+      { key: 'controllerPy', label: 'controller.py', children: processCodeString(data.controllerPy), language: 'python' },
     ];
 
     const java_tabs = [
@@ -150,7 +157,9 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
           key: item.key,
           label: item.label,
           children: renderTabContent({ children: item.children, language: item.language }),
-        }))}
+        }))
+      }
+
       />
     </Modal>
   );
