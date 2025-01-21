@@ -7,7 +7,7 @@ export interface ModelBase {
 }
 
 export interface PageBase {
-  page: number;
+  currentPage: number;
   size: number;
   count?: boolean;
 }

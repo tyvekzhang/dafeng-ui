@@ -78,6 +78,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
 
     const react_tabs = [
       { key: 'index', label: 'index.tsx', children: processCodeString(data.index), language: 'js' },
+      { key: 'router', label: 'router.tsx', children: processCodeString(data.router), language: 'js' },
       { key: 'iQuery', label: 'iQuery.tsx', children: processCodeString(data.iQuery), language: 'js' },
       { key: 'iCreate', label: 'iCreate.tsx', children: processCodeString(data.iCreate), language: 'js' },
       { key: 'iDetail', label: 'iDetail.tsx', children: processCodeString(data.iDetail), language: 'js' },

@@ -44,6 +44,7 @@ export function PaginatedTable<T extends object>({
         rowKey={tableProps.rowKey || 'id'}
         rowSelection={rowSelection}
         className={`min-h-[400px] ${tableProps.className || ''}`}
+        scroll={{ x: 'max-content' }}
       />
       <div className="mt-4">
         <Pagination

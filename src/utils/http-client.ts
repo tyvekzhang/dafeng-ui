@@ -9,6 +9,8 @@ import { refreshToken } from '@/service/user';
 import NProgress from '@/settings/n_progress';
 
 class HttpRequest {
+  requestTracker = new Set();
+
   instance: AxiosInstance;
 
   public constructor(config: AxiosRequestConfig) {
@@ -49,27 +51,58 @@ class HttpRequest {
       async (error) => {
         NProgress.done();
         const originalRequest = error.config;
-        // 判断认证失败和认证过期的情况
+
+        // 检查是否已在处理中
+        const requestKey = `${originalRequest.url}:${originalRequest.method}`;
+        if (this.requestTracker.has(requestKey)) {
+          return Promise.reject(error);
+        }
+
+        // 检查是否为 401/403 并且尚未重试
         if ((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
+          this.requestTracker.add(requestKey); // 添加到追踪器
           originalRequest._retry = true;
+
           try {
             const oldToken = getCacheToken();
             const localRemember = getAuthCache(true, REMEMBER_KEY) as boolean;
+
             if (oldToken) {
-              const token = await refreshToken(oldToken);
-              setAuthCache(localRemember, TOKEN_KEY, token);
+              const newToken = await refreshToken(oldToken);
+              setAuthCache(localRemember, TOKEN_KEY, newToken);
             }
-            return this.instance(originalRequest);
-          } catch (error) {
-            message.error('登录状态已失效, 请重新登录');
+
+            // 使用新的 Token 重试请求
+            return this.instance({
+              ...originalRequest,
+              headers: {
+                ...originalRequest.headers,
+                Authorization: `Bearer ${getCacheToken()}`,
+              },
+            });
+          } catch (refreshError) {
+            // 刷新 Token 失败，清除登录状态
+            message.error('登录状态已失效，请重新登录');
             clearAllAuthCache();
             location.href = '/login';
-            return Promise.reject(error);
+            return Promise.reject(refreshError);
+          } finally {
+            this.requestTracker.delete(requestKey); // 请求完成后移除追踪
           }
         }
-        message.error(error.response.data.msg ? error.response.data.msg : '服务开小差啦');
+
+        // 刷新 Token 请求本身失败的处理
+        if (originalRequest.url.includes('/refresh-token')) {
+          message.error('刷新 Token 失败，请重新登录');
+          clearAllAuthCache();
+          location.href = '/login';
+          return Promise.reject(error);
+        }
+
+        // 其他错误处理
+        message.error(error.response.data?.msg || '服务开小差啦');
         return Promise.reject(error);
-      },
+      }
     );
   }
 

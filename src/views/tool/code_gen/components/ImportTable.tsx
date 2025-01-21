@@ -47,8 +47,8 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
       setLoading(true);
       const params = {
         ...values,
-        page: currentPage,
-        size: pageSize,
+        currentPage: currentPage,
+        pageSize: pageSize,
       };
       const response = await listTables(params);
       setTableData(response.records);
@@ -198,7 +198,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ open, onClose }) => {
             setLoading(true);
             const params = {
               ...form.getFieldsValue(),
-              page: currentPage,
+              currentPage: currentPage,
               pageSize,
             };
             const response = await listTables(params);

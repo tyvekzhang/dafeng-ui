@@ -22,7 +22,7 @@ export const fetchDynamicColumns = (id: number) => {
 }
 export const fetchConnections = async (): Promise<DatabaseConnection[]> => {
   const params = {
-    page: 1,
+    currentPage: 1,
     size: 100,
   };
   return httpClient.get<PageData<DatabaseConnection>>('/connection/connections', params).then((res) => {
@@ -36,7 +36,7 @@ export const fetchConnection = async (connectionId: number) => {
 
 export const fetchDatabases = async (connectionId: number): Promise<Database[]> => {
   const params = {
-    page: 1,
+    currentPage: 1,
     size: 200,
     connection_id: connectionId,
   };
@@ -47,8 +47,8 @@ export const fetchDatabases = async (connectionId: number): Promise<Database[]> 
 
 export const fetchTables = async (databaseId: number): Promise<TableInfo[]> => {
   const params = {
-    page: 1,
-    size: 1000,
+    currentPage: 1,
+    pageSize: 1000,
     database_id: databaseId,
   };
   return httpClient.get<PageData<TableInfo>>('/table/tables', params).then((res) => {
@@ -62,18 +62,18 @@ export const listTables = async (params: Record<string, string>) => {
 
 export const fetchDynamicTableData = async (tableId: number) => {
   const params = {
-    page: 1,
-    size: 10,
+    currentPage: 1,
+    pageSize: 10,
     table_id: tableId,
   };
 
-  return httpClient.get<PageData<any>>(`/gen-table/data/${params.table_id}/${params.page}/${params.size}`)
+  return httpClient.get<PageData<any>>(`/gen-table/data/${params.table_id}/${params.currentPage}/${params.pageSize}`)
 };
 
 export const fetchTableStructure = async (tableId: number): Promise<TableColumn[]> => {
   const params = {
-    page: 1,
-    size: 1000,
+    currentPage: 1,
+    pageSize: 1000,
     table_id: tableId,
   };
 
@@ -90,8 +90,8 @@ export const fetchTableStructure = async (tableId: number): Promise<TableColumn[
 };
 export const fetchIndexStructure = async (tableId: number): Promise<TableIndex[]> => {
   const params = {
-    page: 1,
-    size: 1000,
+    currentPage: 1,
+    pageSize: 1000,
     table_id: tableId,
   };
   return httpClient.get<PageData<TableIndex>>('/index/indexes', params).then((res) => {

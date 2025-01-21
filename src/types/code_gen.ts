@@ -9,10 +9,12 @@ export interface CodePreviewResponse {
   modify: string;
   batchModify: string;
   query: string;
-  detail: string;
   page: string;
+  detail: string;
+  currentPage: string;
   converter: string;
   index: string;
+  router: string;
   iQuery: string;
   iCreate: string;
   iDetail: string;

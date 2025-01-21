@@ -156,8 +156,8 @@ const UserPage: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [size, setSize] = useState<number>(10);
   const [userQueryForm, setUserQueryForm] = useState<UserQueryForm>({
-    page: 1,
-    size: 10,
+    currentPage: 1,
+    paseSize: 10,
     username: undefined,
     nickname: undefined,
     status: undefined,
@@ -192,8 +192,8 @@ const UserPage: React.FC = () => {
     setSize(10);
     setUserQueryForm((prev) => ({
       ...prev,
-      page: 1,
-      size: 10,
+      currentPage: 1,
+      pageSize: 10,
       username: data.username?.trim(),
       nickname: data.nickname?.trim(),
       status: data.status,
@@ -205,7 +205,7 @@ const UserPage: React.FC = () => {
     setSize(size);
     setUserQueryForm((prev) => ({
       ...prev,
-      page: current,
+      currentPage: current,
       size: size,
     }));
   };
@@ -216,8 +216,8 @@ const UserPage: React.FC = () => {
     setSize(10);
     setUserQueryForm((prev) => ({
       ...prev,
-      page: 1,
-      size: 10,
+      currentPage: 1,
+      pageSize: 10,
       username: undefined,
       nickname: undefined,
       status: undefined,

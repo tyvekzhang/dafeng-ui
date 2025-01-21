@@ -32,6 +32,15 @@ const SystemRoute: RouteObject = {
         key: 'wordNew',
       },
     },
+    {
+      path: 'menu',
+      name: 'Menu',
+      element: LazyLoad(lazy(() => import('@/views/system/menu'))),
+      meta: {
+        title: '菜单权限',
+        key: 'menu',
+      },
+    },
   ],
 };
 
