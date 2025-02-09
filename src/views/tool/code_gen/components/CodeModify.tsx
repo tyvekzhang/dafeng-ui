@@ -20,10 +20,8 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
   const [tableForm] = Form.useForm();
 
   useEffect(() => {
-    if (tableInfo) {
-      tableForm.setFieldsValue(tableInfo);
-    }
-  }, [tableForm]);
+    tableForm.setFieldsValue(tableInfo);
+  }, [tableForm, tableInfo]);
 
 
   useEffect(() => {
@@ -262,8 +260,8 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
             <Form.Item label="表名称" name="table_name" required={true}>
               <Input value={tableInfo?.table_name} />
             </Form.Item>
-            <Form.Item label="表描述" name="table_comment">
-              <Input value={tableInfo?.business_name} />
+            <Form.Item label="表描述" name="comment">
+              <Input value={tableInfo?.comment  } />
             </Form.Item>
             <Form.Item label="实体类名称" name="class_name">
               <Input value={tableInfo?.class_name} />

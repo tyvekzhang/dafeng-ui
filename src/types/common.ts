@@ -1,14 +1,14 @@
 import React, { ReactNode } from 'react';
 
 export interface ModelBase {
-  id: number;
+  id: string;
   create_time: Date;
   update_time?: Date;
 }
 
 export interface PageBase {
   currentPage: number;
-  size: number;
+  pageSize: number;
   count?: boolean;
 }
 

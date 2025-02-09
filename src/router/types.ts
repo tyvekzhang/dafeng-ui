@@ -33,7 +33,7 @@ export interface AppMenu {
   icon?: string;
   affix?: boolean;
   orderNo?: number;
-  hideMenu?: boolean;
+  visible?: number;
   hideChildrenInMenu?: boolean;
   hideBreadcrumb?: boolean;
 }

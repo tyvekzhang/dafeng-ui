@@ -41,6 +41,15 @@ const SystemRoute: RouteObject = {
         key: 'menu',
       },
     },
+    {
+      path: 'role',
+      name: 'Role',
+      element: LazyLoad(lazy(() => import('@/views/system/role'))),
+      meta: {
+        title: '角色信息',
+        key: 'role',
+      },
+    },
   ],
 };
 

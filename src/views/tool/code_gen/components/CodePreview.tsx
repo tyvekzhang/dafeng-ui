@@ -49,6 +49,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({ open, onClose, tableId }) => 
       { key: 'servicePy', label: 'service.py', children: processCodeString(data.servicePy), language: 'python' },
       { key: 'serviceImplPy', label: 'serviceImpl.py', children: processCodeString(data.serviceImplPy), language: 'python' },
       { key: 'controllerPy', label: 'controller.py', children: processCodeString(data.controllerPy), language: 'python' },
+      { key: 'routerPy', label: 'router.py', children: processCodeString(data.routerPy), language: 'python' },
     ];
 
     const java_tabs = [

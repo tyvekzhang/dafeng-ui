@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import useStyles from './style';
+import * as AntdIcons from '@ant-design/icons';
 
 interface SvgIconProp {
   name: string;
@@ -26,11 +27,21 @@ const SvgIcon: React.FC<SvgIconProp> = memo((props) => {
   const symbolId = `#${prefix}-${name}`;
   const iconStyle = getIconStyle(size, style);
 
-  return (
-    <svg className={styles.svgIcon} style={iconStyle}>
-      <use href={symbolId} />
-    </svg>
-  );
+  // 动态获取 Ant Design 图标组件
+  const AntdIcon = AntdIcons[name as keyof typeof AntdIcons] as any;
+
+  // 如果图标不存在，返回一个默认的占位符
+  if (!AntdIcon) {
+    return (
+      <svg className={styles.svgIcon} style={iconStyle}>
+        <use href={symbolId} />
+      </svg>
+    )
+  }
+
+  // 渲染 Ant Design 图标
+  return <AntdIcon style={iconStyle} className={styles.svgIcon}/>;
+
 });
 
 export default SvgIcon;

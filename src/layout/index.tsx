@@ -32,7 +32,7 @@ const BasicLayout: React.FC = () => {
       </Sider>
       <Layout>
         <HeaderLayout />
-        <Layout id="mainContent">
+        <Layout className={"w-full"}>
           <TagsLayout />
           <Content>
             <Outlet key={key} />

@@ -1,28 +1,34 @@
 import { MenuCreate } from '@/types/menu';
-import { Button, DatePicker, Form, Input, Modal, Select } from 'antd';
-import { FormInstance } from 'antd/es/form';
+import { Button, Form, Input, Modal, Radio, TreeSelect } from 'antd';
+import type { FormInstance } from 'antd/es/form';
 import React, { useMemo } from 'react';
+import IconSelect from '@/views/system/menu/components/IconSelect';
+import { TreeSelectUtil } from '@/utils/tree-select-util';
 
 const menuCreateFormItemLayout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 17 },
-};
+  labelCol: { span: 4 },
+  wrapperCol: { span: 15 },
+}
 
 interface MenuCreateProps {
-  isMenuCreateModalVisible: boolean;
-  onMenuCreateCancel: () => void;
-  onMenuCreateFinish: (MenuCreate: MenuCreate) => void;
-  isMenuCreateLoading: boolean;
-  menuCreateForm: FormInstance;
+  isMenuCreateModalVisible: boolean
+  onMenuCreateCancel: () => void
+  onMenuCreateFinish: (MenuCreate: MenuCreate) => void
+  isMenuCreateLoading: boolean
+  menuCreateForm: FormInstance
+  optionDataSource: any
 }
 
 const MenuCreateComponent: React.FC<MenuCreateProps> = ({
-  isMenuCreateModalVisible,
-  onMenuCreateCancel,
-  onMenuCreateFinish,
-  isMenuCreateLoading,
-  menuCreateForm,
-}) => {
+                                                          isMenuCreateModalVisible,
+                                                          onMenuCreateCancel,
+                                                          onMenuCreateFinish,
+                                                          isMenuCreateLoading,
+                                                          menuCreateForm,
+                                                          optionDataSource,
+                                                        }) => {
+  const optionDataTransform = [{name: '根目录', id: 0, children: optionDataSource}]
+  const menuTreeData = TreeSelectUtil.transform(optionDataTransform);
   const footerButtons = useMemo(
     () => [
       <Button key="back" onClick={onMenuCreateCancel}>
@@ -33,80 +39,83 @@ const MenuCreateComponent: React.FC<MenuCreateProps> = ({
       </Button>,
     ],
     [isMenuCreateLoading, menuCreateForm, onMenuCreateCancel],
-  );
+  )
+  const handleIconChange = async (iconName: string) => {
+    menuCreateForm.setFieldsValue({ icon: iconName });
+  };
 
   return (
-    <div>
-      <Modal
-        title="系统菜单新增"
-        open={isMenuCreateModalVisible}
-        onCancel={onMenuCreateCancel}
-        footer={footerButtons}
-        width={'60%'}
+    <Modal
+      title="添加菜单"
+      open={isMenuCreateModalVisible}
+      onCancel={onMenuCreateCancel}
+      footer={footerButtons}
+      width={"60%"}
+    >
+      <Form
+        {...menuCreateFormItemLayout}
+        form={menuCreateForm}
+        name="menuCreate"
+        onFinish={onMenuCreateFinish}
+        layout="horizontal"
       >
-        <Form
-          {...menuCreateFormItemLayout}
-          form={ menuCreateForm}
-          name="menuCreate"
-          onFinish={onMenuCreateFinish}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-y-0 gap-x-2 pt-4"
-        >
-          <Form.Item name="name" label="名称" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="icon" label="图标" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="permission" label="权限标识" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="sort" label="排序" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="path" label="路由地址" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="component" label="组件路径" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="type" label="类型" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="cacheable" label="是否缓存" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="visible" label="是否显示" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="parent_id" label="父ID" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-          <Form.Item name="status" label="状态" rules={[{ required: false, message: '请输入' }]}>
-            <Select
-              allowClear
-              placeholder="请选择"
-              optionFilterProp="label"
-              defaultValue={"1"}
-              onChange={() => {} }
-              options={[
-                {
-                  value: '1',
-                  label: '正常',
-                },
-                {
-                  value: '0',
-                  label: '停用',
-                },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item name="comment" label="备注信息" rules={[{ required: false, message: '请输入' }]}>
-            <Input placeholder="请输入" />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
-  );
-};
+        <Form.Item label="上级菜单" name="parent_id">
+          <TreeSelect
+            placeholder="请选择上级菜单"
+            allowClear
+            treeData={menuTreeData}
+          >
+          </TreeSelect>
+        </Form.Item>
 
-export default MenuCreateComponent;
+        <Form.Item label="菜单类型" name="type">
+          <Radio.Group>
+            <Radio value="1">目录</Radio>
+            <Radio value="2">菜单</Radio>
+            <Radio value="3">按钮</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item label="菜单图标" name="icon">
+          <IconSelect onChange={handleIconChange} />
+        </Form.Item>
+
+        <Form.Item label="菜单名称" name="name" required rules={[{ required: true, message: "请输入菜单名称" }]}>
+          <Input placeholder="请输入菜单名称" />
+        </Form.Item>
+
+        <Form.Item label="显示排序" name="sort" required rules={[{ required: true, message: "请输入显示排序" }]}>
+          <Input placeholder="请输入显示排序" />
+        </Form.Item>
+
+        <Form.Item label="是否外链" name="isExternal">
+          <Radio.Group>
+            <Radio value={1}>是</Radio>
+            <Radio value={0}>否</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item label="路由地址" name="path" required rules={[{ required: true, message: "请输入路由地址" }]}>
+          <Input placeholder="请输入路由地址" />
+        </Form.Item>
+
+        <Form.Item label="显示状态" name="visible">
+          <Radio.Group>
+            <Radio value={1}>显示</Radio>
+            <Radio value={0}>隐藏</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item label="菜单状态" name="status">
+          <Radio.Group>
+            <Radio value="1">正常</Radio>
+            <Radio value="0">停用</Radio>
+          </Radio.Group>
+        </Form.Item>
+      </Form>
+    </Modal>
+  )
+}
+
+export default MenuCreateComponent
+

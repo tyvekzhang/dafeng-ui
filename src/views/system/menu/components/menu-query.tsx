@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, Space, Select} from 'antd';
+import { Button, DatePicker, Form, Input, Space} from 'antd';
 import { FormInstance } from 'antd/es/form';
 import React from 'react';
 
@@ -14,13 +14,22 @@ const menuQueryFormItemLayout = {
 };
 
 const MenuQueryComponent: React.FC<MenuQueryProps> = ({
-  onMenuQueryFinish,
-  onMenuQueryReset,
-  menuQueryForm,
-}) => {
+                                                        onMenuQueryFinish,
+                                                        onMenuQueryReset,
+                                                        menuQueryForm,
+                                                      }) => {
   const handleMenuQueryReset = () => {
     onMenuQueryReset();
     onMenuQueryFinish();
+  };
+
+  const handleMenuQueryFinish = (values: any) => {
+    const { create_time } = values
+    if (create_time) {
+      const [startDate, endDate] = create_time
+      values.create_time = [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+    }
+    onMenuQueryFinish()
   };
 
   return (
@@ -28,34 +37,15 @@ const MenuQueryComponent: React.FC<MenuQueryProps> = ({
       {...menuQueryFormItemLayout}
       form={ menuQueryForm}
       name="menuQuery"
-      onFinish={onMenuQueryFinish}
+      onFinish={handleMenuQueryFinish}
       layout="horizontal"
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-0 gap-x-4 pt-4 px-2"
     >
       <Form.Item name="name" label="名称" rules={[{ required: false, message: '请输入' }]}>
         <Input placeholder="请输入" />
       </Form.Item>
-      <Form.Item name="status" label="状态" rules={[{ required: false, message: '请输入' }]}>
-        <Select
-          allowClear
-          placeholder="请选择"
-          optionFilterProp="label"
-          defaultValue={"1"}
-          onChange={() => {} }
-          options={[
-            {
-              value: '1',
-              label: '正常',
-            },
-            {
-              value: '0',
-              label: '停用',
-            },
-          ]}
-        />
-      </Form.Item>
       <Form.Item name="create_time" label="创建时间" rules={[{ required: false, message: '请输入' }]}>
-        <DatePicker.RangePicker />
+        <DatePicker.RangePicker format="YYYY-MM-DD" />
       </Form.Item>
       <Form.Item className="flex justify-end">
         <Space className="inline-flex">

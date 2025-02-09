@@ -7,5 +7,5 @@ export async function getAsyncMenus(): Promise<AppMenu[]> {
     return (a?.orderNo ?? Infinity) - (b?.orderNo ?? Infinity);
   });
 
-  return staticMenus.filter((item: AppMenu) => !item.hideMenu);
+  return staticMenus.filter((item: AppMenu) => item.visible === 1);
 }

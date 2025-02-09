@@ -11,13 +11,13 @@ import {
   userRemove,
   users,
 } from '@/service/user';
-import { UserAdd, UserBatchModify, UserModify, UserQuery, UserQueryForm } from '@/types/user';
+import { UserAdd, UserBatchModify, UserModify, UserQuery, UserQueryForm, UserRoleAssign } from '@/types/user';
 import Add from '@/views/system/user/components/Add';
 import BatchModify from '@/views/system/user/components/BatchModify';
 import Import from '@/views/system/user/components/Import';
 import Modify from '@/views/system/user/components/Modify';
 import Search from '@/views/system/user/components/Search';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -35,12 +35,17 @@ import dayjs from 'dayjs';
 import type { RcFile } from 'rc-upload/lib/interface';
 import React, { useEffect, useState } from 'react';
 import useStyles from './style';
+import AssignRole from '@/views/system/user/components/AssignRole';
+import { RolePage } from '@/types/role';
+import { fetchRoleByPage } from '@/service/role';
+import { assignUserRole } from '@/service/user-role';
 
 const columns = (
   onModify: (user: UserQuery) => void,
   onDelete: (user: UserQuery) => void,
   loadingDelete: boolean,
   handleStatusChange: (user: UserQuery) => void,
+  showAssignRoleModal: (user: UserQuery) => void,
 ) => [
   {
     title: 'ID',
@@ -122,6 +127,10 @@ const columns = (
         >
           删除
         </Button>
+        <button type="button" onClick={() => showAssignRoleModal(record)} className="flex items-center gap-0.5 text-xs btn-operation">
+          <CheckCircleOutlined className="w-3 h-3" />
+          <span>分配角色</span>
+        </button>
       </Space>
     ),
   },
@@ -157,7 +166,7 @@ const UserPage: React.FC = () => {
   const [size, setSize] = useState<number>(10);
   const [userQueryForm, setUserQueryForm] = useState<UserQueryForm>({
     currentPage: 1,
-    paseSize: 10,
+    pageSize: 10,
     username: undefined,
     nickname: undefined,
     status: undefined,
@@ -206,7 +215,7 @@ const UserPage: React.FC = () => {
     setUserQueryForm((prev) => ({
       ...prev,
       currentPage: current,
-      size: size,
+      pageSize: size,
     }));
   };
   const handleQueryReset = () => {
@@ -262,6 +271,40 @@ const UserPage: React.FC = () => {
       setIsUserEditLoading(false);
     }
   };
+  const [isAssignRoleModalVisible, setIsAssignRoleModalVisible] = useState(false)
+  const [isAssignRoleLoading, setIsAssignRoleLoading] = useState(false)
+  const [assignRoleForm] = Form.useForm()
+
+  const [availableRoles, setAvailableRoles] = useState<RolePage[]>([])
+  const [userId, setUserId] = useState<string>('')
+
+  const showAssignRoleModal = async (user: UserQuery) => {
+    const resp = await fetchRoleByPage()
+    setAvailableRoles(resp.records)
+    setUserId(user.id)
+    setIsAssignRoleModalVisible(true)
+  }
+
+  const handleAssignRoleCancel = () => {
+    setIsAssignRoleModalVisible(false)
+    assignRoleForm.resetFields()
+  }
+
+  const handleAssignRole = async (values: { roles: string[] }) => {
+    setIsAssignRoleLoading(true)
+    try {
+      const userRoleAssign = {
+        user_id: userId,
+        role_ids: values.roles,
+      }
+      await assignUserRole(userRoleAssign as UserRoleAssign)
+      message.success("角色分配成功")
+      setIsAssignRoleModalVisible(false)
+      assignRoleForm.resetFields()
+    } finally {
+      setIsAssignRoleLoading(false)
+    }
+  }
 
   const [isUserBatchModifyEnable, setIsUserBatchModifyEnable] = useState<boolean>(true);
   const [isUserBatchEditModalVisible, setIsUserBatchEditModalVisible] = useState<boolean>(false);
@@ -457,6 +500,14 @@ const UserPage: React.FC = () => {
           isLoading={isUserEditLoading}
           form={editForm}
         />
+        <AssignRole
+          isAssignRoleModalVisible={isAssignRoleModalVisible}
+          handleAssignRoleCancel={handleAssignRoleCancel}
+          handleAssignRole={handleAssignRole}
+          isAssignRoleLoading={isAssignRoleLoading}
+          assignRoleForm={assignRoleForm}
+          availableRoles={availableRoles}
+        />
         <Import
           isModalVisible={isUserImportModalVisible}
           isLoading={isUserImportLoading}
@@ -478,7 +529,7 @@ const UserPage: React.FC = () => {
         <Table
           loading={isTableLoading}
           dataSource={dataSource}
-          columns={columns(onUserEdit, handleUserDelete, isLoadingDelete, handleStatusChange)}
+          columns={columns(onUserEdit, handleUserDelete, isLoadingDelete, handleStatusChange, showAssignRoleModal)}
           rowKey={'id'}
           pagination={false}
           rowSelection={rowSelection}

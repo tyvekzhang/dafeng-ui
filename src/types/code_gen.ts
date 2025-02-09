@@ -29,6 +29,7 @@ export interface CodePreviewResponse {
   servicePy: string;
   serviceImplPy: string;
   controllerPy: string;
+  routerPy: string;
 }
 
 export interface GenTableQueryResponse {
@@ -68,6 +69,7 @@ export interface GenTable {
   update_time: string;
   sub_table_fk_name: string | null;
   business_name: string;
+  comment: string;
 }
 
 export interface DbTable {

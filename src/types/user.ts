@@ -48,3 +48,8 @@ export interface UserBatchModify {
   status?: number;
   remark?: string;
 }
+
+export interface UserRoleAssign {
+  user_id: string;
+  role_ids: string[];
+}

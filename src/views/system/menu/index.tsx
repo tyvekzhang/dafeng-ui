@@ -14,7 +14,7 @@ import {
   removeMenu,
 } from "@/service/menu";
 import { BaseQueryImpl } from "@/types";
-import { MenuBatchModify, MenuCreate, MenuDetail, MenuModify, MenuPage } from "@/types/menu";
+import { MenuBatchModify, MenuCreate, MenuDetail, MenuModify, MenuPage, MenuQuery } from '@/types/menu';
 import MenuBatchModifyComponent from "@/views/system/menu/components/menu-batch-modify";
 import MenuCreateComponent from "@/views/system/menu/components/menu-create";
 import MenuImportComponent from "@/views/system/menu/components/menu-import";
@@ -27,6 +27,7 @@ import React, { useEffect, useState } from "react";
 import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
 import MenuDetailComponent from "@/views/system/menu/components/menu-detail";
 import TransitionWrapper from '@/components/base/transition-wrapper';
+import SvgIcon from '@/components/SvgIcon';
 
 const Menu: React.FC = () => {
   // 配置模块
@@ -50,9 +51,9 @@ const Menu: React.FC = () => {
   }
   useEffect(() => {
     const fetchData = async () => {
-      const menuPage = (await menuQueryForm.validateFields()) as MenuPage;
+      const menuQuery = (await menuQueryForm.validateFields()) as MenuQuery;
       const pageData = BaseQueryImpl.create(current, pageSize);
-      const resp = await fetchMenuByPage(pageData, menuPage);
+      const resp = await fetchMenuByPage(pageData, menuQuery);
       setMenuPageDataSource(resp.records);
       setMenuPageTotalCount(resp.total);
     };
@@ -103,57 +104,72 @@ const Menu: React.FC = () => {
       dataIndex: "name",
       key: "name",
       render: (text) => (text ? text : "-"),
+      ellipsis: true,
+      width: "8%",
     },
     {
       title: "图标",
       dataIndex: "icon",
       key: "icon",
-      render: (text) => (text ? text : "-"),
+      render: (text) => (text ? <SvgIcon style={{color: '#595959'}} name={text} size={14} /> : "-"),
+      ellipsis: true,
+      width: "6%",
     },
     {
       title: "权限标识",
       dataIndex: "permission",
       key: "permission",
       render: (text) => (text ? text : "-"),
+      ellipsis: true,
+      width: "12%",
     },
     {
       title: "排序",
       dataIndex: "sort",
       key: "sort",
       render: (text) => (text ? text : "-"),
+      width: "4%",
     },
     {
       title: "路由地址",
       dataIndex: "path",
       key: "path",
       render: (text) => (text ? text : "-"),
+      ellipsis: true,
+      width: "12%",
     },
     {
       title: "组件路径",
       dataIndex: "component",
       key: "component",
       render: (text) => (text ? text : "-"),
+      ellipsis: true,
+      width: "12%",
     },
     {
       title: "状态",
       dataIndex: "status",
       key: "status",
       render: (text) => (text ? text : "-"),
+      width: "4%",
     },
     {
       title: "创建时间",
       dataIndex: "create_time",
       key: "create_time",
       render: (text) => (text ? text : "-"),
+      ellipsis: true,
+      width: "12%",
     },
     {
       title: "操作",
       key: "action",
+      align: "center",
       render: (_, record) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center justify-center">
           <button
             type="button"
-            className="flex items-center gap-1 text-red-500 text-[12px] btn-operation"
+            className="flex items-center gap-0.5 text-xs btn-operation"
             onClick={ () => onMenuDetail(record)}
           >
             <EyeOutlined className="w-3 h-3" />
@@ -161,7 +177,7 @@ const Menu: React.FC = () => {
           </button>
           <button
             type="button"
-            className="flex items-center gap-1 text-blue-500 text-[12px] btn-operation"
+            className="flex items-center gap-0.5 text-xs btn-operation"
             onClick={ () => onMenuModify(record)}
           >
             <EditOutlined className="w-3 h-3" />
@@ -169,7 +185,7 @@ const Menu: React.FC = () => {
           </button>
           <button
             type="button"
-            className="flex items-center gap-1 text-red-500 text-[12px] btn-remove"
+            className="flex items-center gap-0.5 text-xs btn-remove"
             onClick={ () => handleMenuDelete(record)}
           >
             <DeleteOutlined className="w-3 h-3" />
@@ -177,10 +193,10 @@ const Menu: React.FC = () => {
           </button>
 
           {showMore && (
-            <button type="button" className="flex items-center gap-1 text-blue-500 text-[10px] btn-operation">
-               <span>更多</span>
-               <MoreOutlined className="w-3 h-3" />
-             </button>
+            <button type="button" className="flex items-center gap-0.5 text-xs btn-operation">
+              <span>更多</span>
+              <MoreOutlined className="w-3 h-3" />
+            </button>
           )}
         </div>
       ),
@@ -205,14 +221,22 @@ const Menu: React.FC = () => {
     menuQueryForm.resetFields();
   };
   const onMenuQueryFinish = async () => {
-    const menuPage = (await menuQueryForm.validateFields()) as MenuPage;
-    const filteredMenuPage = Object.fromEntries(
-      Object.entries(menuPage).filter(([, value]) => value !== undefined && value !== null && value !== ""),
+    debugger
+    const values = menuQueryForm.getFieldsValue();
+    const { create_time } = values
+    if (create_time) {
+      const [startDate, endDate] = create_time
+      values.create_time = [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+    }
+    const menuQuery = values as MenuQuery;
+    console.log(menuQuery)
+    const filteredMenuQuery = Object.fromEntries(
+      Object.entries(menuQuery).filter(([, value]) => value !== undefined && value !== null && value !== ""),
     );
     resetPagination();
-    await handleMenuQueryFinish(filteredMenuPage as MenuPage);
+    await handleMenuQueryFinish(filteredMenuQuery as MenuQuery);
   };
-  const handleMenuQueryFinish = async (menuPage: MenuPage) => {
+  const handleMenuQueryFinish = async (menuPage: MenuQuery) => {
     await fetchMenuByPage(BaseQueryImpl.create(current, pageSize), menuPage).then((resp) => {
       setMenuPageDataSource(resp.records);
       setMenuPageTotalCount(resp.total);
@@ -403,7 +427,7 @@ const Menu: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 bg-white">
+    <div className="w-full mx-auto px-4 bg-white">
       <TransitionWrapper show={isMenuQueryShow}>
         <div className="shadow-sm">
           <MenuQueryComponent
@@ -456,6 +480,7 @@ const Menu: React.FC = () => {
             onMenuCreateFinish={handleMenuCreateFinish}
             isMenuCreateLoading={isMenuCreateLoading}
             menuCreateForm={ menuCreateForm}
+            optionDataSource={ menuPageDataSource}
           />
         </div>
         <div>

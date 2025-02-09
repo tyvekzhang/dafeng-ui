@@ -57,6 +57,7 @@ class HttpRequest {
         if (this.requestTracker.has(requestKey)) {
           return Promise.reject(error);
         }
+        debugger
 
         // 检查是否为 401/403 并且尚未重试
         if ((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
