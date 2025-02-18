@@ -6,6 +6,5 @@ export async function getAsyncMenus(): Promise<AppMenu[]> {
   staticMenus.sort((a: AppMenu, b: AppMenu) => {
     return (a?.orderNo ?? Infinity) - (b?.orderNo ?? Infinity);
   });
-
   return staticMenus.filter((item: AppMenu) => item.visible === 1);
 }

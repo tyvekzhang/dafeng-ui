@@ -1,6 +1,7 @@
 import ActionButtonComponent from "@/components/base/action-button";
 import { PaginatedTable } from "@/components/base/paginated-table";
 import { message } from "@/components/GlobalToast";
+import dayjs from 'dayjs';
 import {
   batchCreateNewWord,
   batchModifyNewWord,
@@ -14,7 +15,7 @@ import {
   removeNewWord,
 } from "@/service/new-word";
 import { BaseQueryImpl } from "@/types";
-import { NewWordBatchModify, NewWordCreate, NewWordDetail, NewWordModify, NewWordPage } from "@/types/new-word";
+import { NewWordBatchModify, NewWordCreate, NewWordDetail, NewWordModify, NewWordPage, NewWordQuery } from "@/types/new-word";
 import NewWordBatchModifyComponent from "@/views/system/new-word/components/new-word-batch-modify";
 import NewWordCreateComponent from "@/views/system/new-word/components/new-word-create";
 import NewWordImportComponent from "@/views/system/new-word/components/new-word-import";
@@ -27,6 +28,7 @@ import React, { useEffect, useState } from "react";
 import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
 import NewWordDetailComponent from "@/views/system/new-word/components/new-word-detail";
 import TransitionWrapper from '@/components/base/transition-wrapper';
+import { useAppDispatch, useAppSelector } from '@/stores';
 
 const NewWord: React.FC = () => {
   // 配置模块
@@ -49,10 +51,11 @@ const NewWord: React.FC = () => {
     setIsNewWordQueryShow(prevState => !prevState)
   }
   useEffect(() => {
+
     const fetchData = async () => {
-      const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
+      const newWordQuery = (await newWordQueryForm.validateFields()) as NewWordQuery;
       const pageData = BaseQueryImpl.create(current, pageSize);
-      const resp = await fetchNewWordByPage(pageData, newWordPage);
+      const resp = await fetchNewWordByPage(pageData, newWordQuery);
       setNewWordPageDataSource(resp.records);
       setNewWordPageTotalCount(resp.total);
     };
@@ -99,55 +102,56 @@ const NewWord: React.FC = () => {
       width: "8%",
     },
     {
-      title: "文章ID",
-      dataIndex: "article_id",
-      key: "article_id",
-      render: (text) => (text ? text : "-"),
-    },
-    {
-      title: "词库表ID",
-      dataIndex: "word_id",
-      key: "word_id",
-      render: (text) => (text ? text : "-"),
-    },
-    {
-      title: "单词",
+      title: "姓名",
       dataIndex: "word",
       key: "word",
       render: (text) => (text ? text : "-"),
+      width: "12%",
+      ellipsis: true,
     },
     {
-      title: "翻译",
+      title: "国家",
       dataIndex: "translation",
       key: "translation",
       render: (text) => (text ? text : "-"),
+      width: "12%",
+      ellipsis: true,
     },
     {
-      title: "复习次数",
-      dataIndex: "review_count",
-      key: "review_count",
-      render: (text) => (text ? text : "-"),
-    },
-    {
-      title: "复习时间",
+      title: "爱好",
       dataIndex: "next_review_date",
       key: "next_review_date",
-      render: (text) => (text ? text : "-"),
+      render: (text: string) => (
+        text ? <span>{dayjs(text).format('YYYY-MM-DD HH:mm:ss')}</span>: "-"
+      ),
+      width: "14%",
+      ellipsis: true,
     },
     {
-      title: "创建时间",
-      dataIndex: "create_time",
-      key: "create_time",
-      render: (text) => (text ? text : "-"),
+      title: "性别",
+      dataIndex: "tenant",
+      key: "tenant",
+      width: "6%",
+    },
+    {
+      title: "出生年月",
+      dataIndex: "update_time",
+      key: "update_time",
+      render: (text: string) => (
+        text ? <span>{dayjs(text).format('YYYY-MM-DD HH:mm:ss')}</span>: "-"
+      ),
+      width: "14%",
+      ellipsis: true,
     },
     {
       title: "操作",
       key: "action",
+      align: "center",
       render: (_, record) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center justify-center">
           <button
             type="button"
-            className="flex items-center gap-1 text-red-500 text-[12px] btn-operation"
+            className="flex items-center gap-0.5 text-xs btn-operation"
             onClick={ () => onNewWordDetail(record)}
           >
             <EyeOutlined className="w-3 h-3" />
@@ -155,7 +159,7 @@ const NewWord: React.FC = () => {
           </button>
           <button
             type="button"
-            className="flex items-center gap-1 text-blue-500 text-[12px] btn-operation"
+            className="flex items-center gap-0.5 text-xs btn-operation"
             onClick={ () => onNewWordModify(record)}
           >
             <EditOutlined className="w-3 h-3" />
@@ -163,7 +167,7 @@ const NewWord: React.FC = () => {
           </button>
           <button
             type="button"
-            className="flex items-center gap-1 text-red-500 text-[12px] btn-remove"
+            className="flex items-center gap-0.5 text-xs btn-remove"
             onClick={ () => handleNewWordDelete(record)}
           >
             <DeleteOutlined className="w-3 h-3" />
@@ -171,10 +175,10 @@ const NewWord: React.FC = () => {
           </button>
 
           {showMore && (
-            <button type="button" className="flex items-center gap-1 text-blue-500 text-[10px] btn-operation">
-               <span>更多</span>
-               <MoreOutlined className="w-3 h-3" />
-             </button>
+            <button type="button" className="flex items-center gap-0.5 text-xs btn-operation">
+              <span>更多</span>
+              <MoreOutlined className="w-3 h-3" />
+            </button>
           )}
         </div>
       ),
@@ -199,15 +203,21 @@ const NewWord: React.FC = () => {
     newWordQueryForm.resetFields();
   };
   const onNewWordQueryFinish = async () => {
-    const newWordPage = (await newWordQueryForm.validateFields()) as NewWordPage;
-    const filteredNewWordPage = Object.fromEntries(
-      Object.entries(newWordPage).filter(([, value]) => value !== undefined && value !== null && value !== ""),
+    const newWordQueryFormData = newWordQueryForm.getFieldsValue();
+    const { create_time } = newWordQueryFormData
+    if (create_time) {
+      const [startDate, endDate] = create_time
+      newWordQueryFormData.create_time = [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
+    }
+    const newWordQuery = newWordQueryFormData as NewWordQuery;
+    const filteredNewWordQuery = Object.fromEntries(
+      Object.entries(newWordQuery).filter(([, value]) => value !== undefined && value !== null && value !== ""),
     );
     resetPagination();
-    await handleNewWordQueryFinish(filteredNewWordPage as NewWordPage);
+    await handleNewWordQueryFinish(filteredNewWordQuery as NewWordQuery);
   };
-  const handleNewWordQueryFinish = async (newWordPage: NewWordPage) => {
-    await fetchNewWordByPage(BaseQueryImpl.create(current, pageSize), newWordPage).then((resp) => {
+  const handleNewWordQueryFinish = async (newWordQuery: NewWordQuery) => {
+    await fetchNewWordByPage(BaseQueryImpl.create(current, pageSize), newWordQuery).then((resp) => {
       setNewWordPageDataSource(resp.records);
       setNewWordPageTotalCount(resp.total);
     });

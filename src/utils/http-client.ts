@@ -57,7 +57,6 @@ class HttpRequest {
         if (this.requestTracker.has(requestKey)) {
           return Promise.reject(error);
         }
-        debugger
 
         // 检查是否为 401/403 并且尚未重试
         if ((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
@@ -129,7 +128,7 @@ const config = {
   // API 基础地址
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   // 超时时间
-  timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10 * 1000,
+  timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 120 * 1000,
   // 是否允许跨域携带凭证
   withCredentials: import.meta.env.VITE_WITH_CREDENTIALS === 'true' || true,
 };

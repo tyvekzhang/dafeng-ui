@@ -35,12 +35,11 @@ const NewWordDetailComponent: React.FC<NewWordDetailDrawerProps> = ({
     >
       { newWordDetail && (
         <Descriptions column={1} bordered>
-          <Descriptions.Item label="文章ID">{ newWordDetail.article_id}</Descriptions.Item>
-          <Descriptions.Item label="词库表ID">{ newWordDetail.word_id}</Descriptions.Item>
-          <Descriptions.Item label="单词">{ newWordDetail.word}</Descriptions.Item>
-          <Descriptions.Item label="翻译">{ newWordDetail.translation}</Descriptions.Item>
-          <Descriptions.Item label="复习次数">{ newWordDetail.review_count}</Descriptions.Item>
-          <Descriptions.Item label="复习时间">{ newWordDetail.next_review_date}</Descriptions.Item>
+          <Descriptions.Item label="姓名">{ newWordDetail.word}</Descriptions.Item>
+          <Descriptions.Item label="国家">{ newWordDetail.translation}</Descriptions.Item>
+          <Descriptions.Item label="爱好">{ newWordDetail.next_review_date}</Descriptions.Item>
+          <Descriptions.Item label="性别">{ newWordDetail.tenant}</Descriptions.Item>
+          <Descriptions.Item label="出生年月">{ newWordDetail.update_time}</Descriptions.Item>
         </Descriptions>
       )}
     </Drawer>

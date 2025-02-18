@@ -221,7 +221,6 @@ const Menu: React.FC = () => {
     menuQueryForm.resetFields();
   };
   const onMenuQueryFinish = async () => {
-    debugger
     const values = menuQueryForm.getFieldsValue();
     const { create_time } = values
     if (create_time) {

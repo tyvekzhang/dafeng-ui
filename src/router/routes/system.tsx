@@ -50,6 +50,33 @@ const SystemRoute: RouteObject = {
         key: 'role',
       },
     },
+    {
+      path: 'member',
+      name: 'Member',
+      element: LazyLoad(lazy(() => import('@/views/system/member'))),
+      meta: {
+        title: '会员管理',
+        key: 'member',
+      },
+    },
+    {
+      path: 'dict-data',
+      name: 'DictData',
+      element: LazyLoad(lazy(() => import('@/views/system/dict-data'))),
+      meta: {
+        title: '字典数据',
+        key: 'dictData',
+      },
+    },
+    {
+      path: 'dict-type',
+      name: 'DictType',
+      element: LazyLoad(lazy(() => import('@/views/system/dict-type'))),
+      meta: {
+        title: '字典类型',
+        key: 'dictType',
+      },
+    },
   ],
 };
 

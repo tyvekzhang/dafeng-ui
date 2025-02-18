@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { MenuPage, MenuQuery } from '@/types/menu';
 import { BaseQueryImpl } from '@/types';
 import { fetchMenuByPage } from '@/service/menu';
-import { TreeSelectUtil } from '@/utils/tree-select-util';
+import { TreeSelectUtil } from '@/utils/select-util';
 
 const roleCreateFormItemLayout = {
   labelCol: { span: 4 },
@@ -28,7 +28,7 @@ const RoleCreateComponent: React.FC<RoleCreateProps> = ({
   roleCreateForm,
 }) => {
   const [menuPageDataSource, setMenuPageDataSource] = useState<MenuPage[]>([]);
-  const optionDataTransform = [{name: '全选', id: 0, children: menuPageDataSource}]
+  const optionDataTransform = [{name: '菜单根目录', id: 0, children: menuPageDataSource}]
   const menuTreeData = TreeSelectUtil.transform(optionDataTransform as any);
   useEffect(() => {
     const fetchData = async () => {

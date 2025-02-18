@@ -4,6 +4,7 @@ import appSlice from './modules/app';
 import menuSlice from './modules/menu';
 import tagsSlice from './modules/tags';
 import userSlice from './modules/user';
+import dictSlice from '@/stores/modules/dict';
 
 export const store: Store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store: Store = configureStore({
     menu: menuSlice,
     tags: tagsSlice,
     user: userSlice,
+    dict: dictSlice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

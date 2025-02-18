@@ -1,6 +1,6 @@
 import { message } from '@/components/GlobalToast';
-import { exportNewWordTemplate } from '@/service/new-word';
-import { NewWordCreate } from '@/types/new-word';
+import { exportDictTypeTemplate } from '@/service/dict-type';
+import { DictTypeCreate } from '@/types/dict-type';
 import { InboxOutlined } from '@ant-design/icons';
 import { Button, Modal, Table, Upload, UploadFile } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
@@ -8,89 +8,89 @@ import { UploadRequestOption } from 'rc-upload/es/interface';
 import type { RcFile } from 'rc-upload/lib/interface';
 import React, { useState } from 'react';
 
-interface NewWordImportProps {
-  isNewWordImportModalVisible: boolean;
-  isNewWordImportLoading: boolean;
-  onNewWordImportCancel: () => void;
-  onNewWordImportFinish: (fileList: RcFile[]) => Promise<NewWordCreate[]>;
-  handleNewWordImport: () => void;
+interface DictTypeImportProps {
+  isDictTypeImportModalVisible: boolean;
+  isDictTypeImportLoading: boolean;
+  onDictTypeImportCancel: () => void;
+  onDictTypeImportFinish: (fileList: RcFile[]) => Promise<DictTypeCreate[]>;
+  handleDictTypeImport: () => void;
 }
 
-const NewWordImportComponent: React.FC<NewWordImportProps> = ({
-  isNewWordImportModalVisible,
-  onNewWordImportCancel,
-  onNewWordImportFinish,
-  isNewWordImportLoading,
-  handleNewWordImport,
+const DictTypeImportComponent: React.FC<DictTypeImportProps> = ({
+  isDictTypeImportModalVisible,
+  onDictTypeImportCancel,
+  onDictTypeImportFinish,
+  isDictTypeImportLoading,
+  handleDictTypeImport,
 }) => {
-  const [newWordImportFileList, setNewWordImportFileList] = useState<RcFile[]>([]);
-  const [NewWordCreateList, setNewWordCreateList] = useState<NewWordCreate[]>([]);
+  const [dictTypeImportFileList, setDictTypeImportFileList] = useState<RcFile[]>([]);
+  const [DictTypeCreateList, setDictTypeCreateList] = useState<DictTypeCreate[]>([]);
   const [isUploadShow, setIsUploadShow] = useState<boolean>(true);
 
   const footerButtons = () => [
-    <Button key="back" onClick={handleNewWordImportCancel}>
+    <Button key="back" onClick={handleDictTypeImportCancel}>
       取消
     </Button>,
-    <Button key="submit" type="primary" loading={isNewWordImportLoading} onClick={handleNewWordImportConfirm}>
+    <Button key="submit" type="primary" loading={isDictTypeImportLoading} onClick={handleDictTypeImportConfirm}>
       确定
     </Button>,
   ];
 
-  const handleNewWordImportConfirm = async () => {
+  const handleDictTypeImportConfirm = async () => {
     if (isUploadShow) {
-      if (newWordImportFileList.length === 0) {
+      if (dictTypeImportFileList.length === 0) {
         message.warning('请先选择文件');
         return;
       }
       try {
-        const NewWordPageList = await onNewWordImportFinish(newWordImportFileList);
+        const DictTypePageList = await onDictTypeImportFinish(dictTypeImportFileList);
         setIsUploadShow(false);
-        setNewWordCreateList(NewWordPageList as NewWordCreate[]);
+        setDictTypeCreateList(DictTypePageList as DictTypeCreate[]);
       } finally {
-        setNewWordImportFileList([]);
+        setDictTypeImportFileList([]);
       }
     } else {
-      handleNewWordImport();
+      handleDictTypeImport();
       setIsUploadShow(true);
     }
   };
   // 表格列信息
-  const NewWordPageColumns: ColumnsType<NewWordCreate> = [
+  const DictTypePageColumns: ColumnsType<DictTypeCreate> = [
     {
       title: "序号",
       dataIndex: "No",
       key: "No",
-      render: (_: number, _record: NewWordCreate, rowIndex: number) => rowIndex + 1,
+      render: (_: number, _record: DictTypeCreate, rowIndex: number) => rowIndex + 1,
       width: "8%",
     },
     {
-      title: "姓名",
-      dataIndex: "word",
-      key: "word",
+      title: "字典名称",
+      dataIndex: "name",
+      key: "name",
       render: (text) => (text ? text : "-"),
     },
     {
-      title: "国家",
-      dataIndex: "translation",
-      key: "translation",
+      title: "字典类型",
+      dataIndex: "type",
+      key: "type",
       render: (text) => (text ? text : "-"),
     },
     {
-      title: "爱好",
-      dataIndex: "next_review_date",
-      key: "next_review_date",
+      title: "状态",
+      dataIndex: "status",
+      key: "status",
       render: (text) => (text ? text : "-"),
     },
     {
-      title: "性别",
-      dataIndex: "tenant",
-      key: "tenant",
+      title: "备注",
+      dataIndex: "comment",
+      key: "comment",
       render: (text) => (text ? text : "-"),
     },
     {
-      title: "出生年月",
-      dataIndex: "update_time",
-      key: "update_time",
+      title: "创建时间",
+      dataIndex: "create_time",
+      key: "create_time",
       render: (text) => (text ? text : "-"),
     },
     {
@@ -101,8 +101,8 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
     },
   ];
 
-  const handleNewWordExportTemplate = async () => {
-    await exportNewWordTemplate();
+  const handleDictTypeExportTemplate = async () => {
+    await exportDictTypeTemplate();
   };
 
   const customUploadRequest = async (options: UploadRequestOption): Promise<void | undefined> => {
@@ -113,26 +113,26 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
       onError?.(new Error('仅支持xls、xlsx格式文件'));
       return;
     }
-    setNewWordImportFileList((prev) => [...prev, rcFile]);
+    setDictTypeImportFileList((prev) => [...prev, rcFile]);
     setTimeout(() => {
       onSuccess?.(rcFile);
     }, 200);
   };
 
   const handleRemove = (file: UploadFile) => {
-    setNewWordImportFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+    setDictTypeImportFileList((prev) => prev.filter((f) => f.uid !== file.uid));
   };
 
-  const handleNewWordImportCancel = () => {
-    onNewWordImportCancel();
+  const handleDictTypeImportCancel = () => {
+    onDictTypeImportCancel();
     setIsUploadShow(true);
   };
 
   return (
     <Modal
-      title="阅读生词导入"
-      open={isNewWordImportModalVisible}
-      onCancel={handleNewWordImportCancel}
+      title="字典类型导入"
+      open={isDictTypeImportModalVisible}
+      onCancel={handleDictTypeImportCancel}
       footer={footerButtons}
       width={'70%'}
     >
@@ -144,7 +144,7 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
               multiple
               accept=".xlsx,.xls"
               onRemove={handleRemove}
-              fileList={ newWordImportFileList}
+              fileList={ dictTypeImportFileList}
               customRequest={customUploadRequest as any}
             >
               <p className="sc-upload-drag-icon">
@@ -154,15 +154,15 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
               <p className="sc-upload-hint">仅支持上传xls、xlsx格式的文件</p>
             </Upload.Dragger>
           </div>
-          <div onClick={handleNewWordExportTemplate} className="cursor-pointer mt-4 text-blue-600">
+          <div onClick={handleDictTypeExportTemplate} className="cursor-pointer mt-4 text-blue-600">
             下载模板
           </div>
         </div>
       ) : (
         <div>
           <Table
-            columns={ NewWordPageColumns}
-            dataSource={ NewWordCreateList}
+            columns={ DictTypePageColumns}
+            dataSource={ DictTypeCreateList}
             pagination={false}
             bordered={false}
             rowKey={'id'}
@@ -173,4 +173,4 @@ const NewWordImportComponent: React.FC<NewWordImportProps> = ({
   );
 };
 
-export default NewWordImportComponent;
+export default DictTypeImportComponent;

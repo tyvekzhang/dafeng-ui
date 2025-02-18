@@ -3,20 +3,20 @@ import { Button, Form, Input, Modal, Radio, TreeSelect } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import React, { useMemo } from 'react';
 import IconSelect from '@/views/system/menu/components/IconSelect';
-import { TreeSelectUtil } from '@/utils/tree-select-util';
+import { TreeSelectUtil } from '@/utils/select-util';
 
 const menuCreateFormItemLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 15 },
-}
+};
 
 interface MenuCreateProps {
-  isMenuCreateModalVisible: boolean
-  onMenuCreateCancel: () => void
-  onMenuCreateFinish: (MenuCreate: MenuCreate) => void
-  isMenuCreateLoading: boolean
-  menuCreateForm: FormInstance
-  optionDataSource: any
+  isMenuCreateModalVisible: boolean;
+  onMenuCreateCancel: () => void;
+  onMenuCreateFinish: (MenuCreate: MenuCreate) => void;
+  isMenuCreateLoading: boolean;
+  menuCreateForm: FormInstance;
+  optionDataSource: any;
 }
 
 const MenuCreateComponent: React.FC<MenuCreateProps> = ({
@@ -27,7 +27,7 @@ const MenuCreateComponent: React.FC<MenuCreateProps> = ({
                                                           menuCreateForm,
                                                           optionDataSource,
                                                         }) => {
-  const optionDataTransform = [{name: '根目录', id: 0, children: optionDataSource}]
+  const optionDataTransform = [{ name: '根目录', id: 0, children: optionDataSource }];
   const menuTreeData = TreeSelectUtil.transform(optionDataTransform);
   const footerButtons = useMemo(
     () => [
@@ -39,7 +39,7 @@ const MenuCreateComponent: React.FC<MenuCreateProps> = ({
       </Button>,
     ],
     [isMenuCreateLoading, menuCreateForm, onMenuCreateCancel],
-  )
+  );
   const handleIconChange = async (iconName: string) => {
     menuCreateForm.setFieldsValue({ icon: iconName });
   };
@@ -50,7 +50,7 @@ const MenuCreateComponent: React.FC<MenuCreateProps> = ({
       open={isMenuCreateModalVisible}
       onCancel={onMenuCreateCancel}
       footer={footerButtons}
-      width={"60%"}
+      width={'60%'}
     >
       <Form
         {...menuCreateFormItemLayout}
@@ -80,11 +80,11 @@ const MenuCreateComponent: React.FC<MenuCreateProps> = ({
           <IconSelect onChange={handleIconChange} />
         </Form.Item>
 
-        <Form.Item label="菜单名称" name="name" required rules={[{ required: true, message: "请输入菜单名称" }]}>
+        <Form.Item label="菜单名称" name="name" required rules={[{ required: true, message: '请输入菜单名称' }]}>
           <Input placeholder="请输入菜单名称" />
         </Form.Item>
 
-        <Form.Item label="显示排序" name="sort" required rules={[{ required: true, message: "请输入显示排序" }]}>
+        <Form.Item label="显示排序" name="sort" required rules={[{ required: true, message: '请输入显示排序' }]}>
           <Input placeholder="请输入显示排序" />
         </Form.Item>
 
@@ -95,7 +95,7 @@ const MenuCreateComponent: React.FC<MenuCreateProps> = ({
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item label="路由地址" name="path" required rules={[{ required: true, message: "请输入路由地址" }]}>
+        <Form.Item label="路由地址" name="path" required rules={[{ required: true, message: '请输入路由地址' }]}>
           <Input placeholder="请输入路由地址" />
         </Form.Item>
 
@@ -114,8 +114,8 @@ const MenuCreateComponent: React.FC<MenuCreateProps> = ({
         </Form.Item>
       </Form>
     </Modal>
-  )
-}
+  );
+};
 
-export default MenuCreateComponent
+export default MenuCreateComponent;
 

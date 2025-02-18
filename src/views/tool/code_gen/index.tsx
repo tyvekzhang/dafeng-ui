@@ -9,6 +9,7 @@ import ImportTable from './components/ImportTable';
 import { message } from '@/components/GlobalToast';
 import { codeList, deleteTable, downloadCode, syncTable } from '@/service/code_gen';
 import { GenTableQueryResponse } from '@/types/code_gen';
+import dayjs from 'dayjs';
 
 export default function CodeGen() {
   const searchForm = Form.useForm();
@@ -98,6 +99,9 @@ export default function CodeGen() {
       title: '创建时间',
       dataIndex: 'createTime',
       width: '15%',
+      render: (text: string) => (
+        <span>{dayjs(text).format('YYYY-MM-DD HH:mm:ss')}</span>
+      ),
     },
     {
       title: '操作',

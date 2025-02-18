@@ -32,6 +32,15 @@ const ToolRoute: RouteObject = {
         key: 'db',
       },
     },
+    {
+      path: 'pdf',
+      name: 'Pdf',
+      element: LazyLoad(lazy(() => import('@/views/tool/pdf'))),
+      meta: {
+        title: 'Pdf管理',
+        key: 'pdf',
+      },
+    },
   ],
 };
 

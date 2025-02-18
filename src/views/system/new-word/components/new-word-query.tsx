@@ -1,4 +1,18 @@
-import { Button, DatePicker, Form, Input, Space, Select} from 'antd';
+import { Input } from 'antd';
+import { Select } from 'antd';
+import { DatePicker } from 'antd';
+import { Checkbox } from 'antd';
+import { Radio } from 'antd';
+import {
+  AutoComplete,
+  Button,
+  Cascader,
+  ColorPicker,
+  Form,
+  InputNumber, Mentions,
+  Modal, Rate,
+  Slider, Switch, TimePicker, Transfer, TreeSelect, Upload, Space
+} from 'antd';
 import { FormInstance } from 'antd/es/form';
 import React from 'react';
 
@@ -32,26 +46,20 @@ const NewWordQueryComponent: React.FC<NewWordQueryProps> = ({
       layout="horizontal"
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-0 gap-x-4 pt-4 px-2"
     >
-      <Form.Item name="article_id" label="文章ID" rules={[{ required: false, message: '请输入' }]}>
-        <Input placeholder="请输入" />
+      <Form.Item name="word" label="姓名" >
+        <Input placeholder="请输入姓名" />
       </Form.Item>
-      <Form.Item name="word_id" label="词库表ID" rules={[{ required: false, message: '请输入' }]}>
-        <Input placeholder="请输入" />
+      <Form.Item name="translation" label="国家" >
+        <Select placeholder="请选择国家" />
       </Form.Item>
-      <Form.Item name="word" label="单词" rules={[{ required: false, message: '请输入' }]}>
-        <Input placeholder="请输入" />
+      <Form.Item name="next_review_date" label="爱好" >
+        <Checkbox >爱好</Checkbox>
       </Form.Item>
-      <Form.Item name="translation" label="翻译" rules={[{ required: false, message: '请输入' }]}>
-        <Input placeholder="请输入" />
+      <Form.Item name="tenant" label="性别" >
+        <Radio>性别</Radio>
       </Form.Item>
-      <Form.Item name="review_count" label="复习次数" rules={[{ required: false, message: '请输入' }]}>
-        <Input placeholder="请输入" />
-      </Form.Item>
-      <Form.Item name="next_review_date" label="复习时间" rules={[{ required: false, message: '请输入' }]}>
-        <DatePicker.RangePicker />
-      </Form.Item>
-      <Form.Item name="create_time" label="创建时间" rules={[{ required: false, message: '请输入' }]}>
-        <DatePicker.RangePicker />
+      <Form.Item name="update_time" label="出生年月" >
+        <DatePicker format="YYYY-MM-DD" placeholder="请选择出生年月" />
       </Form.Item>
       <Form.Item className="flex justify-end">
         <Space className="inline-flex">
