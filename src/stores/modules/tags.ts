@@ -2,9 +2,12 @@ import type { RouteObject } from '@/router/types';
 import type { TagsState } from '@/stores/types';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { AppDispatch, RootState } from '..';
+import { setItem, getItem } from '@/utils/localStorage';
+
+const VISITED_TAGS_KEY = 'visitedTags';
 
 const initialState: TagsState = {
-  visitedTags: [],
+  visitedTags: getItem(VISITED_TAGS_KEY) || [],
   cachedTags: new Set(),
 };
 
@@ -26,9 +29,11 @@ const tags = createSlice({
       } else {
         state.visitedTags[hasExistIndex] = Object.assign({}, state.visitedTags[hasExistIndex], action.payload);
       }
+      setItem(VISITED_TAGS_KEY, state.visitedTags);
     },
     updateVisitedTags: (state, action) => {
       state.visitedTags = action.payload;
+      setItem(VISITED_TAGS_KEY, state.visitedTags);
     },
     closeTagsByType: (state, action) => {
       let restTags: RouteObject[] = [];
@@ -48,6 +53,7 @@ const tags = createSlice({
           break;
       }
       state.visitedTags = affixTags.concat(restTags.filter((tag: RouteObject) => !tag.meta?.affix));
+      setItem(VISITED_TAGS_KEY, state.visitedTags);
     },
     updateCacheTags: (state) => {
       const cachedSet: Set<string> = new Set();

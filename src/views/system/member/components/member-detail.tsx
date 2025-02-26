@@ -40,6 +40,7 @@ const MemberDetailComponent: React.FC<MemberDetailDrawerProps> = ({
           <Descriptions.Item label="性别">{ memberDetail.gender}</Descriptions.Item>
           <Descriptions.Item label="生日">{ memberDetail.birthday}</Descriptions.Item>
           <Descriptions.Item label="爱好">{ memberDetail.hobby}</Descriptions.Item>
+          <Descriptions.Item label="父Id">{ memberDetail.parent_id}</Descriptions.Item>
         </Descriptions>
       )}
     </Drawer>

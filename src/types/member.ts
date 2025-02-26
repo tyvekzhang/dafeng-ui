@@ -18,6 +18,9 @@ export interface MemberPage {
     /** 爱好 */
     hobby: string;
     
+    /** 父Id */
+    parent_id: string;
+    
 }
 
 export interface MemberCreate {
@@ -36,6 +39,9 @@ export interface MemberCreate {
     
     /** 爱好 */
     hobby: string;
+    
+    /** 父Id */
+    parent_id: string;
     
 }
 
@@ -81,6 +87,9 @@ export interface MemberModify {
     /** 爱好 */
     hobby: string;
     
+    /** 父Id */
+    parent_id: string;
+    
 }
 
 export interface MemberBatchModify {
@@ -101,6 +110,9 @@ export interface MemberBatchModify {
     
     /** 爱好 */
     hobby: string;
+    
+    /** 父Id */
+    parent_id: string;
     
 }
 
@@ -123,5 +135,8 @@ export interface MemberDetail {
     
     /** 爱好 */
     hobby: string;
+    
+    /** 父Id */
+    parent_id: string;
     
 }

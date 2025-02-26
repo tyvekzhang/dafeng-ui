@@ -1,166 +1,157 @@
-import { basicRoutes } from '@/router';
-import type { RouteObject } from '@/router/types';
-import { useAppDispatch, useAppSelector } from '@/stores';
-import { addVisitedTags, closeAllTags, closeTagByKey, closeTagsByType } from '@/stores/modules/tags';
-import { searchRoute } from '@/utils';
-import { CloseOutlined, RedoOutlined } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
-import { Button, Dropdown } from 'antd';
-import classNames from 'classnames';
-import { FC, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { TagItem } from './components';
-import styles from './index.module.less';
+import { basicRoutes } from "@/router"
+import type { RouteObject } from "@/router/types"
+import { useAppDispatch, useAppSelector } from "@/stores"
+import { addVisitedTags, closeAllTags, closeTagByKey, closeTagsByType } from "@/stores/modules/tags"
+import { searchRoute } from "@/utils"
+import { type FC, useEffect, useRef, useState, useCallback } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import TagItem from "./components/TagItem"
 
 const TagsLayout: FC = () => {
-  const items: MenuProps['items'] = [
-    { key: 'left', label: '关闭左侧' },
-    { key: 'right', label: '关闭右侧' },
-    { key: 'other', label: '关闭其它' },
-    { key: 'all', label: '关闭所有' },
-  ];
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const visitedTags = useAppSelector((state) => state.tags.visitedTags)
 
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const visitedTags = useAppSelector((state) => state.tags.visitedTags);
+  const tagsMain = useRef<HTMLDivElement>(null)
+  const tagsMainCont = useRef<HTMLDivElement>(null)
 
-  const tagsMain = useRef<HTMLDivElement>(null);
-  const tagsMainCont = useRef<HTMLDivElement>(null);
+  const [tagsContLeft, setTagsContLeft] = useState(0)
+  const [activeTag, setActiveTag] = useState(pathname)
 
-  const [tagsContLeft, setTagsContLeft] = useState(0);
-  const [activeTag, setActiveTag] = useState(pathname);
-
-  const initAffixTags = (routes: RouteObject[], basePath: string = '/') => {
-    let affixTags: RouteObject[] = [];
+  const initAffixTags = useCallback((routes: RouteObject[], basePath = "/") => {
+    let affixTags: RouteObject[] = []
     for (const route of routes) {
       if (route.meta?.affix) {
-        const fullPath = route.path!.startsWith('/') ? route.path : basePath + route.path;
-        affixTags.push({ ...route, path: fullPath });
+        const fullPath = route.path!.startsWith("/") ? route.path : basePath + route.path
+        affixTags.push({ ...route, path: fullPath })
       }
       if (route.children && route.children.length) {
-        affixTags = affixTags.concat(initAffixTags(route.children, route.path));
+        affixTags = affixTags.concat(initAffixTags(route.children, route.path))
       }
     }
-    return affixTags;
-  };
+    return affixTags
+  }, [])
 
-  const moveToActiveTag = (tag: HTMLElement | null) => {
-    if (!tag) return;
+  const moveToActiveTag = useCallback(
+    (tag: HTMLElement | null) => {
+      if (!tag) return
 
-    const mainContPadding = 4;
-    const mainWidth = tagsMain.current?.offsetWidth || 0;
-    const mainContWidth = tagsMainCont.current?.offsetWidth || 0;
+      const mainContPadding = 4
+      const mainWidth = tagsMain.current?.offsetWidth || 0
+      const mainContWidth = tagsMainCont.current?.offsetWidth || 0
 
-    let leftOffset: number;
+      let leftOffset: number
 
-    if (mainContWidth < mainWidth) {
-      leftOffset = 0;
-    } else if (tag.offsetLeft < -tagsContLeft) {
-      leftOffset = -tag.offsetLeft + mainContPadding;
-    } else if (tag.offsetLeft > -tagsContLeft && tag.offsetLeft + tag.offsetWidth < -tagsContLeft + mainWidth) {
-      leftOffset = Math.min(0, mainWidth - tag.offsetWidth - tag.offsetLeft - mainContPadding);
-    } else {
-      leftOffset = -(tag.offsetLeft - (mainWidth - mainContPadding - tag.offsetWidth));
-    }
-    setTagsContLeft(leftOffset);
-  };
+      if (mainContWidth < mainWidth) {
+        leftOffset = 0
+      } else if (tag.offsetLeft < -tagsContLeft) {
+        leftOffset = -tag.offsetLeft + mainContPadding
+      } else if (tag.offsetLeft > -tagsContLeft && tag.offsetLeft + tag.offsetWidth < -tagsContLeft + mainWidth) {
+        leftOffset = Math.min(0, mainWidth - tag.offsetWidth - tag.offsetLeft - mainContPadding)
+      } else {
+        leftOffset = -(tag.offsetLeft - (mainWidth - mainContPadding - tag.offsetWidth))
+      }
+      setTagsContLeft(leftOffset)
+    },
+    [tagsContLeft],
+  )
 
   useEffect(() => {
-    const affixTags = initAffixTags(basicRoutes);
-    affixTags.forEach((tag) => dispatch(addVisitedTags(tag)));
-    const currRoute = searchRoute(pathname, basicRoutes);
+    const affixTags = initAffixTags(basicRoutes)
+    affixTags.forEach((tag) => dispatch(addVisitedTags(tag)))
+    const currRoute = searchRoute(pathname, basicRoutes)
     if (currRoute) {
-      dispatch(addVisitedTags(currRoute));
+      dispatch(addVisitedTags(currRoute))
     }
-    setActiveTag(pathname);
-  }, [pathname, dispatch]);
+    setActiveTag(pathname)
+  }, [pathname, dispatch, initAffixTags])
 
   useEffect(() => {
-    const tagNodeList = tagsMainCont.current?.childNodes as NodeListOf<HTMLElement>;
-    const activeTagNode = Array.from(tagNodeList).find((item) => item.dataset.path === activeTag) || null;
-    moveToActiveTag(activeTagNode);
-  }, [activeTag]);
+    const tagNodeList = tagsMainCont.current?.childNodes as NodeListOf<HTMLElement>
+    const activeTagNode = Array.from(tagNodeList).find((item) => item.dataset.path === activeTag) || null
+    moveToActiveTag(activeTagNode)
+  }, [activeTag, moveToActiveTag])
 
-  const handleCloseTag = (path: string) => {
+  const handleCloseTag = useCallback((path: string) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    dispatch(closeTagByKey(path)).then(({ payload }) => {
-      const { tagIndex, tagsList } = payload;
-      const tagLen = tagsList.length;
+    dispatch(closeTagByKey(path)).then((action) => {
+      if (action.payload) {
+        const { tagIndex, tagsList } = action.payload
+        const tagLen = tagsList.length
 
-      if (path === activeTag) {
-        const currTag = tagIndex < tagLen ? tagsList[tagIndex] : tagsList[tagLen - 1];
-        navigate(currTag.fullPath);
-      }
-    });
-  };
-
-  const handleClickTag = (path: string) => {
-    setActiveTag(path);
-    navigate(path);
-  };
-
-  const getKey = () => {
-    return Date.now().toString();
-  };
-
-  const handleReload = () => {
-    const index = visitedTags.findIndex((tab: { fullPath: string }) => tab.fullPath === activeTag);
-    if (index >= 0) {
-      navigate(activeTag, { replace: true, state: { key: getKey() } });
-    }
-  };
-
-  const onClick: MenuProps['onClick'] = ({ key }) => {
-    if (key === 'all') {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      dispatch(closeAllTags()).then(({ payload }) => {
-        const lastTag = payload.slice(-1)[0];
-        if (activeTag !== lastTag?.fullPath) {
-          navigate(lastTag?.fullPath);
+        if (path === activeTag) {
+          const currTag = tagIndex < tagLen ? tagsList[tagIndex] : tagsList[tagLen - 1]
+          navigate(currTag.fullPath)
         }
-      });
-    } else {
-      dispatch(closeTagsByType({ type: key, path: activeTag }));
-    }
-  };
+      }
+    })
+  }, [dispatch, navigate, activeTag])
+
+  const handleClickTag = useCallback((path: string) => {
+    setActiveTag(path)
+    navigate(path)
+  }, [navigate])
+
+  const handleReload = useCallback((fullPath: string) => {
+    navigate(fullPath, { replace: true, state: { key: Date.now().toString() } })
+  }, [navigate])
+
+  const handleCloseOthers = useCallback((path: string) => {
+    dispatch(closeTagsByType({ type: "other", path }))
+  }, [dispatch])
+
+  const handleCloseLeft = useCallback((path: string) => {
+    dispatch(closeTagsByType({ type: "left", path }))
+  }, [dispatch])
+
+  const handleCloseRight = useCallback((path: string) => {
+    dispatch(closeTagsByType({ type: "right", path }))
+  }, [dispatch])
+
+  const handleCloseAll = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    dispatch(closeAllTags()).then((action) => {
+      if (action.payload) {
+        const lastTag = action.payload.slice(-1)[0]
+        if (activeTag !== lastTag?.fullPath) {
+          navigate(lastTag?.fullPath)
+        }
+      }
+    })
+  }, [dispatch, navigate, activeTag])
+
+  const tagItems = visitedTags.map((item: RouteObject, index: number) => (
+    <span className={"inline-block h-full"} key={item.fullPath} data-path={item.fullPath}>
+      <TagItem
+        name={item.meta?.title ?? "默认"}
+        fixed={item.meta?.affix}
+        active={activeTag === item.fullPath}
+        isFirst={index === 0}
+        isLast={index === visitedTags.length - 1}
+        id={item.fullPath as string}
+        onClick={() => handleClickTag(item.fullPath as string)}
+        closeTag={() => handleCloseTag(item.fullPath as string)}
+        onCloseOthers={() => handleCloseOthers(item.fullPath as string)}
+        onCloseLeft={() => handleCloseLeft(item.fullPath as string)}
+        onCloseRight={() => handleCloseRight(item.fullPath as string)}
+        onCloseAll={handleCloseAll}
+        onRefresh={() => handleReload(item.fullPath as string)}
+      />
+    </span>
+  ));
 
   return (
-    <div className={styles['layout_tags']}>
-      <div ref={tagsMain} className={styles['layout_tags__main']}>
-        <div ref={tagsMainCont} className={styles['layout_tags__main-cont']} style={{ left: tagsContLeft + 'px' }}>
-          {visitedTags.map((item: RouteObject) => {
-            return (
-              <span key={item.fullPath} data-path={item.fullPath}>
-                <TagItem
-                  name={item.meta?.title ?? '默认'}
-                  active={activeTag === item.fullPath}
-                  fixed={item.meta?.affix}
-                  onClick={() => handleClickTag(item.fullPath as string)}
-                  closeTag={() => handleCloseTag(item.fullPath as string)}
-                />
-              </span>
-            );
-          })}
+    <div>
+      <div ref={tagsMain}>
+        <div ref={tagsMainCont} className="h-8 bg-white border-b pl-4 py-0.5">
+          {tagItems}
         </div>
       </div>
-      <Button
-        className={classNames(`${styles.layout_tags}__btn`, `${styles.layout_tags}__btn-space`)}
-        icon={<RedoOutlined />}
-        size="small"
-        onClick={() => handleReload()}
-      />
-      <Dropdown menu={{ items, onClick }} placement="bottomLeft" className="mr-4">
-        <Button
-          className={classNames(styles['layout_tags__btn'], styles['layout_tags__btn-space'])}
-          icon={<CloseOutlined />}
-          size="small"
-        />
-      </Dropdown>
     </div>
-  );
-};
+  )
+}
 
-export default TagsLayout;
+export default TagsLayout

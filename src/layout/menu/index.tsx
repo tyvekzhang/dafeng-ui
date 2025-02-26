@@ -8,6 +8,9 @@ import { Menu, Spin } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '@/stores';
+import { setDictData } from '@/stores/modules/dict';
+import { fetchAllDictData } from '@/service/dict-data';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -60,12 +63,21 @@ const LayoutMenu = memo((props: any) => {
     return list;
   };
 
+  const dispatch = useAppDispatch()
+  const { dictData } = useAppSelector((state) => state.dict);
+
   const getMenuList = async () => {
     setLoading(true);
     try {
       const menus = await getAsyncMenus();
       setMenuList(getMenuItem(menus));
       setMenuListAction(menus);
+      if (dictData === undefined || JSON.stringify(dictData) === '{}' ) {
+        const resp = await fetchAllDictData()
+        if (resp) {
+          dispatch(setDictData(resp));
+        }
+      }
     } finally {
       setLoading(false);
     }

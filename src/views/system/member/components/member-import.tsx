@@ -94,6 +94,12 @@ const MemberImportComponent: React.FC<MemberImportProps> = ({
       render: (text) => (text ? text : "-"),
     },
     {
+      title: "父Id",
+      dataIndex: "parent_id",
+      key: "parent_id",
+      render: (text) => (text ? text : "-"),
+    },
+    {
       title: "错误信息",
       dataIndex: "errMsg",
       key: "errMsg",

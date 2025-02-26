@@ -15,7 +15,6 @@ import { App, Button, Checkbox, Form } from "antd"
 import { type FC, useState, useCallback, useEffect } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import userStyles from "./style"
-import { setDictData } from "@/stores/modules/dict"
 import { fetchAllDictData } from "@/service/dict-data"
 
 const LoginPage: FC = () => {
@@ -56,9 +55,8 @@ const LoginPage: FC = () => {
   )
 
   const afterLoginAction = useCallback(async (): Promise<UserInfo | null> => {
-    const [userInfo, dictData] = await Promise.all([me(), fetchAllDictData()])
+    const [userInfo] = await Promise.all([me(), fetchAllDictData()])
     dispatch(setUserInfo(userInfo))
-    dispatch(setDictData(dictData))
 
     const redirect = searchParams.get("redirect")
     navigate(redirect || userInfo?.homePath || "/home")
@@ -112,7 +110,7 @@ const LoginPage: FC = () => {
               </div>
             </div>
           </Form.Item>
-          <Form.Item name="remember" valuePropName="checked" noStyle>
+          <Form.Item name="remember" valuePropName="checked">
             <Checkbox>记住我</Checkbox>
           </Form.Item>
           <Form.Item>

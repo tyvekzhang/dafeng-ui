@@ -1,6 +1,8 @@
-import ActionButtonComponent from "@/components/base/action-button";
-import { PaginatedTable } from "@/components/base/paginated-table";
-import { message } from "@/components/GlobalToast";
+import { useAppSelector } from '@/stores';
+import { Form, Tag } from 'antd';
+import ActionButtonComponent from '@/components/base/action-button';
+import { PaginatedTable } from '@/components/base/paginated-table';
+import { message } from '@/components/GlobalToast';
 import dayjs from 'dayjs';
 import {
   batchCreateMember,
@@ -13,20 +15,19 @@ import {
   importMember,
   modifyMember,
   removeMember,
-} from "@/service/member";
-import { BaseQueryImpl } from "@/types";
-import { MemberBatchModify, MemberCreate, MemberDetail, MemberModify, MemberPage, MemberQuery } from "@/types/member";
-import MemberBatchModifyComponent from "@/views/system/member/components/member-batch-modify";
-import MemberCreateComponent from "@/views/system/member/components/member-create";
-import MemberImportComponent from "@/views/system/member/components/member-import";
-import MemberModifyComponent from "@/views/system/member/components/member-modify";
-import MemberQueryComponent from "@/views/system/member/components/member-query";
-import { Form } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import type { RcFile } from "rc-upload/lib/interface";
-import React, { useEffect, useState } from "react";
+} from '@/service/member';
+import { BaseQueryImpl } from '@/types';
+import { MemberBatchModify, MemberCreate, MemberDetail, MemberModify, MemberPage, MemberQuery } from '@/types/member';
+import MemberBatchModifyComponent from '@/views/system/member/components/member-batch-modify';
+import MemberCreateComponent from '@/views/system/member/components/member-create';
+import MemberImportComponent from '@/views/system/member/components/member-import';
+import MemberModifyComponent from '@/views/system/member/components/member-modify';
+import MemberQueryComponent from '@/views/system/member/components/member-query';
+import { ColumnsType } from 'antd/lib/table';
+import type { RcFile } from 'rc-upload/lib/interface';
+import React, { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import MemberDetailComponent from "@/views/system/member/components/member-detail";
+import MemberDetailComponent from '@/views/system/member/components/member-detail';
 import TransitionWrapper from '@/components/base/transition-wrapper';
 
 const Member: React.FC = () => {
@@ -41,6 +42,7 @@ const Member: React.FC = () => {
   const showMore = false;
 
   // 查询模块
+  const { dictData } = useAppSelector((state) => state.dict);
   const [isMemberQueryShow, setIsMemberQueryShow] = useState<boolean>(true)
   const [memberPageDataSource, setMemberPageDataSource] = useState<MemberPage[]>([]);
   const [memberPageTotalCount, setMemberPageTotalCount] = useState(0);
@@ -111,14 +113,34 @@ const Member: React.FC = () => {
       title: "国家",
       dataIndex: "nation",
       key: "nation",
-      render: (text) => (text ? text : "-"),
-      width: "12%",
+      render: (text) => {
+        const values = (text !== undefined && text !== null) ? String(text).split(',') : [];
+        return values.map((value: string) => {
+          const item = dictData["sys_user_country"].find((d: Record<string, string>) => d.value === value);
+          if (item) {
+            return <Tag bordered={false} color="processing" key={item.value}>{item.label}</Tag>;
+          }
+          return null;
+        });
+      },
+
       ellipsis: true,
     },
     {
       title: "性别",
       dataIndex: "gender",
       key: "gender",
+      render: (text) => {
+        const values = (text !== undefined && text !== null) ? String(text).split(',') : [];
+        return values.map((value: string) => {
+          const item = dictData["sys_user_sex"].find((d: Record<string, string>) => d.value === value);
+          if (item) {
+            return <Tag bordered={false} color="processing" key={item.value}>{item.label}</Tag>;
+          }
+          return null;
+        });
+      },
+
       width: "6%",
     },
     {
@@ -135,9 +157,24 @@ const Member: React.FC = () => {
       title: "爱好",
       dataIndex: "hobby",
       key: "hobby",
-      render: (text) => (text ? text : "-"),
-      width: "12%",
+      render: (text) => {
+        const values = (text !== undefined && text !== null) ? String(text).split(',') : [];
+        return values.map((value: string) => {
+          const item = dictData["sys_user_hobby"].find((d: Record<string, string>) => d.value === value);
+          if (item) {
+            return <Tag bordered={false} color="processing" key={item.value}>{item.label}</Tag>;
+          }
+          return null;
+        });
+      },
+
       ellipsis: true,
+    },
+    {
+      title: "父Id",
+      dataIndex: "parent_id",
+      key: "parent_id",
+      width: "6%",
     },
     {
       title: "操作",
@@ -200,11 +237,12 @@ const Member: React.FC = () => {
   };
   const onMemberQueryFinish = async () => {
     const memberQueryFormData = memberQueryForm.getFieldsValue();
-    const { create_time } = memberQueryFormData
-    if (create_time) {
-      const [startDate, endDate] = create_time
-      memberQueryFormData.create_time = [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
-    }
+    const birthday = memberQueryFormData.birthday;
+    const birthdayStart = birthday ? birthday[0]?.format('YYYY-MM-DD') : null;
+    const birthdayEnd = birthday ? birthday[1]?.format('YYYY-MM-DD') : null;
+    delete memberQueryFormData.birthday;
+    if (birthdayStart) memberQueryFormData['birthday_start'] = birthdayStart;
+    if (birthdayEnd) memberQueryFormData['birthday_end'] = birthdayEnd;
     const memberQuery = memberQueryFormData as MemberQuery;
     const filteredMemberQuery = Object.fromEntries(
       Object.entries(memberQuery).filter(([, value]) => value !== undefined && value !== null && value !== ""),
@@ -456,6 +494,7 @@ const Member: React.FC = () => {
             onMemberCreateFinish={handleMemberCreateFinish}
             isMemberCreateLoading={isMemberCreateLoading}
             memberCreateForm={ memberCreateForm}
+            treeSelectDataSource={ memberPageDataSource }
           />
         </div>
         <div>
@@ -472,6 +511,7 @@ const Member: React.FC = () => {
             onMemberModifyFinish={handleMemberModifyFinish}
             isMemberModifyLoading={isMemberModifyLoading}
             memberModifyForm={ memberModifyForm}
+            treeSelectDataSource={ memberPageDataSource }
           />
         </div>
         <div>
@@ -481,6 +521,7 @@ const Member: React.FC = () => {
             onMemberBatchModifyFinish={handleMemberBatchModifyFinish}
             isMemberBatchModifyLoading={isMemberBatchModifyLoading}
             memberBatchModifyForm={ memberBatchModifyForm}
+            treeSelectDataSource={ memberPageDataSource }
           />
         </div>
         <div>
