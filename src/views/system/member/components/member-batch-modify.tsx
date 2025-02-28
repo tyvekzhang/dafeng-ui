@@ -66,9 +66,10 @@ const MemberBatchModifyComponent: React.FC<MemberBatchModifyProps> = ({
       onCancel={onMemberBatchModifyCancel}
       footer={footerButtons}
       destroyOnClose
+      width={"60%"}
     >
         <Form
-          {... memberBatchModifyFormItemLayout}
+          {...memberBatchModifyFormItemLayout}
           form={ memberBatchModifyForm}
           name="memberBatchModify"
           onFinish={onMemberBatchModifyFinish}

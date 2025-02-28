@@ -66,6 +66,7 @@ const MemberModifyComponent: React.FC<MemberModifyProps> = ({
       onCancel={onMemberModifyCancel}
       footer={footerButtons}
       destroyOnClose
+      width={"60%"}
     >
         <Form
           {...memberModifyFormItemLayout}

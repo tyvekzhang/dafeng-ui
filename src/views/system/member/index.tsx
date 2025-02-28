@@ -1,8 +1,9 @@
+
 import { useAppSelector } from '@/stores';
-import { Form, Tag } from 'antd';
-import ActionButtonComponent from '@/components/base/action-button';
-import { PaginatedTable } from '@/components/base/paginated-table';
-import { message } from '@/components/GlobalToast';
+import { Form } from "antd";
+import ActionButtonComponent from "@/components/base/action-button";
+import { PaginatedTable } from "@/components/base/paginated-table";
+import { message } from "@/components/GlobalToast";
 import dayjs from 'dayjs';
 import {
   batchCreateMember,
@@ -15,19 +16,19 @@ import {
   importMember,
   modifyMember,
   removeMember,
-} from '@/service/member';
-import { BaseQueryImpl } from '@/types';
-import { MemberBatchModify, MemberCreate, MemberDetail, MemberModify, MemberPage, MemberQuery } from '@/types/member';
-import MemberBatchModifyComponent from '@/views/system/member/components/member-batch-modify';
-import MemberCreateComponent from '@/views/system/member/components/member-create';
-import MemberImportComponent from '@/views/system/member/components/member-import';
-import MemberModifyComponent from '@/views/system/member/components/member-modify';
-import MemberQueryComponent from '@/views/system/member/components/member-query';
-import { ColumnsType } from 'antd/lib/table';
-import type { RcFile } from 'rc-upload/lib/interface';
-import React, { useEffect, useState } from 'react';
+} from "@/service/member";
+import { BaseQueryImpl } from "@/types";
+import { MemberBatchModify, MemberCreate, MemberDetail, MemberModify, MemberPage, MemberQuery } from "@/types/member";
+import MemberBatchModifyComponent from "@/views/system/member/components/member-batch-modify";
+import MemberCreateComponent from "@/views/system/member/components/member-create";
+import MemberImportComponent from "@/views/system/member/components/member-import";
+import MemberModifyComponent from "@/views/system/member/components/member-modify";
+import MemberQueryComponent from "@/views/system/member/components/member-query";
+import { ColumnsType } from "antd/lib/table";
+import type { RcFile } from "rc-upload/lib/interface";
+import React, { useEffect, useState } from "react";
 import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import MemberDetailComponent from '@/views/system/member/components/member-detail';
+import MemberDetailComponent from "@/views/system/member/components/member-detail";
 import TransitionWrapper from '@/components/base/transition-wrapper';
 
 const Member: React.FC = () => {
@@ -114,16 +115,21 @@ const Member: React.FC = () => {
       dataIndex: "nation",
       key: "nation",
       render: (text) => {
-        const values = (text !== undefined && text !== null) ? String(text).split(',') : [];
-        return values.map((value: string) => {
-          const item = dictData["sys_user_country"].find((d: Record<string, string>) => d.value === value);
-          if (item) {
-            return <Tag bordered={false} color="processing" key={item.value}>{item.label}</Tag>;
-          }
-          return null;
-        });
+          const values = (text!== undefined && text!== null)? String(text).split(',') : [];
+          return values.map((value, index) => {
+              const item = dictData["sys_user_country"].find((d) => d.value === value);
+              if (item) {
+                  const content = <span key={item.value}>{item.label}</span>;
+                  return index < values.length - 1? (
+                      <React.Fragment key={`${item.value}-with-comma`}>
+                          {content},&nbsp;
+                      </React.Fragment>
+                  ) : content;
+              }
+              return null;
+          });
       },
-
+      
       ellipsis: true,
     },
     {
@@ -131,17 +137,22 @@ const Member: React.FC = () => {
       dataIndex: "gender",
       key: "gender",
       render: (text) => {
-        const values = (text !== undefined && text !== null) ? String(text).split(',') : [];
-        return values.map((value: string) => {
-          const item = dictData["sys_user_sex"].find((d: Record<string, string>) => d.value === value);
-          if (item) {
-            return <Tag bordered={false} color="processing" key={item.value}>{item.label}</Tag>;
-          }
-          return null;
-        });
+          const values = (text!== undefined && text!== null)? String(text).split(',') : [];
+          return values.map((value, index) => {
+              const item = dictData["sys_user_sex"].find((d) => d.value === value);
+              if (item) {
+                  const content = <span key={item.value}>{item.label}</span>;
+                  return index < values.length - 1? (
+                      <React.Fragment key={`${item.value}-with-comma`}>
+                          {content},&nbsp;
+                      </React.Fragment>
+                  ) : content;
+              }
+              return null;
+          });
       },
-
-      width: "6%",
+      
+      ellipsis: true,
     },
     {
       title: "生日",
@@ -158,16 +169,21 @@ const Member: React.FC = () => {
       dataIndex: "hobby",
       key: "hobby",
       render: (text) => {
-        const values = (text !== undefined && text !== null) ? String(text).split(',') : [];
-        return values.map((value: string) => {
-          const item = dictData["sys_user_hobby"].find((d: Record<string, string>) => d.value === value);
-          if (item) {
-            return <Tag bordered={false} color="processing" key={item.value}>{item.label}</Tag>;
-          }
-          return null;
-        });
+          const values = (text!== undefined && text!== null)? String(text).split(',') : [];
+          return values.map((value, index) => {
+              const item = dictData["sys_user_hobby"].find((d) => d.value === value);
+              if (item) {
+                  const content = <span key={item.value}>{item.label}</span>;
+                  return index < values.length - 1? (
+                      <React.Fragment key={`${item.value}-with-comma`}>
+                          {content},&nbsp;
+                      </React.Fragment>
+                  ) : content;
+              }
+              return null;
+          });
       },
-
+      
       ellipsis: true,
     },
     {
@@ -235,21 +251,17 @@ const Member: React.FC = () => {
     resetPagination();
     memberQueryForm.resetFields();
   };
-  const onMemberQueryFinish = async () => {
+const onMemberQueryFinish = async () => {
     const memberQueryFormData = memberQueryForm.getFieldsValue();
-    const birthday = memberQueryFormData.birthday;
-    const birthdayStart = birthday ? birthday[0]?.format('YYYY-MM-DD') : null;
-    const birthdayEnd = birthday ? birthday[1]?.format('YYYY-MM-DD') : null;
-    delete memberQueryFormData.birthday;
-    if (birthdayStart) memberQueryFormData['birthday_start'] = birthdayStart;
-    if (birthdayEnd) memberQueryFormData['birthday_end'] = birthdayEnd;
+            const birthdayValue = memberQueryFormData.birthday ? memberQueryFormData.birthday.format('YYYY-MM-DD') : null;
+            memberQueryFormData.birthday = birthdayValue;
     const memberQuery = memberQueryFormData as MemberQuery;
     const filteredMemberQuery = Object.fromEntries(
-      Object.entries(memberQuery).filter(([, value]) => value !== undefined && value !== null && value !== ""),
+        Object.entries(memberQuery).filter(([, value]) => value !== undefined && value !== null && value !== ""),
     );
     resetPagination();
     await handleMemberQueryFinish(filteredMemberQuery as MemberQuery);
-  };
+};
   const handleMemberQueryFinish = async (memberQuery: MemberQuery) => {
     await fetchMemberByPage(BaseQueryImpl.create(current, pageSize), memberQuery).then((resp) => {
       setMemberPageDataSource(resp.records);
@@ -327,6 +339,9 @@ const Member: React.FC = () => {
     setSelectedRowKeys([memberPage.id])
     setSelectedRows([memberPage])
     memberModifyForm.setFieldsValue({ ...memberPage });
+    if (memberPage.birthday) {
+      memberModifyForm.setFieldsValue({ "birthday": dayjs(memberPage.birthday) });
+    }
   };
 
   const handleMemberModifyCancel = () => {
@@ -353,11 +368,15 @@ const Member: React.FC = () => {
   // 批量更新模块
   const onMemberBatchModify = () => {
     if (selectedRowKeys.length === 1) {
-      setIsMemberModifyModalVisible(true);
-      memberModifyForm.setFieldsValue({ ...selectedRows[0] });
-    } else {
+      const selectedRow = selectedRows[0]
+      memberBatchModifyForm.setFieldsValue({ ...selectedRow });
+      if (selectedRow.birthday) {
+        memberBatchModifyForm.setFieldsValue({ "birthday": dayjs(selectedRow.birthday) });
+      }
       setIsMemberBatchModifyModalVisible(true);
+    } else {
       memberBatchModifyForm.resetFields();
+      setIsMemberBatchModifyModalVisible(true);
     }
   };
   const [isMemberBatchModifyModalVisible, setIsMemberBatchModifyModalVisible] = useState<boolean>(false);

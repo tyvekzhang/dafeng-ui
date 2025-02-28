@@ -12,7 +12,7 @@ import { AxiosResponse } from 'axios';
 import { downloadBlob } from '@/service/util';
 
 export function fetchAllDictData() {
-  return httpClient.get<Record<string, any>>('/dict-data/all');
+  return httpClient.get<Record<number, any>>('/dict-data/all');
 }
 /**
  * 分页查询DictData

@@ -10,7 +10,7 @@ export interface MemberPage {
     nation: string;
     
     /** 性别 */
-    gender: number;
+    gender: string;
     
     /** 生日 */
     birthday: string;
@@ -32,7 +32,7 @@ export interface MemberCreate {
     nation: string;
     
     /** 性别 */
-    gender: number;
+    gender: string;
     
     /** 生日 */
     birthday: string;
@@ -57,7 +57,7 @@ export interface MemberQuery {
     nation: string;
     
     /** 性别 */
-    gender: number;
+    gender: string;
     
     /** 生日 */
     birthday: string;
@@ -79,7 +79,7 @@ export interface MemberModify {
     nation: string;
     
     /** 性别 */
-    gender: number;
+    gender: string;
     
     /** 生日 */
     birthday: string;
@@ -103,7 +103,7 @@ export interface MemberBatchModify {
     nation: string;
     
     /** 性别 */
-    gender: number;
+    gender: string;
     
     /** 生日 */
     birthday: string;
@@ -128,7 +128,7 @@ export interface MemberDetail {
     nation: string;
     
     /** 性别 */
-    gender: number;
+    gender: string;
     
     /** 生日 */
     birthday: string;
