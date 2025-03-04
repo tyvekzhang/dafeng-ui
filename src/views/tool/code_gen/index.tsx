@@ -38,6 +38,7 @@ export default function CodeGen() {
   const handleSync = async (record: GenTableQueryResponse) => {
     await syncTable(record.id);
     message.success('同步成功');
+    fetchCodeList();
   };
 
   const handleCodeGenerate = async (record: GenTableQueryResponse) => {

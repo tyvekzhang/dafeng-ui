@@ -1,24 +1,7 @@
-import { Input } from 'antd';
-import { Select } from 'antd';
-import { DatePicker } from 'antd';
-import { Checkbox } from 'antd';
-import { Radio } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
-import { TreeSelect } from 'antd';
+import { Button, Checkbox, DatePicker, Form, Input, Modal, Radio, Select, TreeSelect } from 'antd';
 import { TreeSelectUtil } from '@/utils/select-util';
-import { MemberPage } from '@/types/member';
-import {
-  AutoComplete,
-  Button,
-  Cascader,
-  ColorPicker,
-  Form,
-  InputNumber, Mentions,
-  Modal, Rate,
-  Slider, Switch, TimePicker, Transfer, Upload,
-} from 'antd';
+import { MemberModify, MemberPage } from '@/types/member';
 import { useAppSelector } from '@/stores';
-import { MemberModify } from '@/types/member';
 import { FormInstance } from 'antd/es/form';
 import React, { useMemo } from 'react';
 

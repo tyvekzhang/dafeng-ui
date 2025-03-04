@@ -36,8 +36,8 @@ export const fetchConnection = async (connectionId: number) => {
 
 export const fetchDatabases = async (connectionId: number): Promise<Database[]> => {
   const params = {
-    currentPage: 1,
-    size: 200,
+    current: 1,
+    pageSize: 200,
     connection_id: connectionId,
   };
   return httpClient.get<PageData<Database>>('/database/databases', params).then((res) => {
@@ -70,7 +70,7 @@ export const fetchDynamicTableData = async (tableId: number) => {
   return httpClient.get<PageData<any>>(`/gen-table/data/${params.table_id}/${params.currentPage}/${params.pageSize}`)
 };
 
-export const fetchTableStructure = async (tableId: number): Promise<TableColumn[]> => {
+export const fetchTableStructure = async (tableId: number) => {
   const params = {
     currentPage: 1,
     pageSize: 1000,

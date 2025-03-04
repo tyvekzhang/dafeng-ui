@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { codeModify, getTableDetail } from '@/service/code_gen';
 import { GenField, GenTable } from '@/types/code_gen';
 import { message } from '@/components/GlobalToast';
-
+import { useAppSelector } from '@/stores';
 const { Option } = Select;
 
 interface CodeEditProps {
@@ -18,6 +18,7 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
   const [tableInfo, setTableInfo] = useState<GenTable>(); // 基本信息
   const [fieldInfo, setFieldInfo] = useState<GenField[]>([]); // 表格数据
   const [tableForm] = Form.useForm();
+  const { dictData } = useAppSelector((state) => state.dict);
 
   useEffect(() => {
     tableForm.setFieldsValue(tableInfo);
@@ -207,14 +208,13 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
           onChange={(newValue) => handleFieldChange(record.id, 'html_type', newValue)}
         >
           <Option value="input">文本框</Option>
-          <Option value="textarea">文本域</Option>
+          {/*<Option value="textarea">文本域</Option>*/}
           <Option value="select">下拉框</Option>
           <Option value="radio">单选框</Option>
           <Option value="checkbox">复选框</Option>
-          <Option value="datetime">日期控件</Option>
-          <Option value="imageUpload">图片上传</Option>
-          <Option value="fileUpload">文件上传</Option>
-          <Option value="editor">富文本控件</Option>
+          <Option value="datepicker">日期控件</Option>
+          {/*<Option value="fileUpload">文件上传</Option>*/}
+          {/*<Option value="editor">富文本控件</Option>*/}
         </Select>
       ),
     },
@@ -222,6 +222,35 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
       title: '字典类型',
       dataIndex: 'dict_type',
       key: 'dict_type',
+      width: '10%',
+      render: (value: string, record: GenField) => {
+        const options = [];
+        for (const key in dictData) {
+          const items = dictData[key];
+          const labels = items.map((item: { label: string; }) => item.label);
+          const displayLabel = labels.join(',');
+          // 构建正确的 option 对象
+          const option = {
+            value: key,
+            label: displayLabel
+          };
+          // 正确更新 options 数组
+          options.push(option);
+        }
+        return (
+          <Select
+            value={changedFields[record.id]?.dict_type ?? value}
+            onChange={(newValue) => handleFieldChange(record.id, 'dict_type', newValue)}
+            style={{ width: '100%' }}
+          >
+            {options.map((option) => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        );
+      }
     },
   ];
 
