@@ -222,7 +222,7 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
       title: '字典类型',
       dataIndex: 'dict_type',
       key: 'dict_type',
-      width: '10%',
+      width: '8%',
       render: (value: string, record: GenField) => {
         const options = [];
         for (const key in dictData) {
@@ -245,7 +245,9 @@ const CodeModify: React.FC<CodeEditProps> = ({ open, onClose, tableId }) => {
           >
             {options.map((option) => (
               <Option key={option.value} value={option.value}>
-                {option.label}
+                <span>{option.value}</span>
+                <span>{" "}</span>
+                <span className='text-gray-400 text-ellipsis'>{option.label}</span>
               </Option>
             ))}
           </Select>
