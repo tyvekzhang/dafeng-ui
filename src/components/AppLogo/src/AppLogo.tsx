@@ -17,7 +17,7 @@ const AppLogo: FC = () => {
   };
 
   return (
-    <div className="container mx-auto" onClick={handleClick}>
+    <div className="container mx-auto p-2" onClick={handleClick}>
       <Space className="mx-auto flex justify-center items-center">
         {/* 图标 */}
         <img className={styles.logoImg} src={logoImg} alt="logo" />

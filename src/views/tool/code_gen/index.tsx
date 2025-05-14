@@ -69,7 +69,7 @@ export default function CodeGen() {
       dataIndex: 'No',
       key: 'No',
       render: (_: number, _record: GenTableQueryResponse, rowIndex: number) => rowIndex + 1,
-      width: '8%',
+      width: '5%',
     },
     {
       title: '连接',
@@ -79,7 +79,7 @@ export default function CodeGen() {
     {
       title: '数据库',
       dataIndex: 'databaseName',
-      width: '10%',
+      width: '14%',
     },
     {
       title: '表名',

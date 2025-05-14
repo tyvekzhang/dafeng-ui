@@ -43,7 +43,7 @@ import {
   Checkbox,
   Form,
   Input,
-  Menu,
+  Menu, MenuProps,
   Modal,
   Popconfirm,
   Select,
@@ -58,6 +58,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import useStates from './style';
 import TextArea from 'antd/es/input/TextArea';
+import { nanoid } from '@reduxjs/toolkit';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
@@ -1013,6 +1014,7 @@ const DatabaseExplorer: React.FC = () => {
   const handleSqlQueryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSqlQuery(e.target.value);
   };
+
   return (
     <div className="w-full">
       <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
@@ -1030,8 +1032,7 @@ const DatabaseExplorer: React.FC = () => {
             </Button>
             <Menu
               mode="inline"
-              triggerSubMenuAction="click"
-              style={{ height: 'calc(100vh - 196px)', borderRight: 0, overflow: 'scroll' }}
+              style={{ height: 'calc(100vh - 220px)', borderRight: 0, overflow: 'scroll' }}
             >
               {connections.map((connection) => (
                 <SubMenu
