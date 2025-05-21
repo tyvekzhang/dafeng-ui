@@ -15,6 +15,15 @@ const SystemRoute: RouteObject = {
   },
   children: [
     {
+      path: 'article',
+      name: 'Article',
+      element: LazyLoad(lazy(() => import('@/views/system/article'))),
+      meta: {
+        title: '文献管理',
+        key: 'article',
+      },
+    },
+    {
       path: 'user',
       name: 'User',
       element: LazyLoad(lazy(() => import('@/views/system/user'))),
